@@ -67,10 +67,6 @@ jobs:
       continue-on-error: true 
       run: |
         make code-typing
-    - name: Validate website content (mkdocs)
-      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7') }}
-      run: |
-        make docs-validate
     - name: Pytest Fast
       if: ${{ !(matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7') }}
       run: |

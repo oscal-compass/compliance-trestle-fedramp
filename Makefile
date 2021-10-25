@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-submodules: 
-	git submodule update --init
 
 develop: submodules
 	python -m pip install -e .[dev] --upgrade --upgrade-strategy eager --
@@ -64,18 +62,6 @@ release::
 	git config --global user.email "semantic-release@github-actions"
 	semantic-release publish
 
-gen-oscal::
-	python ./scripts/gen_oscal.py
-
-docs-automation::
-	python ./scripts/website_automation.py
-
-docs-validate:: docs-automation
-	mkdocs build -c -s
-	rm -rf site
-
-docs-serve: docs-automation
-	mkdocs serve	
 
 mdformat: pre-commit-update
 	pre-commit run mdformat --all-files

@@ -54,9 +54,6 @@ jobs:
       continue-on-error: true
       run: |
         make code-typing
-    - name: Validate website content (mkdocs)
-      run: |
-        make docs-validate
 
 # This test simulates what it is like for a user to install trestle today.
 # Coverage cannot be calculated as part of
