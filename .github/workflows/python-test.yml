@@ -177,11 +177,10 @@ jobs:
         args: >
           -Dsonar.python.coverage.reportPaths=coverage.xml
           -Dsonar.tests=tests/
-          -Dsonar.sources=trestle/ 
+          -Dsonar.sources=trestle_fedramp/ 
           -Dsonar.python.version=3.7
-          -Dsonar.projectKey=compliance-trestle
+          -Dsonar.projectKey=compliance-trestle-fedramp
           -Dsonar.organization=compliance-trestle
-          -Dsonar.cpd.exclusions=trestle/oscal/*.py
     - name: SonarQube Quality Gate check
       uses: sonarsource/sonarqube-quality-gate-action@master
       # Force to fail step after specific time
