@@ -41,10 +41,10 @@ test::
 	python -m pytest --exitfirst -n auto
 
 test-cov::
-	python -m pytest --cov=trestle  --exitfirst -n auto -vv --cov-report=xml --cov-fail-under=96
+	python -m pytest --cov=trestle_fedramp  --exitfirst -n auto -vv --cov-report=xml --cov-fail-under=96
 
 test-all-random::
-	python -m pytest --cov=trestle --cov-report=xml --random-order
+	python -m pytest --cov=trestle_fedramp --cov-report=xml --random-order
 
 test-verbose:
 	python -m pytest  -vv -n auto
@@ -65,6 +65,20 @@ release::
 
 mdformat: pre-commit-update
 	pre-commit run mdformat --all-files
+
+
+fedramp-copy:
+	mkdir -p trestle_fedramp/resources/fedramp-source/content/baselines/rev4
+	cp -R fedramp-source/dist/content/baselines/rev4/xml trestle_fedramp/resources/fedramp-source/content/baselines/rev4/
+	mkdir -p trestle_fedramp/resources/fedramp-source/content/resources
+	cp -R fedramp-source/dist/content/resources/xml trestle_fedramp/resources/fedramp-source/content/resources/
+	mkdir -p trestle_fedramp/resources/fedramp-source/vendor
+	cp ssp.xsl trestle_fedramp/resources/fedramp-source/
+	cp fedramp-source/vendor/svrl2html.xsl trestle_fedramp/resources/fedramp-source/vendor/
+	mkdir -p trestle_fedramp/resources/nist-source/xml
+	cp -R nist-source/xml/convert trestle_fedramp/resources/nist-source/xml/
+	cp oscal_ssp_json-to-xml-converter-new.xsl trestle_fedramp/resources/nist-source/xml/convert/
+
 
 # POSIX ONLY
 clean::
