@@ -17,7 +17,6 @@
 
 import pathlib
 
-
 JSON_FEDRAMP_SSP_PATH = pathlib.Path('fedramp-source/dist/content/templates/ssp/json/').resolve()
 JSON_FEDRAMP_SSP_NAME = 'FedRAMP-SSP-OSCAL-Template.json'
 XML_FEDRAMP_SSP_PATH = pathlib.Path('fedramp-source/dist/content/templates/ssp/xml/').resolve()

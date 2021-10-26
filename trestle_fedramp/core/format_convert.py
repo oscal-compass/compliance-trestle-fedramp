@@ -22,8 +22,9 @@ from pkg_resources import resource_filename
 
 import saxonc
 
-import trestle_fedramp.const as const
 from trestle.core.err import TrestleError
+
+import trestle_fedramp.const as const
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -35,8 +36,9 @@ class JsonXmlConverter:
 
     def __init__(self):
         """Initialize JSON to XML converter."""
-        self.ssp_j_x_xsl_path = pathlib.Path(resource_filename('trestle_fedramp.resources',
-                                                               const.NIST_SSP_JSON_XML_XSL)).resolve()
+        self.ssp_j_x_xsl_path = pathlib.Path(
+            resource_filename('trestle_fedramp.resources', const.NIST_SSP_JSON_XML_XSL)
+        ).resolve()
         logger.info(f'SSP converter from JSON to XML: {self.ssp_j_x_xsl_path}')
 
         self.initial_template = const.NIST_INITIAL_TEMPLATE

@@ -21,8 +21,9 @@ from pkg_resources import resource_filename
 
 import saxonc
 
-import trestle_fedramp.const as const
 from trestle.core.err import TrestleError
+
+import trestle_fedramp.const as const
 from trestle_fedramp.core.format_convert import JsonXmlConverter
 
 logger = logging.getLogger(__name__)
