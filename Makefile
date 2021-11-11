@@ -41,7 +41,7 @@ test::
 	python -m pytest --exitfirst -n auto
 
 test-cov::
-	python -m pytest --cov=trestle_fedramp  --exitfirst -n auto -vv --cov-report=xml --cov-fail-under=0
+	python -m pytest -vv --cov=trestle_fedramp -n auto  --cov-report=xml --cov-fail-under=0
 
 test-all-random::
 	python -m pytest --cov=trestle_fedramp --cov-report=xml --random-order

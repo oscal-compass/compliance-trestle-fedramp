@@ -67,7 +67,7 @@ def test_validate_ssp(tmp_path: pathlib.Path) -> None:
     assert not success
 
 
-def test_validate_ssp_worng_format(tmp_path: pathlib.Path) -> None:
+def test_validate_ssp_wrong_format(tmp_path: pathlib.Path) -> None:
     """Inavlid format of content."""
     file_path = pathlib.Path(test_utils.JSON_FEDRAMP_SSP_PATH) / test_utils.JSON_FEDRAMP_SSP_NAME
     with open(file_path, 'r') as f:
