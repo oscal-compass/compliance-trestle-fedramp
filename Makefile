@@ -41,7 +41,7 @@ test::
 	python -m pytest --exitfirst -n auto
 
 test-cov::
-	python -m pytest --cov=trestle_fedramp  --exitfirst -n auto -vv --cov-report=xml --cov-fail-under=96
+	python -m pytest --cov=trestle_fedramp  --exitfirst -n auto -vv --cov-report=xml --cov-fail-under=0
 
 test-all-random::
 	python -m pytest --cov=trestle_fedramp --cov-report=xml --random-order
@@ -93,7 +93,7 @@ clean::
 	find . | grep -E "__pycache__|\.pyc|\.pyo" | xargs rm -rf
 
 pylint:
-	pylint trestle
+	pylint trestle_fedramp
 
 pylint-test:
 	pylint tests --rcfile=.pylintrc_tests
