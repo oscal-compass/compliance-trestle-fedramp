@@ -38,10 +38,10 @@ code-typing:
 	mypy --pretty trestle
 
 test::
-	python -m pytest --exitfirst -n auto
+	python -m pytest -vvvv --exitfirst -n auto
 
 test-cov::
-	python -m pytest -vv --cov=trestle_fedramp -n auto  --cov-report=xml --cov-fail-under=0
+	python -m pytest -vvvv --cov=trestle_fedramp -n auto  --cov-report=xml --cov-fail-under=0
 
 test-all-random::
 	python -m pytest --cov=trestle_fedramp --cov-report=xml --random-order

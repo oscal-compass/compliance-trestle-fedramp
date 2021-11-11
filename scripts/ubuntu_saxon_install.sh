@@ -21,8 +21,8 @@ echo 'See .github/workflows/python-test.yml'
 wget -O /tmp/saxon.zip https://www.saxonica.com/saxon-c/libsaxon-HEC-setup64-v1.2.1.zip \
   && unzip /tmp/saxon.zip -d /tmp \
   && (echo "/opt/saxonica" && cat) | /tmp/libsaxon-HEC-setup64-v1.2.1 \
-  && ln -s /opt/saxonica/libsaxonhec.so /usr/lib/libsaxonhec.so \
-  && ln -s /opt/saxonica/rt /usr/lib/rt
+  && sudo ln -s /opt/saxonica/libsaxonhec.so /usr/lib/libsaxonhec.so \
+  && sudo ln -s /opt/saxonica/rt /usr/lib/rt
 
 echo 'Building saxon python bindings'
 cd /opt/saxonica/Saxon.C.API/python-saxon \
