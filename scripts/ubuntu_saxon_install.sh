@@ -16,6 +16,8 @@
 echo 'Installing saxon-C'
 echo 'Note this script presumes pythonpath and LD_LIBRARY_PATH are pre-configured.'
 echo 'See .github/workflows/python-test.yml'
+
+
 wget -O /tmp/saxon.zip https://www.saxonica.com/saxon-c/libsaxon-HEC-setup64-v1.2.1.zip \
   && unzip /tmp/saxon.zip -d /tmp \
   && (echo "/opt/saxonica" && cat) | /tmp/libsaxon-HEC-setup64-v1.2.1 \

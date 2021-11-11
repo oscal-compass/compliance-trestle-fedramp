@@ -130,13 +130,16 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
         scripts/ubuntu_saxon_install.sh
-        echo "LD_LIBRARY_PATH=${{ env.LD_LIBRARY_PATH}}:/usr/lib/rt/lib/amd64" >> $GITHUB_ENV
-        echo "PYTHON_PATH=${{ env.PYTHON_PATH}}:/opt/saxonica/Saxon.C.API/python-saxon" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=${{ env.LD_LIBRARY_PATH }}:/usr/lib/rt/lib/amd64" >> $GITHUB_ENV
+        echo "PYTHONPATH=${{ env.PYTHONPATH }}:/opt/saxonica/Saxon.C.API/python-saxon" >> $GITHUB_ENV
     # MAC OS INSTALL
     - name: Install Saxon (mac OS)
       if: ${{ matrix.os == 'macos-latest' }}
       run: |
-        env
+        scripts/mac_saxon_install.sh
+        echo "JET_HOME=/usr/local/lib/rt" >> $GITHUB_ENV
+        echo "DYLD_LIBRARY_PATH=/usr/local/lib/rt/lib/jetvm:${{ env.DYLD_LIBRARY_PATH }}" >> $GITHUB_ENV
+        echo "PYTHONPATH=${{ env.PYTHONPATH }}:/opt/saxonica/Saxon.C.API/python-saxon" >> $GITHUB_ENV
     # Windows Dev tools
     - name: Install microsoft dev tools
       if: ${{ matrix.os == 'windows-latest' }}
