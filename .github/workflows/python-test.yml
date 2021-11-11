@@ -129,17 +129,17 @@ jobs:
          ${{ matrix.os }}-${{ matrix.python-version }}-pip-
   
     - name: Install Saxon (ubuntu)
-      if: ${{ !(matrix.os == 'ubuntu-latest') }}
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
         env
         scripts/ubuntu_saxon_install.sh
   
     - name: Install Saxon (mac OS)
-      if: ${{ !(matrix.os == 'macos-latest') }}
+      if: ${{ matrix.os == 'macos-latest' }}
       run: |
         env
     - name: Install Saxon (Windows)
-      if: ${{ !(matrix.os == 'windows-latest') }}
+      if: ${{ matrix.os == 'windows-latest' }}
       run: |
         echo ${env}
     - name: Install build tools
