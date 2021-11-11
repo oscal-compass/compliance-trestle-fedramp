@@ -96,16 +96,10 @@ jobs:
         include:
         - os: ubuntu-latest
           path: ~/.cache/pip
-        - os: macos-latest
-          path: ~/Library/Caches/pip
-          env: 
-            LD_LIBRARY_PATH: "/usr/lib/rt/lib/maco"
-            PYTHONPATH: "/opt/saxonica/Saxon.C.API/python-saxon"
-        - os: windows-latest
-          path: ~\AppData\Local\pip\Cache
-          env: 
-            LD_LIBRARY_PATH: "/usr/lib/rt/lib/windows"
-            PYTHONPATH: "/opt/saxonica/Saxon.C.API/python-saxon"
+        # - os: macos-latest
+        #   path: ~/Library/Caches/pip
+        # - os: windows-latest
+        #   path: ~\AppData\Local\pip\Cache
         python-version: [3.7, 3.8, 3.9]
     steps:
     - name: Don't mess with line endings
