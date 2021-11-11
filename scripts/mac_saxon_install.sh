@@ -19,8 +19,7 @@ echo 'See .github/workflows/python-test.yml'
 
 # Altered for  mac os unzip behaviour
 wget -O /tmp/saxon.zip https://www.saxonica.com/saxon-c/libsaxon-HEC-mac-setup-v1.2.1.zip \
-  && unzip /tmp/saxon.zip -d /tmp/saxon \
-  && (echo "/opt/saxonica" && cat) | /tmp/saxon \
+  && unzip /tmp/saxon.zip -d /opt/saxonica \ 
   && sudo ln -s /opt/saxonica/libsaxonhec.dylib /usr/lib/libsaxonhec.dylib \
   && sudo ln -s /opt/saxonica/rt /usr/lib/rt
 
