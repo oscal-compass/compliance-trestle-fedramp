@@ -143,12 +143,13 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
 
     # download saxonc with the built-in powershell command rather than wget.
-    - name: download saxonc
+    - name: Download saxonc (windows)
+      if: ${{ matrix.os == 'windows-latest' }}
       run: |
         Invoke-WebRequest -Uri https://www.saxonica.com/saxon-c/libsaxon-HEC-win-setup-v1.2.1.exe -OutFile saxon.exe
         
     # install saxonc in non-interactive batch mode and specify the destination directory
-    - name: Install and build saxon
+    - name: Install and build saxon (windows)
       if: ${{ matrix.os == 'windows-latest' }}
       run: |
         .\saxon.exe /batch /dest "D:\a\action-play\action-play\sax"
