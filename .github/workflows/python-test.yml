@@ -131,7 +131,7 @@ jobs:
     - name: Install Saxon (mac OS)
       if: ${{ matrix.os == 'macos-latest' }}
       run: |
-        scripts/mac_saxon_install.sh
+        bash scripts/mac_saxon_install.sh
         echo "JET_HOME=/opt/saxonica/rt" >> $GITHUB_ENV
         echo "DYLD_LIBRARY_PATH=/opt/saxonica/rt/lib/jetvm:/opt/saxonica:${{ env.DYLD_LIBRARY_PATH }}" >> $GITHUB_ENV
         echo "PYTHONPATH=${{ env.PYTHONPATH }}:/opt/saxonica/Saxon.C.API/python-saxon" >> $GITHUB_ENV
