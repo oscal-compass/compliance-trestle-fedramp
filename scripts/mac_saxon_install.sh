@@ -21,7 +21,6 @@ echo 'See .github/workflows/python-test.yml'
 wget -O /tmp/saxon.zip https://www.saxonica.com/saxon-c/libsaxon-HEC-mac-setup-v1.2.1.zip \
   && mkdir /opt/saxonica \
   && unzip /tmp/saxon.zip -d /opt/saxonica \
-  && cp -R /tmp/libsaxon-HEC-mac-setup-v1.2.1/ /opt/saxonica/ \
   && sudo ln -s /opt/saxonica/libsaxonhec.dylib /usr/local/lib/libsaxonhec.dylib \
   && sudo ln -s /opt/saxonica/rt /usr/local/lib/rt
 
