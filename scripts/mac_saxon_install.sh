@@ -18,11 +18,12 @@ echo 'Note this script presumes pythonpath and LD_LIBRARY_PATH are pre-configure
 echo 'See .github/workflows/python-test.yml'
 
 # Altered for  mac os unzip
-wget -O /tmp/saxon.zip https://www.saxonica.com/saxon-c/libsaxon-HEC-mac-setup-v1.2.1.zip
-unzip /tmp/saxon.zip -d /tmp/saxon
+wget -O /tmp/saxon.zip https://www.saxonica.com/saxon-c/libsaxon-HEC-mac-setup-v1.2.1.zip \
+  && unzip /tmp/saxon.zip -d /tmp \
+  && (echo "/opt/saxonica" && cat) | /tmp/libsaxon-HEC-mac-setup-v1.2.1 \
+  && sudo ln -s /opt/saxonica/libsaxonhec.dylib /usr/local/lib/libsaxonhec.dylib \
+  && sudo ln -s /opt/saxonica/rt /usr/local/lib/rt
 
-
-sudo mv /tmp/saxon /opt/saxonica
 
 echo 'Building saxon python bindings'
 cd /opt/saxonica/Saxon.C.API/python-saxon \

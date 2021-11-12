@@ -57,7 +57,7 @@ class FedrampValidator:
         logger.debug(f'SSP XSL file: {self.ssp_xsl_path}')
         logger.debug(f'SVRL XSL file: {self.svrl_xsl_path}')
 
-    def validate_ssp(self, ssp_content: str, data_format: str) -> bool:
+    def validate_ssp(self, ssp_content: str, data_format: str, output_dir: pathlib.Path = pathlib.Path.cwd()) -> bool:
         """Validate the given SSP content as per FedRAMP validation rules."""
         if not self.ssp_xsl_path.exists():
             raise TrestleError(f'SSP validation (xsl file) {self.ssp_xsl_path} does not exist')
@@ -92,16 +92,16 @@ class FedrampValidator:
 
         value = xpath_proc.evaluate('//*:failed-assert')
         if value is not None:
-            output = 'fedramp-validation-report.xml'
-            with open(output, 'w') as f:
+            output = output_dir / 'fedramp-validation-report.xml'
+            with open(str(output), 'w') as f:
                 f.write(str(value))
                 logger.info(f'Failed assertion written to file: {output}')
 
             # transform svrl output to html
             if self.svrl_xsl_path is not None:
                 html = xslt_proc.transform_to_string(xdm_node=svrl_node, stylesheet_file=str(self.svrl_xsl_path))
-                output = 'fedramp-validation-report.html'
-                with open(output, 'w') as f:
+                output = output_dir / 'fedramp-validation-report.html'
+                with open(str(output), 'w') as f:
                     f.write(html)
                     logger.info(f'HTML output of Failed assertion written to file: {output}')
             # there are failures; validation failed
