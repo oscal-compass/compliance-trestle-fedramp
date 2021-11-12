@@ -18,8 +18,9 @@ echo 'Note this script presumes pythonpath and LD_LIBRARY_PATH are pre-configure
 echo 'See .github/workflows/python-test.yml'
 
 # Altered for  mac os unzip
-wget -O /tmp/saxon.zip https://www.saxonica.com/saxon-c/libsaxon-HEC-mac-setup-v1.2.1.zip \
-  && sudo unzip /tmp/saxon.zip -d /opt/saxonica \
+wget -O /tmp/saxon.zip https://www.saxonica.com/saxon-c/libsaxon-HEC-mac-setup-v1.2.1.zip
+unzip /tmp/saxon.zip -d /tmp/saxon
+sudo mv /tmp/saxon /opt/saxonica
 sudo ln -s /opt/saxonica/libsaxonhec.dylib /usr/lib/libsaxonhec.dylib \
 sudo ln -s /opt/saxonica/rt /usr/lib/rt
 
