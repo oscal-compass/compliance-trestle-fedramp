@@ -57,8 +57,11 @@ class FedrampValidator:
         logger.debug(f'SSP XSL file: {self.ssp_xsl_path}')
         logger.debug(f'SVRL XSL file: {self.svrl_xsl_path}')
 
-    def validate_ssp(self, ssp_content: str, data_format: str, output_dir: pathlib.Path = pathlib.Path.cwd()) -> bool:
+    def validate_ssp(self, ssp_content: str, data_format: str, output_dir: pathlib.Path = None) -> bool:
         """Validate the given SSP content as per FedRAMP validation rules."""
+        if output_dir is None:
+            output_dir = pathlib.Path.cwd()
+
         if not self.ssp_xsl_path.exists():
             raise TrestleError(f'SSP validation (xsl file) {self.ssp_xsl_path} does not exist')
 

@@ -27,7 +27,6 @@ from trestle.utils import fs
 
 from trestle_fedramp.core.fedramp import FedrampValidator
 
-
 logger = logging.getLogger(__name__)
 
 

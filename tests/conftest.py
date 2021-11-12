@@ -17,10 +17,11 @@
 
 import os
 import pathlib
-import pytest
-from pytest import MonkeyPatch
 import sys
 from typing import Iterator
+
+import pytest
+from pytest import MonkeyPatch
 
 from trestle.cli import Trestle
 from trestle.core.err import TrestleError
