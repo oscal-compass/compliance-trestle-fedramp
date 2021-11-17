@@ -82,6 +82,13 @@ jobs:
     - name: Install build tools
       run: |
         make develop
+    # SAXON BUILD SCRIPTS
+    - name: Install Saxon (ubuntu)
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: |
+        scripts/ubuntu_saxon_install.sh
+        echo "LD_LIBRARY_PATH=${{ env.LD_LIBRARY_PATH }}:/usr/lib/rt/lib/amd64" >> $GITHUB_ENV
+        echo "PYTHONPATH=${{ env.PYTHONPATH }}:/opt/saxonica/Saxon.C.API/python-saxon" >> $GITHUB_ENV
     - name: Run binary tests
       run: |
         make test-bdist
