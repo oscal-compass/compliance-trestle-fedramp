@@ -92,10 +92,13 @@ jobs:
     - name: Run binary tests
       # Shell transitions here require an explicit export of the variable.
       run: |
+        echo 'GITHUB ENV'
+        echo $GITHUB_ENV
+        echo 'GITHUB ENV'
         echo ${{ env.SAXON_PYTHONPATH }}
-        echo SAXON_PYTHONPATH
+        echo $SAXON_PYTHONPATH
         export SAXON_PYTHONPATH=${{ env.SAXON_PYTHONPATH }}
-        echo SAXON_PYTHONPATH
+        echo $SAXON_PYTHONPATH
         
         export LD_LIBRARY_PATH=${{ env.LD_LIBRARY_PATH }}
         make test-bdist
