@@ -38,5 +38,5 @@ cd tmp_bin_test
 ln -s ../tests
 ln -s ../fedramp-source 
 ln -s ../nist-source
-python -m pytest -v --exitfirst
+python -m pytest tests/ -v --exitfirst
 
