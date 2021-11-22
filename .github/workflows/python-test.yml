@@ -93,7 +93,7 @@ jobs:
       # Shell transitions here require an explicit export of the variable.
       run: |
         echo 'GITHUB ENV'
-        echo $GITHUB_ENV
+        env
         echo 'GITHUB ENV'
         echo ${{ env.SAXON_PYTHONPATH }}
         echo $SAXON_PYTHONPATH
