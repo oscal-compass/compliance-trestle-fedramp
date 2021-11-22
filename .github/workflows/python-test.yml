@@ -89,6 +89,8 @@ jobs:
         scripts/ubuntu_saxon_install.sh
         echo "LD_LIBRARY_PATH=${{ env.LD_LIBRARY_PATH }}:/usr/lib/rt/lib/amd64" >> $GITHUB_ENV
         echo "SAXON_PYTHONPATH=/opt/saxonica/Saxon.C.API/python-saxon" >> $GITHUB_ENV
+    - name: PRINT GITHUB ENV
+      uses: hmarr/debug-action@v2
     - name: Run binary tests
       # Shell transitions here require an explicit export of the variable.
       run: |
