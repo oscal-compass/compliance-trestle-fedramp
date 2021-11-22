@@ -36,5 +36,7 @@ python -m pip install pytest
 # this is required to get away from the damn base directory
 cd tmp_bin_test
 ln -s ../tests
+ln -s ../fedramp-source 
+ln -s ../nist-source
 python -m pytest -v --exitfirst
 
