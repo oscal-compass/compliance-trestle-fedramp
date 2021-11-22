@@ -92,16 +92,8 @@ jobs:
     - name: PRINT GITHUB ENV
       uses: hmarr/debug-action@v2
     - name: Run binary tests
-      # Shell transitions here require an explicit export of the variable.
       run: |
-        echo 'GITHUB ENV'
-        env
-        echo 'GITHUB ENV'
-        echo ${{ env.SAXON_PYTHONPATH }}
-        echo $SAXON_PYTHONPATH
         export SAXON_PYTHONPATH=${{ env.SAXON_PYTHONPATH }}
-        echo $SAXON_PYTHONPATH
-        
         export LD_LIBRARY_PATH=${{ env.LD_LIBRARY_PATH }}
         make test-bdist
 
