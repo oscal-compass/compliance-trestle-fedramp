@@ -90,7 +90,10 @@ jobs:
         echo "LD_LIBRARY_PATH=${{ env.LD_LIBRARY_PATH }}:/usr/lib/rt/lib/amd64" >> $GITHUB_ENV
         echo "SAXON_PYTHONPATH=/opt/saxonica/Saxon.C.API/python-saxon" >> $GITHUB_ENV
     - name: Run binary tests
+      # Shell transitions here require an explicit export of the variable.
       run: |
+        export SAXON_PYTHONPATH=${{ env.SAXON_PYTHONPATH }}
+        export LD_LIBRARY_PATH=${{ env.LD_LIBRARY_PATH }}
         make test-bdist
 
   test:

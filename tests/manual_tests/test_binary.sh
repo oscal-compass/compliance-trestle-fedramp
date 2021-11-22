@@ -15,7 +15,7 @@
 # This script is designed to test whether the bdist is behaving correctly.
 # Note that it encodes the stanndard testing protocol and should be updated.
 
-
+echo $SAXON_PYTHONPATH
 mkdir tmp_bin_test
 echo '---- setting up venv ----' 
 python -m venv tmp_bin_test/venv
