@@ -25,7 +25,7 @@ echo '---- Buiilding bdist ----'
 python setup.py bdist_wheel
 echo '---- Buiilding bdist DONE ----'
 echo '---- Enabling venv ----'
-. tmp_bin_test/venv/bin/activate
+source tmp_bin_test/venv/bin/activate
 echo '---- setting PYTHON PATH  ----'
 echo $PYTHONPATH
 export PYTHONPATH=$PYTHONPATH:$SAXON_PYTHONPATH
