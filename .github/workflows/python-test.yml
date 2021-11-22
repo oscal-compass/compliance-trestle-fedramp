@@ -84,7 +84,6 @@ jobs:
         make develop
     # SAXON BUILD SCRIPTS
     - name: Install Saxon (ubuntu)
-      if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
         scripts/ubuntu_saxon_install.sh
         echo "LD_LIBRARY_PATH=${{ env.LD_LIBRARY_PATH }}:/usr/lib/rt/lib/amd64" >> $GITHUB_ENV
