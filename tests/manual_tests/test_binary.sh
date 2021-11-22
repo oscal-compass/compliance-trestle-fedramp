@@ -17,14 +17,23 @@
 
 
 mkdir tmp_bin_test
+echo '---- setting up venv ----' 
 python -m venv tmp_bin_test/venv
+echo '---- venv setup done ----'
+ls tmp_bin_test
+echo '---- Buiilding bdist ----'
 python setup.py bdist_wheel
-source tmp_bin_test/venv/bin/activate
+echo '---- Buiilding bdist DONE ----'
+echo '---- Enabling venv ----'
+. tmp_bin_test/venv/bin/activate
+echo '---- setting PYTHON PATH  ----'
 export PYTHONPATH=$PYTHONPATH:$SAXON_PYTHONPATH
+echo $PYTHONPATH
+echo '----  PRINTED PYTHON PATH  ----'
 python -m pip install dist/*.whl
-python -m pip install pytest-xdist
+python -m pip install pytest
 # this is required to get away from the damn base directory
 cd tmp_bin_test
 ln -s ../tests
-python -m pytest --exitfirst -n auto
+python -m pytest -v --exitfirst
 
