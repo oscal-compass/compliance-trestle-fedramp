@@ -27,6 +27,7 @@ echo '---- Buiilding bdist DONE ----'
 echo '---- Enabling venv ----'
 . tmp_bin_test/venv/bin/activate
 echo '---- setting PYTHON PATH  ----'
+echo $PYTHONPATH
 export PYTHONPATH=$PYTHONPATH:$SAXON_PYTHONPATH
 echo $PYTHONPATH
 echo '----  PRINTED PYTHON PATH  ----'
