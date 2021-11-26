@@ -66,7 +66,7 @@ class ValidateCmd(CommandPlusDocs):
                 return 1
             data_str = json.dumps(data)
             validator = FedrampValidator()
-            valid = validator.validate_ssp(data_str, model_file.split('.')[-1], output_dir)
+            valid = validator.validate_ssp(data_str, str(model_file).split('.')[-1], output_dir)
         except Exception as error:
             logger.error(f'Unexpected error: {error}')
             return 1
