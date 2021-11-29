@@ -15,6 +15,7 @@
 .settings
 .project
 .pydevproject
+.env
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
@@ -36,6 +37,7 @@ _*/
 build
 dist
 tmp
+pip-wheel*
 
 .coverage*
 coverage.xml
