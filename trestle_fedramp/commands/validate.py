@@ -22,7 +22,7 @@ import pathlib
 
 import trestle.utils.log as log
 from trestle.core import parser
-from trestle.core.commands.command_docs import CommandPlusDocs
+from trestle.core.commands.command_docs import CommandBase
 from trestle.utils import fs
 
 from trestle_fedramp.core.fedramp import FedrampValidator
@@ -30,7 +30,8 @@ from trestle_fedramp.core.fedramp import FedrampValidator
 logger = logging.getLogger(__name__)
 
 
-class ValidateCmd(CommandPlusDocs):
+class ValidateCmd(CommandBase):
+
     """Validate contents of an OSCAL model based on FedRAMP specifications."""
 
     name = 'fedramp-validate'
