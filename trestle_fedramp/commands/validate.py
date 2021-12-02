@@ -31,7 +31,6 @@ logger = logging.getLogger(__name__)
 
 
 class ValidateCmd(CommandBase):
-
     """Validate contents of an OSCAL model based on FedRAMP specifications."""
 
     name = 'fedramp-validate'
