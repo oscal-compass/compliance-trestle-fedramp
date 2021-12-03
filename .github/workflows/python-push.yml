@@ -8,26 +8,73 @@ on:
       - main
 
 jobs:
-  build:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Don't mess with line endings
+      run: |
+        git config --global core.autocrlf false
+    - name: Don't mess with line endings
+      run: |
+        git config --global core.autocrlf false
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ubuntu-latest-3.9-pip-${{ hashFiles('setup.cfg') }}
+        restore-keys: |
+          ubuntu-latest-3.9-pip-
+    - name: Install build tools
+      run: |
+        make develop
+    - name: Setup pre-commit
+      run: |
+        make pre-commit
+    - name: Install dependencies
+      run: |
+        make install
+    - name: Run md document formatting (mdformat)
+      run: |
+        make mdformat
+    - name: Run code formatting (yapf)
+      run: |
+        make code-format
+    - name: Run code linting (flake8)
+      run: |
+        make code-lint
+    - name: Run code typing check (mypy)
+      continue-on-error: true
+      run: |
+        make code-typing
+
+  test:
+    # This test
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
+        #os: [ubuntu-latest, macos-latest, windows-latest]
         include:
         - os: ubuntu-latest
           path: ~/.cache/pip
         - os: macos-latest
           path: ~/Library/Caches/pip
-        - os: windows-latest
-          path: ~\AppData\Local\pip\Cache
+        # - os: windows-latest
+        #   path: ~\AppData\Local\pip\Cache
         python-version: [3.7, 3.8, 3.9]
-
     steps:
-    - name: Don't mess with  line endings
+    - name: Don't mess with line endings
       run: |
         git config --global core.autocrlf false
     - uses: actions/checkout@v2
       with:
+        fetch-depth: 0
         submodules: true
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
@@ -40,33 +87,44 @@ jobs:
         restore-keys: |
          ${{ matrix.os }}-${{ matrix.python-version }}-pip-
 
+    # SAXON BUILD SCRIPTS
+    - name: Install Saxon (ubuntu)
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: |
+        scripts/ubuntu_saxon_install.sh
+        echo "LD_LIBRARY_PATH=${{ env.LD_LIBRARY_PATH }}:/usr/lib/rt/lib/amd64" >> $GITHUB_ENV
+        echo "PYTHONPATH=${{ env.PYTHONPATH }}:/opt/saxonica/Saxon.C.API/python-saxon" >> $GITHUB_ENV
+    # MAC OS INSTALL
+    - name: Install Saxon (mac OS)
+      if: ${{ matrix.os == 'macos-latest' }}
+      run: |
+        bash scripts/mac_saxon_install.sh
+        echo "JET_HOME=/opt/saxonica/rt" >> $GITHUB_ENV
+        echo "DYLD_LIBRARY_PATH=/opt/saxonica/rt/lib/jetvm:/opt/saxonica:${{ env.DYLD_LIBRARY_PATH }}" >> $GITHUB_ENV
+        echo "PYTHONPATH=${{ env.PYTHONPATH }}:/opt/saxonica/Saxon.C.API/python-saxon" >> $GITHUB_ENV
+    # Windows Dev tools
+    - name: Install microsoft dev tools
+      if: ${{ matrix.os == 'windows-latest' }}
+      uses: ilammy/msvc-dev-cmd@v1
+
+    # download saxonc with the built-in powershell command rather than wget.
+    - name: Download saxonc (windows)
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: |
+        Invoke-WebRequest -Uri https://www.saxonica.com/saxon-c/libsaxon-HEC-win-setup-v1.2.1.exe -OutFile saxon.exe
+        
+    # install saxonc in non-interactive batch mode and specify the destination directory
+    - name: Install and build saxon (windows)
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: |
+        .\saxon.exe /batch /dest "D:\a\action-play\action-play\sax"
+        cd "D:\a\action-play\action-play\sax\Saxon.C.API\python-saxon"
+        python saxon-setup.py build_ext -if
+
+        
     - name: Install build tools
       run: |
         make develop
-    - name: Setup pre-commit
-      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7') }}
-      run: |
-        make pre-commit
-    - name: Install dependencies
-      run: |
-        make install
-    - name: Run md document formatting (mdformat)
-      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7') }}
-      run: |
-        make mdformat
-    - name: Run code formatting (yapf)
-      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7') }}
-      run: |
-        make code-format
-    - name: Run code linting (flake8)
-      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7') }}
-      run: |
-        make code-lint
-    - name: Run code typing check (mypy)
-      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7') }}
-      continue-on-error: true 
-      run: |
-        make code-typing
     - name: Pytest Fast
       if: ${{ !(matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7') }}
       run: |
@@ -75,16 +133,69 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7' }}
       run: |
         make test-cov
-    - name: Push code-cov
-      if: ${{ !(matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7') }}
-      uses: codecov/codecov-action@v1
-      with: 
-        token: ${{ secrets.CODECOV_TOKEN }}
-        file: ./coverage.xml
+
+    - name: Upload artifact
+      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7' }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: coverage
+        path: coverage.xml
+
+  sonar:
+    if: github.repository == 'IBM/compliance-trestle-fedramp'
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+    - name: Don't mess with line endings
+      run: |
+        git config --global core.autocrlf false
+    - name: Don't mess with line endings
+      run: |
+        git config --global core.autocrlf false
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ubuntu-latest-3.9-pip-${{ hashFiles('setup.cfg') }}
+        restore-keys: |
+          ubuntu-latest-3.9-pip-
+    - name: Install build tools
+      run: |
+        make develop
+    - name: Get coverage
+      uses: actions/download-artifact@v2
+      with:
+        name: coverage
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.python.coverage.reportPaths=coverage.xml
+          -Dsonar.tests=tests/
+          -Dsonar.sources=trestle_fedramp/ 
+          -Dsonar.python.version=3.7
+          -Dsonar.projectKey=compliance-trestle-fedramp
+          -Dsonar.organization=compliance-trestle
+    - name: SonarQube Quality Gate check
+      uses: sonarsource/sonarqube-quality-gate-action@master
+      # Force to fail step after specific time
+      timeout-minutes: 5
+      env:
+       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
   deploy:
 
     runs-on: ubuntu-latest
-    needs: build
+    needs: sonar
     if: github.ref == 'refs/heads/main' && github.repository == 'IBM/compliance-trestle-fedramp'
     steps:
     - uses: actions/checkout@v2
