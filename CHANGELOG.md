@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.0 (2021-12-03)
+### Feature
+* Added fedramp validation code ([#2](https://github.com/IBM/compliance-trestle-fedramp/issues/2)) ([`1c365ab`](https://github.com/IBM/compliance-trestle-fedramp/commit/1c365abacd95f38490966e399dc7e868aeedb076))
+
+### Fix
+* Fedramp validate command to extend from CommandBase ([#8](https://github.com/IBM/compliance-trestle-fedramp/issues/8)) ([`caf61ae`](https://github.com/IBM/compliance-trestle-fedramp/commit/caf61aeefca536510b95b8377b1314ee0792392e))
+* Correct build pipeline for prod ([#7](https://github.com/IBM/compliance-trestle-fedramp/issues/7)) ([`533fda9`](https://github.com/IBM/compliance-trestle-fedramp/commit/533fda909103c65ec0e0709b844eeed9eb45d66d))
+* Model extension ([#5](https://github.com/IBM/compliance-trestle-fedramp/issues/5)) ([`1c20dd5`](https://github.com/IBM/compliance-trestle-fedramp/commit/1c20dd5c824cadeb5b36aa8fbad6bba2b4430dc8))
+
 ## v0.1.0 (2021-11-11)
 ### Feature
 * Add changelog marker for semantic release. ([`8905afd`](https://github.com/IBM/compliance-trestle-fedramp/commit/8905afd00493124ed5f32c79966a87cdf568ae48))
