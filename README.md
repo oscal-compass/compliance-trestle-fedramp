@@ -6,7 +6,7 @@ This plugin provides APIs and commands for validating a FedRAMP compliant SSP (i
 
 ## Python codebase, easy installation via pip
 
-compliance-trestle-fedramp currently runs on  python platforms on Linux and Mac. Windows support is planned to be added soon. It is available on PyPi so it is easily installed via pip.  It is under active development and new releases are made available regularly. 
+compliance-trestle-fedramp currently runs on  python platforms on Linux and Mac. Windows support is planned to be added soon. It is available on PyPi so it is easily installed via pip.  It is under active development and new releases are made available regularly.
 
 It is dependent on SaxonC and requires it to be installed and configured on the system beforehand. It has been tested with [Saxon-HE/C v1.2.1](https://www.saxonica.com/saxon-c/index.xml). The Python extension for SaxonC also needs to be setup as trestle-fedramp uses the Python interface for invoking functionalities of SaxonC.
 
@@ -16,7 +16,7 @@ A tutorial on how this plugin is created can be found [here](https://ibm.github.
 
 ## Development status
 
-Compliance trestle fedramp is currently in beta. The expectation is that in ongoing work there may be un-announced changes that are breaking within the trestle-fedramp codebase. 
+Compliance trestle fedramp is currently in beta. The expectation is that in ongoing work there may be un-announced changes that are breaking within the trestle-fedramp codebase.
 
 ## Contributing to Trestle-fedramp
 
