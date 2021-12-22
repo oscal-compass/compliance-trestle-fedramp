@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v0.2.1 (2021-12-22)
+### Fix
+* Updated readme.md ([#10](https://github.com/IBM/compliance-trestle-fedramp/issues/10)) ([`5ad08fa`](https://github.com/IBM/compliance-trestle-fedramp/commit/5ad08faf0ce212e1d7926e5e12df4913e6fba873))
+
 ## v0.2.0 (2021-12-03)
 ### Feature
 * Added fedramp validation code ([#2](https://github.com/IBM/compliance-trestle-fedramp/issues/2)) ([`1c365ab`](https://github.com/IBM/compliance-trestle-fedramp/commit/1c365abacd95f38490966e399dc7e868aeedb076))
