@@ -67,7 +67,7 @@ repos:
         files: "^(trestle_fedramp)"
         stages: [commit]
   - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.10
+    rev: 0.7.11
     hooks:
     - id: mdformat
       exclude: "CHANGELOG.md"
