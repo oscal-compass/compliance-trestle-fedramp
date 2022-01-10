@@ -1,13 +1,13 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1  # Use the ref you want to point at
+    rev: v4.1.0  # Use the ref you want to point at
     hooks:
       - id: check-merge-conflict
       - id: check-yaml
       - id: no-commit-to-branch
         args: [--branch, develop, --branch, main]
   - repo: https://github.com/pre-commit/mirrors-yapf
-    rev: v0.31.0
+    rev: v0.32.0
     hooks:
       - id: yapf
         args: [--in-place, --parallel, --recursive, --style, .yapf-config]
@@ -67,7 +67,7 @@ repos:
         files: "^(trestle_fedramp)"
         stages: [commit]
   - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.11
+    rev: 0.7.13
     hooks:
     - id: mdformat
       exclude: "CHANGELOG.md"
