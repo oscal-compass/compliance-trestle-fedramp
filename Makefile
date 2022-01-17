@@ -26,7 +26,7 @@ pre-commit-update:
 
 install:
 	python -m pip install  --upgrade pip setuptools
-	python -m pip install . --upgrade --upgrade-strategy eager
+	python -m pip install . --upgrade -vvv --upgrade-strategy eager
 
 code-format: pre-commit-update
 	pre-commit run yapf --all-files
