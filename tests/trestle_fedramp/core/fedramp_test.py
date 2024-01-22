@@ -21,7 +21,7 @@ import pytest
 
 from tests import test_utils
 
-from trestle.core.err import TrestleError
+from trestle.common.err import TrestleError
 
 from trestle_fedramp import const
 from trestle_fedramp.core.fedramp import FedrampValidator

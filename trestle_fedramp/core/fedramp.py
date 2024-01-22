@@ -21,7 +21,7 @@ from pkg_resources import resource_filename
 
 import saxonc
 
-from trestle.core.err import TrestleError
+from trestle.common.err import TrestleError
 
 import trestle_fedramp.const as const
 from trestle_fedramp.core.format_convert import JsonXmlConverter
