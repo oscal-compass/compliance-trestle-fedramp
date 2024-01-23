@@ -21,10 +21,10 @@ import logging
 import pathlib
 
 import trestle.common.log as log
-from trestle.core.commands.common import return_codes
+from trestle.common.file_utils import load_file
 from trestle.core import parser
 from trestle.core.commands.command_docs import CommandBase
-from trestle.common.file_utils import load_file
+from trestle.core.commands.common import return_codes
 
 from trestle_fedramp.core.fedramp import FedrampValidator
 

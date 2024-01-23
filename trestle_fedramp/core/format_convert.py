@@ -21,6 +21,7 @@ import sys
 from pkg_resources import resource_filename
 
 from saxonche import PySaxonProcessor
+
 from trestle.common.err import TrestleError
 
 import trestle_fedramp.const as const
@@ -55,7 +56,7 @@ class JsonXmlConverter:
         if not xsl_path.exists():
             raise TrestleError(f'xslt converter {xsl_path} does not exist')
 
-        xml_str: str = ""
+        xml_str: str = ''
         with PySaxonProcessor(license=False) as saxon_proc:
             # set initial template global property
             saxon_proc.set_configuration_property('it', self.initial_template)

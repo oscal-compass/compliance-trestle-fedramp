@@ -20,7 +20,7 @@ import tempfile
 
 from pkg_resources import resource_filename
 
-from saxonche import (PySaxonProcessor, PySaxonApiError, PyXslt30Processor)
+from saxonche import (PySaxonApiError, PySaxonProcessor, PyXslt30Processor)
 
 from trestle.common.err import TrestleError
 

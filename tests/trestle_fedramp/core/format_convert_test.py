@@ -39,7 +39,6 @@ def test_json2xml(tmp_path: pathlib.Path) -> None:
         json_content = f.read()
     converter = JsonXmlConverter()
     xml_str = converter.json2xml('ssp', json_content)
-    print(xml_str)
     assert '<system-security-plan' in xml_str
 
 
