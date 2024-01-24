@@ -16,7 +16,7 @@
 """Core constants module containing all constants."""
 
 # FedRAMP related files and directories
-FEDRAM_BASELINE = 'fedramp-source/content/baselines/rev4/xml'
+FEDRAM_BASELINE = 'fedramp-source/content/baselines/rev5/xml'
 FEDRAMP_REGISTRY = 'fedramp-source/content/resources/xml'
 FEDRAM__SVRL_XSL = 'fedramp-source/vendor/svrl2html.xsl'
 FEDRAMP_SSP_XSL = 'fedramp-source/ssp.xsl'
