@@ -119,11 +119,6 @@ jobs:
         key: ${{ matrix.os }}-${{ matrix.python-version }}-pip-${{ hashFiles('setup.cfg') }}
         restore-keys: |
          ${{ matrix.os }}-${{ matrix.python-version }}-pip-
-
-    # Windows Dev tools
-    - name: Install microsoft dev tools
-      if: ${{ matrix.os == 'windows-latest' }}
-      uses: ilammy/msvc-dev-cmd@v1
         
     - name: Install build tools
       run: |
