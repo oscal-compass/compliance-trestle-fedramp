@@ -149,9 +149,9 @@ class FedrampSSPReader:
 
         for implemented_requirement in as_list(ssp_data.control_implementation.implemented_requirements):
             control_id = implemented_requirement.control_id
-            control_origination: Optional[str] = self._get_control_origination_values(implemented_requirement)
-            label = controls_by_label.get(control_id)
+            label = controls_by_label.get(control_id, '')
             if label:
+                control_origination: Optional[str] = self._get_control_origination_values(implemented_requirement)
                 control_dict[label] = FedrampSSPData(control_origination=control_origination)
         return control_dict
 
