@@ -16,7 +16,7 @@
 """Testing reading OSCAL SSP data for FedRAMP transformation."""
 
 import pathlib
-from typing import Tuple
+from typing import List, Tuple
 
 import pytest
 
@@ -26,34 +26,59 @@ from trestle.core.generators import generate_sample_model
 from trestle.oscal import ssp
 from trestle.oscal.common import Property
 
+from trestle_fedramp.const import (
+    FEDRAMP_CUST_CONFIGURED,
+    FEDRAMP_HYBRID,
+    FEDRAMP_INHERITED,
+    FEDRAMP_SHARED,
+    FEDRAMP_SHORT_CUST_CONFIGURED,
+    FEDRAMP_SHORT_INHERITED,
+    FEDRAMP_SHORT_SP_CORPORATE,
+    FEDRAMP_SHORT_SP_SYSTEM,
+    FEDRAMP_SP_CORPORATE
+)
 from trestle_fedramp.core.ssp_reader import (ControlOrigination, FedrampControlDict, FedrampSSPReader)
 
 
 def test_control_origination() -> None:
     """Test valid and invalid control origination values."""
-    assert ControlOrigination.get_long_name(['sp-corporate']) == 'Service Provider Corporate'
-    assert ControlOrigination.get_long_name(['sp-system']) == 'Service Provider System Specific'
-    assert (
-        ControlOrigination.get_long_name(['customer-configured']) == 'Configured by Customer (Customer System Specific)'
+    # Validate combinations of control origination values.
+    long_names: List[str] = ControlOrigination.get_long_names([FEDRAMP_SHORT_SP_CORPORATE, FEDRAMP_SHORT_SP_SYSTEM])
+    assert long_names == [FEDRAMP_HYBRID]
+
+    # Shared should take precedence over the other values.
+    long_names = ControlOrigination.get_long_names(
+        [FEDRAMP_SHORT_SP_CORPORATE, FEDRAMP_SHORT_SP_SYSTEM, FEDRAMP_SHORT_CUST_CONFIGURED]
     )
-    assert ControlOrigination.get_long_name(['customer-provided']) == 'Provided by Customer (Customer System Specific)'
-    assert ControlOrigination.get_long_name(['inherited']) == 'Inherited'
-    assert (
-        ControlOrigination.get_long_name(['sp-corporate',
-                                          'sp-system']) == 'Service Provider Hybrid (Corporate and System Specific)'
+    assert long_names == [FEDRAMP_SHARED]
+
+    # Combination with inherited
+    long_names = ControlOrigination.get_long_names(
+        [FEDRAMP_SHORT_SP_CORPORATE, FEDRAMP_SHORT_CUST_CONFIGURED, FEDRAMP_SHORT_INHERITED]
     )
-    assert (
-        ControlOrigination.get_long_name(['sp-corporate', 'customer-configured']
-                                         ) == 'Shared (Service Provider and Customer Responsibility)'
-    )
+
+    assert len(long_names) == 2
+    assert FEDRAMP_SHARED in long_names
+    assert FEDRAMP_INHERITED in long_names
+
+    # Neither shared nor hybrid
+    long_names = ControlOrigination.get_long_names([FEDRAMP_SHORT_INHERITED, FEDRAMP_SHORT_CUST_CONFIGURED])
+
+    assert len(long_names) == 2
+    assert FEDRAMP_INHERITED in long_names
+    assert FEDRAMP_CUST_CONFIGURED in long_names
+
+    # Single value
+    long_names = ControlOrigination.get_long_names([FEDRAMP_SHORT_SP_CORPORATE])
+    assert long_names == [FEDRAMP_SP_CORPORATE]
 
     # Assert that if the input is not a valid control origination value, it raises a ValueError.
     with pytest.raises(ValueError, match='Invalid control origination value: invalid. Use one of .*'):
-        ControlOrigination.get_long_name(['invalid'])
+        ControlOrigination.get_long_names([FEDRAMP_SHORT_CUST_CONFIGURED, 'invalid'])
 
-    # Validate error for an invalid combination of control origination values.
-    with pytest.raises(ValueError, match='Invalid control origination values: .*'):
-        ControlOrigination.get_long_name(['inherited', 'customer-configured'])
+    # Validate error for empty list.
+    with pytest.raises(ValueError, match='Control origination values are empty'):
+        ControlOrigination.get_long_names([])
 
 
 def test_reader_control_origination(tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str]) -> None:
@@ -68,9 +93,9 @@ def test_reader_control_origination(tmp_trestle_dir_with_ssp: Tuple[pathlib.Path
     assert len(ssp_control_dict) > 0
 
     # Verify the control origination values for the implemented requirements.
-    assert ssp_control_dict['AC-1'].control_origination == 'Service Provider System Specific'
-    assert ssp_control_dict['AC-2'].control_origination == 'Shared (Service Provider and Customer Responsibility)'
-    assert ssp_control_dict['AU-1'].control_origination == 'Service Provider Corporate'
+    assert ssp_control_dict['AC-1'].control_origination == ['Service Provider System Specific']
+    assert ssp_control_dict['AC-2'].control_origination == ['Shared (Service Provider and Customer Responsibility)']
+    assert ssp_control_dict['AU-1'].control_origination == ['Service Provider Corporate']
 
 
 def test_get_control_origination() -> None:
@@ -91,4 +116,4 @@ def test_get_control_origination() -> None:
     )
 
     # This should return the long name of the control origination value.
-    assert ssp_reader._get_control_origination_values(impl_req) == 'Service Provider Corporate'
+    assert ssp_reader._get_control_origination_values(impl_req) == ['Service Provider Corporate']

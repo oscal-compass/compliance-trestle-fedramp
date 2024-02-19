@@ -44,7 +44,7 @@ class SSPTransformCmd(CommandPlusDocs):
     def _init_arguments(self) -> None:
         logger.debug('Init arguments')
         self.add_argument('-n', '--ssp-name', help='OSCAL SSP name from trestle workspace.', type=str, required=True)
-        self.parser.add_argument(
+        self.add_argument(
             '-l',
             '--level',
             required=True,

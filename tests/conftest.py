@@ -84,7 +84,7 @@ def tmp_trestle_dir_with_ssp(tmp_path: pathlib.Path, monkeypatch: MonkeyPatch) -
 
 
 @pytest.fixture(scope='function')
-def docx_document() -> Iterator[Document]:
+def docx_document() -> Iterator[DocxDocument]:
     """Return a docx document."""
     template = pathlib.Path(BaselineLevel.get_template('high')).resolve()
     with open(template, 'rb') as file:
@@ -97,8 +97,8 @@ def test_ssp_control_dict() -> Iterator[FedrampControlDict]:
     """Return a dictionary of control data."""
     control_dict: FedrampControlDict = {
         'AC-1': FedrampSSPData(control_origination=None),
-        'AC-2': FedrampSSPData(control_origination=const.FEDRAMP_SP_SYSTEM),
-        'AC-20': FedrampSSPData(control_origination=const.FEDRAMP_INHERITED),
-        'CM-6': FedrampSSPData(control_origination=const.FEDRAMP_SHARED)
+        'AC-2': FedrampSSPData(control_origination=[const.FEDRAMP_SP_SYSTEM]),
+        'AC-20': FedrampSSPData(control_origination=[const.FEDRAMP_SP_CORPORATE, const.FEDRAMP_INHERITED]),
+        'CM-6': FedrampSSPData(control_origination=[const.FEDRAMP_SHARED])
     }
     yield control_dict

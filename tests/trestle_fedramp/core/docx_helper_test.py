@@ -15,6 +15,8 @@
 # limitations under the License.
 """Testing docx utility classes."""
 
+from typing import List
+
 from docx.document import Document as DocxDocument  # type: ignore
 from docx.table import _Cell  # type: ignore
 from docx.text.paragraph import Paragraph  # type: ignore
@@ -30,15 +32,27 @@ from trestle_fedramp.core.ssp_reader import FedrampControlDict, FedrampSSPData
 
 def verify_checkboxes(cell: _Cell, ssp_data: FedrampSSPData) -> None:
     """Verify the checkboxes are populated correctly."""
-    for paragraph in cell.paragraphs:
-        checked = checkbox_is_set(paragraph)
-        checked_text = checkbox_text_is_set(paragraph)
-        if ssp_data.control_origination is None or ssp_data.control_origination not in paragraph.text:
-            assert not checked
-            assert not checked_text
-        else:
-            assert checked
-            assert checked_text
+    checked_list: List[int] = []
+    checked_list_text: str = ''
+    for i, paragraph in enumerate(cell.paragraphs):
+        if checkbox_is_set(paragraph) and checkbox_text_is_set(paragraph):
+            checked_list.append(i)
+            checked_list_text += paragraph.text
+
+    if ssp_data.control_origination is None:
+        assert len(checked_list) == 0
+    else:
+        expected_checklist_list: List[int] = []
+        for control_origination in ssp_data.control_origination:
+            index_loc: int = ControlSummaries.get_control_origination_index(control_origination)
+            expected_checklist_list.append(index_loc)
+
+            # Check that the actual text is correct in the paragraph
+            # Each FedRAMP long string should be in the checked paragraphs of the
+            # cell.
+            assert control_origination in checked_list_text
+
+        assert checked_list == expected_checklist_list
 
 
 def checkbox_is_set(paragraph: Paragraph) -> bool:
@@ -78,7 +92,7 @@ def test_control_summaries_populate(docx_document: DocxDocument, test_ssp_contro
 def test_control_summaries_with_invalid_input(docx_document: DocxDocument) -> None:
     """Trigger and error with invalid input."""
     # AC-1 does not have an control origination inherited value
-    invalid_control_dict: FedrampControlDict = {'AC-1': FedrampSSPData(control_origination=const.FEDRAMP_INHERITED)}
+    invalid_control_dict: FedrampControlDict = {'AC-1': FedrampSSPData(control_origination=[const.FEDRAMP_INHERITED])}
     control_summaries = ControlSummaries(docx_document, invalid_control_dict)
 
     with pytest.raises(TrestleError, match='.*Invalid control origination for AC-1: Inherited'):

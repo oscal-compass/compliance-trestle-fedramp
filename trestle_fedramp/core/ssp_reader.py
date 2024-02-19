@@ -39,6 +39,7 @@ from trestle_fedramp.const import (
     FEDRAMP_SHARED,
     FEDRAMP_SHORT_CUST_CONFIGURED,
     FEDRAMP_SHORT_CUST_PROVIDED,
+    FEDRAMP_SHORT_INHERITED,
     FEDRAMP_SHORT_SP_CORPORATE,
     FEDRAMP_SHORT_SP_SYSTEM,
     FEDRAMP_SHORT_TO_LONG_NAME,
@@ -52,7 +53,7 @@ class ControlOrigination:
     provider_sp: List[str] = [FEDRAMP_SHORT_SP_CORPORATE, FEDRAMP_SHORT_SP_SYSTEM]
 
     @classmethod
-    def get_long_name(cls, control_origination_values: List[str]) -> str:
+    def get_long_names(cls, control_origination_values: List[str]) -> List[str]:
         """
         Get the long name for control origination value(s).
 
@@ -60,7 +61,7 @@ class ControlOrigination:
             control_origination_values: List of control origination values.
 
         Returns:
-            Long name for the control origination value or combination of values.
+            Long names for the control origination value or combination of values.
 
         Notes:
             The input values can be a single or set control origination properties values.
@@ -68,18 +69,34 @@ class ControlOrigination:
             and specific system is considered as shared.
 
         """
-        if len(control_origination_values) > 1:
-            for value in control_origination_values:
-                cls._check_value(value)
-            if cls.is_shared(control_origination_values):
-                return FEDRAMP_SHARED
-            if cls._is_hybrid(control_origination_values):
-                return FEDRAMP_HYBRID
-            raise ValueError(f'Invalid control origination values: {control_origination_values}')
+        # Validate the input values
+        if not control_origination_values:
+            raise ValueError('Control origination values are empty')
+
+        for value in control_origination_values:
+            if value not in FEDRAMP_CO_VALUES:
+                raise ValueError(f'Invalid control origination value: {value}. Use one of {FEDRAMP_CO_VALUES}')
+
+        long_names: Set[str] = set()
+
+        # Inherited can be combined with other values
+        if FEDRAMP_SHORT_INHERITED in control_origination_values:
+            fedramp_inherited_long = FEDRAMP_SHORT_TO_LONG_NAME[FEDRAMP_SHORT_INHERITED]
+            long_names.add(fedramp_inherited_long)
+
+        # If the values are in the provider and customer set, then it is shared
+        # This would encompass hybrid if both service provider values are present
+        # with customer values.
+        if cls.is_shared(control_origination_values):
+            long_names.add(FEDRAMP_SHARED)
+        elif cls._is_hybrid(control_origination_values):
+            long_names.add(FEDRAMP_HYBRID)
         else:
-            value = control_origination_values[0]
-            cls._check_value(value)
-            return FEDRAMP_SHORT_TO_LONG_NAME[value]
+            # Add individual long names if they don't belong to shared or hybrid
+            for value in control_origination_values:
+                long_names.add(FEDRAMP_SHORT_TO_LONG_NAME[value])
+
+        return list(long_names)
 
     @staticmethod
     def _is_hybrid(control_origination_values: List[str]) -> bool:
@@ -101,18 +118,12 @@ class ControlOrigination:
 
         return False
 
-    @classmethod
-    def _check_value(cls, value: str) -> None:
-        """Check if the value is valid."""
-        if value not in FEDRAMP_CO_VALUES:
-            raise ValueError(f'Invalid control origination value: {value}. Use one of {FEDRAMP_CO_VALUES}')
-
 
 @dataclass
 class FedrampSSPData:
     """Class to hold the OSCAL SSP data for FedRAMP SSP conversion."""
 
-    control_origination: Optional[str]
+    control_origination: Optional[List[str]]
 
 
 # FedRAMP data by control
@@ -142,7 +153,7 @@ class FedrampSSPReader:
             control_id = implemented_requirement.control_id
             label = controls_by_label.get(control_id, '')
             if label:
-                control_origination: Optional[str] = self._get_control_origination_values(implemented_requirement)
+                control_origination: Optional[List[str]] = self._get_control_origination_values(implemented_requirement)
                 control_dict[label] = FedrampSSPData(control_origination=control_origination)
         return control_dict
 
@@ -164,7 +175,7 @@ class FedrampSSPReader:
                 controls_by_label[control.id] = label
         return controls_by_label
 
-    def _get_control_origination_values(self, implemented_requirement: ImplementedRequirement) -> Optional[str]:
+    def _get_control_origination_values(self, implemented_requirement: ImplementedRequirement) -> Optional[List[str]]:
         """
         Check for the control origination property and return the value.
 
@@ -173,12 +184,11 @@ class FedrampSSPReader:
             not the OSCAL control origination values.
         """
         prop_values: List[str] = []
-        if implemented_requirement.props:
-            for prop in implemented_requirement.props:
-                if prop.name == CONTROL_ORIGINATION and prop.ns == NAMESPACE_FEDRAMP:
-                    prop_values.append(prop.value)
+        for prop in as_list(implemented_requirement.props):
+            if prop.name == CONTROL_ORIGINATION and prop.ns == NAMESPACE_FEDRAMP:
+                prop_values.append(prop.value)
 
         if not prop_values:
             return None
 
-        return ControlOrigination.get_long_name(prop_values)
+        return ControlOrigination.get_long_names(prop_values)
