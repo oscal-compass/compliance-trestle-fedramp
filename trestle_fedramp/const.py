@@ -15,6 +15,8 @@
 # limitations under the License.
 """Core constants module containing all constants."""
 
+from typing import Dict, List
+
 # FedRAMP related files and directories
 FEDRAM_BASELINE = 'fedramp-source/content/baselines/rev5/xml'
 FEDRAMP_REGISTRY = 'fedramp-source/content/resources/xml'
@@ -33,6 +35,20 @@ FEDRAMP_APPENDIX_A_HIGH = 'fedramp-source/content/templates/SSP-Appendix-A-High-
 
 # CONTROL ORIGINATION FEDRAMP
 
+FEDRAMP_SHORT_SP_CORPORATE = 'sp-corporate'
+FEDRAMP_SHORT_SP_SYSTEM = 'sp-system'
+FEDRAMP_SHORT_CUST_CONFIGURED = 'customer-configured'
+FEDRAMP_SHORT_CUST_PROVIDED = 'customer-provided'
+FEDRAMP_SHORT_INHERITED = 'inherited'
+
+FEDRAMP_CO_VALUES: List[str] = [
+    FEDRAMP_SHORT_SP_CORPORATE,
+    FEDRAMP_SHORT_SP_SYSTEM,
+    FEDRAMP_SHORT_CUST_CONFIGURED,
+    FEDRAMP_SHORT_CUST_PROVIDED,
+    FEDRAMP_SHORT_INHERITED
+]
+
 FEDRAMP_SP_CORPORATE = 'Service Provider Corporate'
 FEDRAMP_SP_SYSTEM = 'Service Provider System Specific'
 FEDRAMP_CUST_CONFIGURED = 'Configured by Customer (Customer System Specific)'
@@ -40,6 +56,14 @@ FEDRAMP_CUST_PROVIDED = 'Provided by Customer (Customer System Specific)'
 FEDRAMP_SHARED = 'Shared (Service Provider and Customer Responsibility)'
 FEDRAMP_HYBRID = 'Service Provider Hybrid (Corporate and System Specific)'
 FEDRAMP_INHERITED = 'Inherited'
+
+FEDRAMP_SHORT_TO_LONG_NAME: Dict[str, str] = {
+    FEDRAMP_SHORT_SP_CORPORATE: FEDRAMP_SP_CORPORATE,
+    FEDRAMP_SHORT_SP_SYSTEM: FEDRAMP_SP_SYSTEM,
+    FEDRAMP_SHORT_CUST_CONFIGURED: FEDRAMP_CUST_CONFIGURED,
+    FEDRAMP_SHORT_CUST_PROVIDED: FEDRAMP_CUST_PROVIDED,
+    FEDRAMP_SHORT_INHERITED: FEDRAMP_INHERITED
+}
 
 # FedRAMP Template Constants
 CONTROL_SUMMARY = 'Control Summary Information'

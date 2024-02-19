@@ -22,7 +22,7 @@ Control Origination Property -> Control Origination String Value
 
 import pathlib
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set
 
 from trestle.common.const import CONTROL_ORIGINATION, NAMESPACE_FEDRAMP
 from trestle.common.list_utils import as_list
@@ -34,26 +34,22 @@ from trestle.oscal.catalog import Catalog
 from trestle.oscal.ssp import ImplementedRequirement, SystemSecurityPlan
 
 from trestle_fedramp.const import (
-    FEDRAMP_CUST_CONFIGURED,
-    FEDRAMP_CUST_PROVIDED,
+    FEDRAMP_CO_VALUES,
     FEDRAMP_HYBRID,
-    FEDRAMP_INHERITED,
     FEDRAMP_SHARED,
-    FEDRAMP_SP_CORPORATE,
-    FEDRAMP_SP_SYSTEM
+    FEDRAMP_SHORT_CUST_CONFIGURED,
+    FEDRAMP_SHORT_CUST_PROVIDED,
+    FEDRAMP_SHORT_SP_CORPORATE,
+    FEDRAMP_SHORT_SP_SYSTEM,
+    FEDRAMP_SHORT_TO_LONG_NAME,
 )
 
 
 class ControlOrigination:
     """Represents the FedRAMP control origination mapping per FedRAMP validation rules."""
 
-    SP_CORPORATE = 'sp-corporate'
-    SP_SYSTEM = 'sp-system'
-    CUST_CONFIGURED = 'customer-configured'
-    CUST_PROVIDED = 'customer-provided'
-    INHERITED = 'inherited'
-
-    VALUES = {SP_SYSTEM, SP_CORPORATE, CUST_CONFIGURED, CUST_PROVIDED, INHERITED}
+    customer_sp: List[str] = [FEDRAMP_SHORT_CUST_CONFIGURED, FEDRAMP_SHORT_CUST_PROVIDED]
+    provider_sp: List[str] = [FEDRAMP_SHORT_SP_CORPORATE, FEDRAMP_SHORT_SP_SYSTEM]
 
     @classmethod
     def get_long_name(cls, control_origination_values: List[str]) -> str:
@@ -72,13 +68,6 @@ class ControlOrigination:
             and specific system is considered as shared.
 
         """
-        data = {
-            cls.SP_CORPORATE: FEDRAMP_SP_CORPORATE,
-            cls.SP_SYSTEM: FEDRAMP_SP_SYSTEM,
-            cls.CUST_CONFIGURED: FEDRAMP_CUST_CONFIGURED,
-            cls.CUST_PROVIDED: FEDRAMP_CUST_PROVIDED,
-            cls.INHERITED: FEDRAMP_INHERITED
-        }
         if len(control_origination_values) > 1:
             for value in control_origination_values:
                 cls._check_value(value)
@@ -90,22 +79,24 @@ class ControlOrigination:
         else:
             value = control_origination_values[0]
             cls._check_value(value)
-            return data[value]
+            return FEDRAMP_SHORT_TO_LONG_NAME[value]
 
-    @classmethod
-    def _is_hybrid(cls, control_origination_values: List[str]) -> bool:
+    @staticmethod
+    def _is_hybrid(control_origination_values: List[str]) -> bool:
         """Check if the control origination values are hybrid."""
-        return cls.SP_CORPORATE in control_origination_values and cls.SP_SYSTEM in control_origination_values
+        return (
+            FEDRAMP_SHORT_SP_CORPORATE in control_origination_values
+            and FEDRAMP_SHORT_SP_SYSTEM in control_origination_values
+        )
 
     @classmethod
     def is_shared(cls, control_origination_values: List[str]) -> bool:
         """Check if the control origination values are shared."""
-        customer_sp: List[str] = [cls.CUST_CONFIGURED, cls.CUST_PROVIDED]
-        provider_sp: List[str] = [cls.SP_CORPORATE, cls.SP_SYSTEM]
+        control_origination_set: Set[str] = set(control_origination_values)
 
         # If the values contain both customer and provider values, then it is shared
-        if set(control_origination_values).intersection(provider_sp) and set(control_origination_values).intersection(
-                customer_sp):
+        if control_origination_set.intersection(cls.provider_sp) and control_origination_set.intersection(
+                cls.customer_sp):
             return True
 
         return False
@@ -113,8 +104,8 @@ class ControlOrigination:
     @classmethod
     def _check_value(cls, value: str) -> None:
         """Check if the value is valid."""
-        if value not in cls.VALUES:
-            raise ValueError(f'Invalid control origination value: {value}. Use one of {cls.VALUES}')
+        if value not in FEDRAMP_CO_VALUES:
+            raise ValueError(f'Invalid control origination value: {value}. Use one of {FEDRAMP_CO_VALUES}')
 
 
 @dataclass
