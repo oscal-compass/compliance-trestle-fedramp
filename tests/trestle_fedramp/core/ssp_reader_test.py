@@ -16,7 +16,7 @@
 """Testing reading OSCAL SSP data for FedRAMP transformation."""
 
 import pathlib
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 import pytest
 
@@ -38,6 +38,43 @@ from trestle_fedramp.const import (
     FEDRAMP_SP_CORPORATE
 )
 from trestle_fedramp.core.ssp_reader import (ControlOrigination, FedrampControlDict, FedrampSSPReader)
+
+
+def test_reader_ssp_data(tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str]) -> None:
+    """Test retrieving information from an OSCAL SSP for FedRAMP."""
+    tmp_trestle_dir, ssp_name = tmp_trestle_dir_with_ssp
+    ssp_file_path = ModelUtils.get_model_path_for_name_and_class(tmp_trestle_dir, ssp_name, ssp.SystemSecurityPlan)
+    assert ssp_file_path is not None
+
+    ssp_reader: FedrampSSPReader = FedrampSSPReader(tmp_trestle_dir, ssp_file_path)
+
+    ssp_control_dict: FedrampControlDict = ssp_reader.read_ssp_data()
+    assert len(ssp_control_dict) > 0
+
+    # Verify the control origination values for the implemented requirements.
+    assert ssp_control_dict['AC-1'].control_origination == ['Service Provider System Specific']
+    assert ssp_control_dict['AC-2'].control_origination == ['Shared (Service Provider and Customer Responsibility)']
+    assert ssp_control_dict['AU-1'].control_origination == ['Service Provider Corporate']
+
+    # Verify the control implementation descriptions
+    responses_dict: Dict[str, str] = ssp_control_dict['AC-1'].control_implementation_description
+    assert len(responses_dict) == 2
+    assert '' not in responses_dict
+    assert 'a.' in responses_dict
+
+    assert responses_dict['a.'] == (
+        '\nThis System: Describe how Part a is satisfied within the system.'
+        '\n[EXAMPLE]Policies: Describe how this policy component satisfies part a.'
+    )
+
+    assert responses_dict['b.'] == (
+        '\nThis System: Describe how Part b is satisfied within the system for a component.'
+        '\n[EXAMPLE]Procedures: Describe how Part b is satisfied within the system for '
+        'another component.'
+    )
+
+
+# Control origination tests
 
 
 def test_control_origination() -> None:
@@ -81,26 +118,8 @@ def test_control_origination() -> None:
         ControlOrigination.get_long_names([])
 
 
-def test_reader_control_origination(tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str]) -> None:
-    """Test retrieving control origination values from the SSP."""
-    tmp_trestle_dir, ssp_name = tmp_trestle_dir_with_ssp
-
-    ssp_reader: FedrampSSPReader = FedrampSSPReader(tmp_trestle_dir)
-
-    ssp_file_path = ModelUtils.get_model_path_for_name_and_class(tmp_trestle_dir, ssp_name, ssp.SystemSecurityPlan)
-    assert ssp_file_path is not None
-    ssp_control_dict: FedrampControlDict = ssp_reader.read_ssp_data(ssp_file_path)
-    assert len(ssp_control_dict) > 0
-
-    # Verify the control origination values for the implemented requirements.
-    assert ssp_control_dict['AC-1'].control_origination == ['Service Provider System Specific']
-    assert ssp_control_dict['AC-2'].control_origination == ['Shared (Service Provider and Customer Responsibility)']
-    assert ssp_control_dict['AU-1'].control_origination == ['Service Provider Corporate']
-
-
 def test_get_control_origination() -> None:
     """Test getting control origination from the implemented requirement."""
-    ssp_reader: FedrampSSPReader = FedrampSSPReader(pathlib.Path.cwd())
     impl_req = generate_sample_model(ssp.ImplementedRequirement)
     impl_req.props = []
     impl_req.props.append(
@@ -108,7 +127,7 @@ def test_get_control_origination() -> None:
     )
 
     # This should be none because the namespace is not the FedRAMP namespace.
-    assert ssp_reader._get_control_origination_values(impl_req) is None
+    assert FedrampSSPReader.get_control_origination_values(impl_req) is None
 
     impl_req.props = []
     impl_req.props.append(
@@ -116,4 +135,4 @@ def test_get_control_origination() -> None:
     )
 
     # This should return the long name of the control origination value.
-    assert ssp_reader._get_control_origination_values(impl_req) == ['Service Provider Corporate']
+    assert FedrampSSPReader.get_control_origination_values(impl_req) == ['Service Provider Corporate']

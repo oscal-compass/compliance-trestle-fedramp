@@ -2465,13 +2465,13 @@
               ]
             },
             {
-              "statement-id": "ac-1_smt.a.1",
+              "statement-id": "ac-1_smt.a",
               "uuid": "fb4d039a-dc4f-46f5-9c1f-f6343eaf69bc",
               "by-components": [
                 {
                   "component-uuid": "60f92bcf-f353-4236-9803-2a5d417555f4",
                   "uuid": "3f5612a4-cd1d-4c47-8cae-75d2eaa332cd",
-                  "description": "Describe how Part a is satisfied within the system.\n\nLegacy approach. If no policy component is defined, describe here how the policy satisfies part a.\n\nIn this case, a link must be provided to the policy.\n\nFedRAMP prefers all policies and procedures be attached as a resource in the back-matter. The link points to a resource.",
+                  "description": "Describe how Part a is satisfied within the system.",
                   "links": [
                     {
                       "href": "#330bac69-5840-479a-981b-afda037d7a6f",
@@ -2487,23 +2487,23 @@
                 {
                   "component-uuid": "88b8d7bb-ba23-4430-bf62-028eab822050",
                   "uuid": "2CF56836-6834-49A9-96CD-4F49C17AAB01",
-                  "description": "Describe how this policy component satisfies part a.\n\nComponent approach. This links to a component representing the Identity Management and Access Control Policy.\n\nThat component contains a link to the policy, so it does not have to be linked here too."
+                  "description": "Describe how this policy component satisfies part a."
                 }
               ]
             },
             {
-              "statement-id": "ac-1_smt.a.2",
+              "statement-id": "ac-1_smt.b",
               "uuid": "c365cf95-5bc0-4599-9773-f4eddf69798d",
               "by-components": [
                 {
                   "component-uuid": "60f92bcf-f353-4236-9803-2a5d417555f4",
                   "uuid": "00507a44-e0d7-4fe6-ad20-8d474a84ee15",
-                  "description": "Describe how Part b is satisfied within the system.\n\nLegacy approach. If no policy component is defined, describe here how the procedure satisfies part b.\n\nIn this case, a link must be provided to the procedure.\n\nFedRAMP prefers all policies and procedures be attached as a resource in the back-matter. The link points to a resource."
+                  "description": "Describe how Part b is satisfied within the system for a component."
                 },
                 {
                   "component-uuid": "fa90644a-8bf8-47da-b0d3-82bffc708afc",
                   "uuid": "42ac379e-4abc-4716-809c-119c03b5ac64",
-                  "description": "Describe how Part b is satisfied within the system.\n\nLegacy approach. If no policy component is defined, describe here how the procedure satisfies part b.\n\nIn this case, a link must be provided to the procedure.\n\nFedRAMP prefers all policies and procedures be attached as a resource in the back-matter. The link points to a resource."
+                  "description": "Describe how Part b is satisfied within the system for another component."
                 }
               ]
             },

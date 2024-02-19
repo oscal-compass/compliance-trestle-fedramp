@@ -15,15 +15,18 @@
 Read and prepare OSCAL SSP information for template.
 
 The OSCAL SSP is stored in the FedRAMPControlDict in a way that
-would be expected by the FedRAMP Template.
+would be expected by the FedRAMP Template without knowledge of the
+template structure.
 Control ID -> Labels
-Control Origination Property -> Control Origination String Value
+Control Origination Property -> Control Origination String Value(s)
+Control Implementation Description -> Dictionary of response for each part
 """
 
 import pathlib
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Set
 
+from trestle.common.common_types import TypeWithByComps
 from trestle.common.const import CONTROL_ORIGINATION, NAMESPACE_FEDRAMP
 from trestle.common.list_utils import as_list
 from trestle.common.load_validate import load_validate_model_path
@@ -121,12 +124,22 @@ class ControlOrigination:
 
 @dataclass
 class FedrampSSPData:
-    """Class to hold the OSCAL SSP data for FedRAMP SSP conversion."""
+    """
+    Class to hold the OSCAL SSP data for FedRAMP SSP conversion.
 
+    Fields:
+        control_implementation_description: Dictionary of control implementation description by control part
+        control_origination: Top level control origination values list
+
+    Notes: To conform to the convention used by Trestle to denote information at
+    the control level, will be '' in the control_implementation_description dictionary.
+    """
+
+    control_implementation_description: Dict[str, str]
     control_origination: Optional[List[str]]
 
 
-# FedRAMP data by control
+# FedRAMP data by control label
 FedrampControlDict = Dict[str, FedrampSSPData]
 
 
@@ -138,44 +151,86 @@ class FedrampSSPReader:
     prepare the data for the FedRAMP Template.
     """
 
-    def __init__(self, trestle_root: pathlib.Path) -> None:
+    def __init__(self, trestle_root: pathlib.Path, ssp_path: pathlib.Path) -> None:
         """Initialize FedRAMP SSP reader."""
         self._root = trestle_root
+        self._ssp: SystemSecurityPlan = load_validate_model_path(self._root, ssp_path)  # type: ignore
 
-    def read_ssp_data(self, ssp_path: pathlib.Path) -> FedrampControlDict:
-        """Read the ssp from file and return the data for the FedRAMP Template."""
-        control_dict: FedrampControlDict = {}
-        ssp_data: SystemSecurityPlan = load_validate_model_path(self._root, ssp_path)  # type: ignore
-
-        controls_by_label: Dict[str, str] = self.load_profile_info(ssp_data.import_profile.href)
-
-        for implemented_requirement in as_list(ssp_data.control_implementation.implemented_requirements):
-            control_id = implemented_requirement.control_id
-            label = controls_by_label.get(control_id, '')
-            if label:
-                control_origination: Optional[List[str]] = self._get_control_origination_values(implemented_requirement)
-                control_dict[label] = FedrampSSPData(control_origination=control_origination)
-        return control_dict
-
-    def load_profile_info(self, profile_path: str) -> Dict[str, str]:
-        """Load the profile and store the control by label."""
-        controls_by_label: Dict[str, str] = {}
         profile_resolver = ProfileResolver()
         resolved_catalog: Catalog = profile_resolver.get_resolved_profile_catalog(
             self._root,
-            profile_path,
+            self._ssp.import_profile.href,
             block_params=False,
             params_format='[.]',
             show_value_warnings=True,
         )
+        catalog_interface = CatalogInterface(resolved_catalog)
 
-        for control in CatalogInterface(resolved_catalog).get_all_controls_from_dict():
+        # Setup dictionaries for control and statement mapping
+        self._control_labels_by_id: Dict[str, str] = self._load_profile_info(catalog_interface=catalog_interface)
+        self._statement_labels_by_id: Dict[str, Dict[str, str]] = catalog_interface.get_statement_part_id_map(False)
+
+        self._comp_titles_by_uuid: Dict[str, str] = {}
+        for component in as_list(self._ssp.system_implementation.components):
+            self._comp_titles_by_uuid[component.uuid] = component.title
+
+    def read_ssp_data(self) -> FedrampControlDict:
+        """Read the ssp from file and return the data for the FedRAMP Template."""
+        control_dict: FedrampControlDict = {}
+
+        for implemented_requirement in as_list(self._ssp.control_implementation.implemented_requirements):
+            control_id = implemented_requirement.control_id
+            label = self._control_labels_by_id.get(control_id, '')
+            if label:
+                control_origination: Optional[List[str]] = self.get_control_origination_values(implemented_requirement)
+                control_implementation_description: Dict[
+                    str, str] = self.get_control_implementation_description(implemented_requirement)
+                control_dict[label] = FedrampSSPData(
+                    control_origination=control_origination,
+                    control_implementation_description=control_implementation_description
+                )
+        return control_dict
+
+    def _load_profile_info(self, catalog_interface: CatalogInterface) -> Dict[str, str]:
+        """Load the profile and store the control by label."""
+        controls_by_label: Dict[str, str] = {}
+
+        for control in catalog_interface.get_all_controls_from_dict():
             label = ControlInterface.get_label(control)
             if label:
                 controls_by_label[control.id] = label
         return controls_by_label
 
-    def _get_control_origination_values(self, implemented_requirement: ImplementedRequirement) -> Optional[List[str]]:
+    def get_control_implementation_description(self, implemented_requirement: ImplementedRequirement) -> Dict[str, str]:
+        """Get the control implementation description."""
+        control_implementation_description: Dict[str, str] = {}
+
+        response_text: str = self._get_responses_from_by_comp(implemented_requirement)
+        if response_text:
+            control_implementation_description[''] = response_text
+
+        statement_labels = self._statement_labels_by_id.get(implemented_requirement.control_id, {})
+
+        for statement in as_list(implemented_requirement.statements):
+            statement_label = statement_labels.get(statement.statement_id, '')
+            if statement_label:
+                response_text = self._get_responses_from_by_comp(statement)
+                if response_text:
+                    control_implementation_description[statement_label] = response_text
+
+        return control_implementation_description
+
+    def _get_responses_from_by_comp(self, type_with_bycomp: TypeWithByComps) -> str:
+        """Get the control implementation description for each by component."""
+        control_response_text: str = ''
+        for by_component in as_list(type_with_bycomp.by_components):
+            if by_component.description:
+                title = self._comp_titles_by_uuid.get(by_component.component_uuid, '')
+                control_response_text = control_response_text + '\n' + title + ': ' + by_component.description
+        return control_response_text
+
+    @staticmethod
+    def get_control_origination_values(implemented_requirement: ImplementedRequirement) -> Optional[List[str]]:
         """
         Check for the control origination property and return the value.
 

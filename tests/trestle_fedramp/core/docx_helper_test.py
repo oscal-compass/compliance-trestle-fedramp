@@ -85,14 +85,16 @@ def test_control_summaries_populate(docx_document: DocxDocument, test_ssp_contro
         if not control_summaries.is_control_summary_table(row_header):
             continue
         control_id = ControlSummaries.get_control_id(row_header)
-        data: FedrampSSPData = test_ssp_control_dict.get(control_id, FedrampSSPData(None))
+        data: FedrampSSPData = test_ssp_control_dict.get(control_id, FedrampSSPData({}, None))
         verify_checkboxes(table.cell(*control_summaries.control_origination_cell), data)
 
 
 def test_control_summaries_with_invalid_input(docx_document: DocxDocument) -> None:
     """Trigger and error with invalid input."""
     # AC-1 does not have an control origination inherited value
-    invalid_control_dict: FedrampControlDict = {'AC-1': FedrampSSPData(control_origination=[const.FEDRAMP_INHERITED])}
+    invalid_control_dict: FedrampControlDict = {
+        'AC-1': FedrampSSPData({}, control_origination=[const.FEDRAMP_INHERITED])
+    }
     control_summaries = ControlSummaries(docx_document, invalid_control_dict)
 
     with pytest.raises(TrestleError, match='.*Invalid control origination for AC-1: Inherited'):

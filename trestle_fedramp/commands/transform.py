@@ -76,8 +76,8 @@ class SSPTransformCmd(CommandPlusDocs):
                 raise TrestleError(f'Bug FedRAMP Template {template} does not exist')
 
             # Read the OSCAL SSP data
-            ssp_reader = FedrampSSPReader(args.trestle_root)
-            control_dict: FedrampControlDict = ssp_reader.read_ssp_data(ssp_file_path)
+            ssp_reader = FedrampSSPReader(args.trestle_root, ssp_file_path)
+            control_dict: FedrampControlDict = ssp_reader.read_ssp_data()
 
             # Load the document and save it for altering
             with open(template, 'rb') as file:
