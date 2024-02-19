@@ -67,6 +67,7 @@ FEDRAMP_SHORT_TO_LONG_NAME: Dict[str, str] = {
 
 # FedRAMP Template Constants
 CONTROL_SUMMARY = 'Control Summary Information'
+CONTROL_RESPONSE = 'What is the solution and how is it implemented?'
 XML_NAMESPACE = '{http://schemas.microsoft.com/office/word/2010/wordml}'
 CHECKBOX_XPATH = './/w:sdt//w:sdtPr//w14:checkbox'
 BOX_ICON_XPATH = './/w:sdt//w:sdtContent//w:r//w:t'

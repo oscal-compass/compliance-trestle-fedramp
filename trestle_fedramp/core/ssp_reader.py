@@ -213,6 +213,10 @@ class FedrampSSPReader:
 
         for statement in as_list(implemented_requirement.statements):
             statement_label = statement_labels.get(statement.statement_id, '')
+            # Remove ending period from statement label to ensure consistency
+            statement_label = statement_label[:-1] if statement_label and statement_label.endswith(
+                '.'
+            ) else statement_label
             if statement_label:
                 response_text = self._get_responses_from_by_comp(statement)
                 if response_text:

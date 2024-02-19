@@ -30,7 +30,7 @@ from trestle.core.commands.common import return_codes
 from trestle.oscal import ssp
 
 from trestle_fedramp.core.baselines import BaselineLevel
-from trestle_fedramp.core.docx_helper import ControlSummaries
+from trestle_fedramp.core.docx_helper import FedrampDocx
 from trestle_fedramp.core.ssp_reader import FedrampControlDict, FedrampSSPReader
 
 logger = logging.getLogger(__name__)
@@ -84,8 +84,8 @@ class SSPTransformCmd(CommandPlusDocs):
                 document: DocxDocument = Document(file)
 
             # Populate the document with the OSCAL SSP data
-            control_summaries: ControlSummaries = ControlSummaries(document, control_dict)
-            control_summaries.populate()
+            fedramp_docx: FedrampDocx = FedrampDocx(document, control_dict)
+            fedramp_docx.populate()
 
             document.save(args.output_file)
         except Exception as e:

@@ -60,14 +60,15 @@ def test_reader_ssp_data(tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str]) -> 
     responses_dict: Dict[str, str] = ssp_control_dict['AC-1'].control_implementation_description
     assert len(responses_dict) == 2
     assert '' not in responses_dict
-    assert 'a.' in responses_dict
+    assert 'a' in responses_dict
+    assert 'b' in responses_dict
 
-    assert responses_dict['a.'] == (
+    assert responses_dict['a'] == (
         '\nThis System: Describe how Part a is satisfied within the system.'
         '\n[EXAMPLE]Policies: Describe how this policy component satisfies part a.'
     )
 
-    assert responses_dict['b.'] == (
+    assert responses_dict['b'] == (
         '\nThis System: Describe how Part b is satisfied within the system for a component.'
         '\n[EXAMPLE]Procedures: Describe how Part b is satisfied within the system for '
         'another component.'
