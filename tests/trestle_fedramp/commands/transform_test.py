@@ -39,7 +39,12 @@ def test_transform_ssp_level_high(
     tmp_trestle_dir, ssp_name = tmp_trestle_dir_with_ssp
     tmp_file = tmp_path / test_docx_file
     args = argparse.Namespace(
-        ssp_name=ssp_name, level='high', output_file=str(tmp_file), trestle_root=tmp_trestle_dir, verbose=0
+        ssp_name=ssp_name,
+        level='high',
+        output_file=str(tmp_file),
+        trestle_root=tmp_trestle_dir,
+        verbose=0,
+        components=''
     )
     rc = SSPTransformCmd()._run(args)
     assert rc == 0
@@ -55,7 +60,12 @@ def test_transform_ssp_level_moderate(
     tmp_trestle_dir, ssp_name = tmp_trestle_dir_with_ssp
     tmp_file = tmp_path / test_docx_file
     args = argparse.Namespace(
-        ssp_name=ssp_name, level='moderate', output_file=str(tmp_file), trestle_root=tmp_trestle_dir, verbose=0
+        ssp_name=ssp_name,
+        level='moderate',
+        output_file=str(tmp_file),
+        trestle_root=tmp_trestle_dir,
+        verbose=0,
+        components=''
     )
     rc = SSPTransformCmd()._run(args)
     assert rc == 0
@@ -71,7 +81,33 @@ def test_transform_ssp_level_low(
     tmp_trestle_dir, ssp_name = tmp_trestle_dir_with_ssp
     tmp_file = tmp_path / test_docx_file
     args = argparse.Namespace(
-        ssp_name=ssp_name, level='low', output_file=str(tmp_file), trestle_root=tmp_trestle_dir, verbose=0
+        ssp_name=ssp_name,
+        level='low',
+        output_file=str(tmp_file),
+        trestle_root=tmp_trestle_dir,
+        verbose=0,
+        components=''
+    )
+    rc = SSPTransformCmd()._run(args)
+    assert rc == 0
+
+    assert tmp_file.exists()
+
+
+def test_transform_ssp_with_components(
+    tmp_path: pathlib.Path,
+    tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str],
+) -> None:
+    """Test Fedramp SSP transform command with FedRAMP High Baseline template."""
+    tmp_trestle_dir, ssp_name = tmp_trestle_dir_with_ssp
+    tmp_file = tmp_path / test_docx_file
+    args = argparse.Namespace(
+        ssp_name=ssp_name,
+        level='high',
+        output_file=str(tmp_file),
+        trestle_root=tmp_trestle_dir,
+        verbose=0,
+        components='This System'
     )
     rc = SSPTransformCmd()._run(args)
     assert rc == 0
@@ -82,7 +118,12 @@ def test_transform_ssp_level_low(
 def test_transform_ssp_invalid_level(tmp_path: pathlib.Path, tmp_trestle_dir: pathlib.Path, caplog: Any) -> None:
     """Test fails with an invalid level."""
     args = argparse.Namespace(
-        ssp_name='test-ssp', level='fake', output_file=str(tmp_path), trestle_root=tmp_trestle_dir, verbose=0
+        ssp_name='test-ssp',
+        level='fake',
+        output_file=str(tmp_path),
+        trestle_root=tmp_trestle_dir,
+        verbose=0,
+        components=''
     )
     rc = SSPTransformCmd()._run(args)
     assert rc == 1
@@ -91,7 +132,12 @@ def test_transform_ssp_invalid_level(tmp_path: pathlib.Path, tmp_trestle_dir: pa
 def test_transform_missing_ssp(tmp_path: pathlib.Path, tmp_trestle_dir: pathlib.Path, caplog: Any) -> None:
     """Test fails with a missing ssp."""
     args = argparse.Namespace(
-        ssp_name='test-ssp', level='high', output_file=str(tmp_path), trestle_root=tmp_trestle_dir, verbose=0
+        ssp_name='test-ssp',
+        level='high',
+        output_file=str(tmp_path),
+        trestle_root=tmp_trestle_dir,
+        verbose=0,
+        components=''
     )
     rc = SSPTransformCmd()._run(args)
     assert rc == 1

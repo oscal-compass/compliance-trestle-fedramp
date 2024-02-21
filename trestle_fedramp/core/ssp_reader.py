@@ -151,10 +151,23 @@ class FedrampSSPReader:
     prepare the data for the FedRAMP Template.
     """
 
-    def __init__(self, trestle_root: pathlib.Path, ssp_path: pathlib.Path) -> None:
-        """Initialize FedRAMP SSP reader."""
+    def __init__(
+        self,
+        trestle_root: pathlib.Path,
+        ssp_path: pathlib.Path,
+        include_components: Optional[List[str]] = None
+    ) -> None:
+        """
+        Initialize FedRAMP SSP reader.
+
+        Args:
+            trestle_root: Trestle project root path.
+            ssp_path: Path to the OSCAL SSP.
+            include_components: Optional list of component titles to include in the control responses.
+        """
         self._root = trestle_root
         self._ssp: SystemSecurityPlan = load_validate_model_path(self._root, ssp_path)  # type: ignore
+        self._include_components = include_components
 
         profile_resolver = ProfileResolver()
         resolved_catalog: Catalog = profile_resolver.get_resolved_profile_catalog(
@@ -170,9 +183,31 @@ class FedrampSSPReader:
         self._control_labels_by_id: Dict[str, str] = self._load_profile_info(catalog_interface=catalog_interface)
         self._statement_labels_by_id: Dict[str, Dict[str, str]] = catalog_interface.get_statement_part_id_map(False)
 
-        self._comp_titles_by_uuid: Dict[str, str] = {}
+        # Setup dictionaries for component title. Only include components that are in the include_components list.
+        self._comp_titles_by_uuid: Dict[str, str] = self._get_component_info()
+
+    def _get_component_info(self) -> Dict[str, str]:
+        """
+        Get the component information mapped to UUID.
+
+        Notes: This will only include components that are in the include_components list if it is
+        provided.
+        """
+        components_by_uuid: Dict[str, str] = {}
         for component in as_list(self._ssp.system_implementation.components):
-            self._comp_titles_by_uuid[component.uuid] = component.title
+            if not self._include_components or component.title in self._include_components:
+                components_by_uuid[component.uuid] = component.title
+        return components_by_uuid
+
+    def _load_profile_info(self, catalog_interface: CatalogInterface) -> Dict[str, str]:
+        """Load the profile and store the control by label."""
+        controls_by_label: Dict[str, str] = {}
+
+        for control in catalog_interface.get_all_controls_from_dict():
+            label = ControlInterface.get_label(control)
+            if label:
+                controls_by_label[control.id] = label
+        return controls_by_label
 
     def read_ssp_data(self) -> FedrampControlDict:
         """Read the ssp from file and return the data for the FedRAMP Template."""
@@ -190,16 +225,6 @@ class FedrampSSPReader:
                     control_implementation_description=control_implementation_description
                 )
         return control_dict
-
-    def _load_profile_info(self, catalog_interface: CatalogInterface) -> Dict[str, str]:
-        """Load the profile and store the control by label."""
-        controls_by_label: Dict[str, str] = {}
-
-        for control in catalog_interface.get_all_controls_from_dict():
-            label = ControlInterface.get_label(control)
-            if label:
-                controls_by_label[control.id] = label
-        return controls_by_label
 
     def get_control_implementation_description(self, implemented_requirement: ImplementedRequirement) -> Dict[str, str]:
         """Get the control implementation description."""
@@ -227,9 +252,9 @@ class FedrampSSPReader:
     def _get_responses_from_by_comp(self, type_with_bycomp: TypeWithByComps) -> str:
         """Get the control implementation description for each by component."""
         control_response_text: str = ''
-        for by_component in as_list(type_with_bycomp.by_components):
-            if by_component.description:
-                title = self._comp_titles_by_uuid.get(by_component.component_uuid, '')
+        for by_component in as_list(type_with_bycomp.by_components):  # type: ignore
+            title = self._comp_titles_by_uuid.get(by_component.component_uuid, '')
+            if title and by_component.description:
                 control_response_text = control_response_text + '\n' + title + ': ' + by_component.description
         return control_response_text
 
