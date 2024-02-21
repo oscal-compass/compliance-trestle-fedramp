@@ -30,15 +30,10 @@ logger = logging.getLogger(__name__)
 
 
 class FedrampDocx():
-    """
-    Helper class for populating the FedRAMP template.
-
-    Notes:
-     This class contains reusable for working with the docx template.
-    """
+    """Class for populating the FedRAMP template."""
 
     def __init__(self, docx: Document, control_dict: FedrampControlDict) -> None:
-        """Initialize the BaseFedrampDocxHelper class."""
+        """Initialize the FedrampDocx class."""
         self.docx = docx
         self.control_dict = control_dict
 
@@ -87,6 +82,7 @@ class ControlSummaries():
 
     def __init__(self) -> None:
         """Initialize the ControlSummaries class."""
+        # Control origination is always the last row in the table
         self.control_origination_cell: Tuple[int, int] = (-1, 0)
 
     @staticmethod
@@ -115,9 +111,12 @@ class ControlSummaries():
             const.FEDRAMP_SHARED: 6,
             const.FEDRAMP_INHERITED: 7
         }
-        return data[control_origination]
+        try:
+            return data[control_origination]
+        except KeyError:
+            raise TrestleError(f'Invalid FedRAMP control origination value: {control_origination}')
 
-    def set_checkbox(self, paragraph: Paragraph) -> None:
+    def _set_checkbox(self, paragraph: Paragraph) -> None:
         """Check the checkbox in the paragraph."""
         # Find the checkbox element and set the checked attribute to 1
         check_box = paragraph._element.xpath(const.CHECKBOX_XPATH)[0]
@@ -125,9 +124,9 @@ class ControlSummaries():
             raise TrestleError(f'Checkbox not found in the paragraph with text: {paragraph.text}')
         checked = check_box.find(f'{const.XML_NAMESPACE}checked')
         checked.attrib[f'{const.XML_NAMESPACE}val'] = '1'
-        self.set_checkbox_text(paragraph)
+        self._set_checkbox_text(paragraph)
 
-    def set_checkbox_text(self, paragraph: Paragraph) -> None:
+    def _set_checkbox_text(self, paragraph: Paragraph) -> None:
         """Set the checkbox text."""
         checkbox_text = paragraph._element.xpath(const.BOX_ICON_XPATH)[0]
         if checkbox_text is None:
@@ -145,7 +144,7 @@ class ControlSummaries():
                 if co_paragraph_index_loc > len(control_origination_cell.paragraphs):
                     raise TrestleError(f'Invalid control origination for {control_id}: {control_origination}')
                 co_paragraph: Paragraph = control_origination_cell.paragraphs[co_paragraph_index_loc]
-                self.set_checkbox(co_paragraph)
+                self._set_checkbox(co_paragraph)
         except Exception as e:
             raise TrestleError(f'Error populating control summary for {control_id}: {e}')
 
@@ -153,21 +152,18 @@ class ControlSummaries():
 class ControlImplementationDescriptions():
     """Populate the control implementation description in the FedRAMP template."""
 
-    def __init__(self) -> None:
-        """Initialize the ControlImplementationDescriptions class."""
-        self.part_str = 'Part'
-
-    def get_part_id(self, part_information: str) -> str:
-        """Get the part id from the table."""
-        if part_information.startswith(self.part_str):
-            return part_information.split(' ')[1].strip(':')
-        else:
-            return ''
-
     @staticmethod
     def is_control_implementation_table(row_header: str) -> bool:
         """Check if the table is a control implementation table."""
         return row_header.endswith(const.CONTROL_RESPONSE)
+
+    @staticmethod
+    def get_part_id(part_information: str) -> str:
+        """Get the part id from the table."""
+        if part_information.startswith(const.FEDRAMP_STATEMENT_PREFIX):
+            return part_information.split(' ')[1].strip(':')
+        else:
+            return ''
 
     def populate_table(self, table: Table, control_id: str, ssp_data: FedrampSSPData) -> None:
         """Populate the table with the SSP data."""
