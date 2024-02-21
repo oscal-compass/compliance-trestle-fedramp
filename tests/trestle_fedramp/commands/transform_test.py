@@ -26,6 +26,11 @@ import logging
 import pathlib
 from typing import Any, Tuple
 
+from docx import Document  # type: ignore
+from docx.document import Document as DocxDocument  # type: ignore
+
+from tests.test_utils import verify_responses
+
 from trestle_fedramp.commands.transform import SSPTransformCmd
 
 test_docx_file = 'test.docx'
@@ -113,6 +118,19 @@ def test_transform_ssp_with_components(
     assert rc == 0
 
     assert tmp_file.exists()
+
+    # Responses filled for the This System component only and part c was
+    # not filled in the test SSP
+    expected_data = {
+        'a': 'Part a:\n\nThis System: Describe how Part a is satisfied within the system.',
+        'b': 'Part b:\n\nThis System: Describe how Part b is satisfied within the system for a component.',
+        'c': 'Part c:'
+    }
+
+    temp_doc_output: DocxDocument = Document(str(tmp_file))
+    for table in temp_doc_output.tables:
+        if 'AC-1 What is the solution and how is it implemented?' in table.cell(0, 0).text:
+            verify_responses(table, expected_data)
 
 
 def test_transform_ssp_invalid_level(tmp_path: pathlib.Path, tmp_trestle_dir: pathlib.Path, caplog: Any) -> None:
