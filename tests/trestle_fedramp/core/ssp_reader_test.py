@@ -75,29 +75,6 @@ def test_reader_ssp_data(tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str]) -> 
     )
 
 
-def test_reader_ssp_data_with_include_components(tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str]) -> None:
-    """Test retrieving information from an OSCAL SSP for FedRAMP with component filtering."""
-    tmp_trestle_dir, ssp_name = tmp_trestle_dir_with_ssp
-    ssp_file_path = ModelUtils.get_model_path_for_name_and_class(tmp_trestle_dir, ssp_name, ssp.SystemSecurityPlan)
-    assert ssp_file_path is not None
-
-    ssp_reader: FedrampSSPReader = FedrampSSPReader(tmp_trestle_dir, ssp_file_path, ['This System'])
-
-    ssp_control_dict: FedrampControlDict = ssp_reader.read_ssp_data()
-    assert len(ssp_control_dict) > 0
-
-    # Verify the control implementation descriptions
-    responses_dict: Dict[str, str] = ssp_control_dict['AC-1'].control_implementation_description
-    assert len(responses_dict) == 2
-    assert '' not in responses_dict
-    assert 'a' in responses_dict
-    assert 'b' in responses_dict
-
-    assert responses_dict['a'] == ('\nThis System: Describe how Part a is satisfied within the system.')
-
-    assert responses_dict['b'] == ('\nThis System: Describe how Part b is satisfied within the system for a component.')
-
-
 # Control origination tests
 
 

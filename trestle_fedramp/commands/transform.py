@@ -24,7 +24,6 @@ from docx.document import Document as DocxDocument  # type: ignore
 
 import trestle.common.log as log
 from trestle.common.err import TrestleError, handle_generic_command_exception
-from trestle.common.list_utils import comma_sep_to_list
 from trestle.common.model_utils import ModelUtils
 from trestle.core.commands.command_docs import CommandPlusDocs
 from trestle.core.commands.common import return_codes
@@ -54,16 +53,6 @@ class SSPTransformCmd(CommandPlusDocs):
             help='FedRAMP Baseline level for template selection.',
         )
         self.add_argument(
-            '-c',
-            '--components',
-            required=False,
-            type=str,
-            help=(
-                'Comma separated list of components by title to include in the output. '
-                'If not provided, all components are included.'
-            ),
-        )
-        self.add_argument(
             '-o', '--output-file', help='Output file for populated SSP Appendix A template', type=str, required=True
         )
 
@@ -87,8 +76,7 @@ class SSPTransformCmd(CommandPlusDocs):
                 raise TrestleError(f'Bug FedRAMP Template {template} does not exist')
 
             # Read the OSCAL SSP data
-            include_components = comma_sep_to_list(args.components) if args.components else None
-            ssp_reader = FedrampSSPReader(args.trestle_root, ssp_file_path, include_components)
+            ssp_reader = FedrampSSPReader(args.trestle_root, ssp_file_path)
             control_dict: FedrampControlDict = ssp_reader.read_ssp_data()
 
             # Load the document and save it for altering

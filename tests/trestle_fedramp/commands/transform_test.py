@@ -17,8 +17,6 @@
 Testing fedramp transform command functionality.
 
 This validate high level functionality of the transform command.
-For example if there is success when expected and failure when expected and
-if the file is written.
 """
 
 import argparse
@@ -34,6 +32,7 @@ from tests.test_utils import verify_responses
 from trestle_fedramp.commands.transform import SSPTransformCmd
 
 test_docx_file = 'test.docx'
+example_control = 'AC-1 What is the solution and how is it implemented?'
 
 
 def test_transform_ssp_level_high(
@@ -56,12 +55,35 @@ def test_transform_ssp_level_high(
 
     assert tmp_file.exists()
 
+    # Verify example control
+    expected_data = {
+        'a': (
+            'Part a:\n\nThis System: Describe how Part a is satisfied within the system.\n'
+            '[EXAMPLE]Policies: Describe how this policy component satisfies part a.'
+        ),
+        'b': (
+            'Part b:\n\nThis System: Describe how Part b is satisfied within the system for a component.\n'
+            '[EXAMPLE]Procedures: Describe how Part b is satisfied within the system for another component.'
+        ),
+        'c': 'Part c:'
+    }
+
+    temp_doc_output: DocxDocument = Document(str(tmp_file))
+    for table in temp_doc_output.tables:
+        if example_control in table.cell(0, 0).text:
+            verify_responses(table, expected_data)
+
 
 def test_transform_ssp_level_moderate(
     tmp_path: pathlib.Path,
     tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str],
 ) -> None:
-    """Test Fedramp SSP transform command with FedRAMP Moderate Baseline template."""
+    """
+    Test Fedramp SSP transform command with FedRAMP Moderate Baseline template.
+
+    Notes: The moderate is encompassed by the high so we only need to test the details of the
+    high.
+    """
     tmp_trestle_dir, ssp_name = tmp_trestle_dir_with_ssp
     tmp_file = tmp_path / test_docx_file
     args = argparse.Namespace(
@@ -82,7 +104,12 @@ def test_transform_ssp_level_low(
     tmp_path: pathlib.Path,
     tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str],
 ) -> None:
-    """Test Fedramp SSP transform command with FedRAMP Low Baseline template."""
+    """
+    Test Fedramp SSP transform command with FedRAMP Low Baseline template.
+
+    Notes: The low is encompassed by the high so we only need to test the details of the
+    high.
+    """
     tmp_trestle_dir, ssp_name = tmp_trestle_dir_with_ssp
     tmp_file = tmp_path / test_docx_file
     args = argparse.Namespace(
@@ -97,40 +124,6 @@ def test_transform_ssp_level_low(
     assert rc == 0
 
     assert tmp_file.exists()
-
-
-def test_transform_ssp_with_components(
-    tmp_path: pathlib.Path,
-    tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str],
-) -> None:
-    """Test Fedramp SSP transform command with FedRAMP High Baseline template."""
-    tmp_trestle_dir, ssp_name = tmp_trestle_dir_with_ssp
-    tmp_file = tmp_path / test_docx_file
-    args = argparse.Namespace(
-        ssp_name=ssp_name,
-        level='high',
-        output_file=str(tmp_file),
-        trestle_root=tmp_trestle_dir,
-        verbose=0,
-        components='This System'
-    )
-    rc = SSPTransformCmd()._run(args)
-    assert rc == 0
-
-    assert tmp_file.exists()
-
-    # Responses filled for the This System component only and part c was
-    # not filled in the test SSP
-    expected_data = {
-        'a': 'Part a:\n\nThis System: Describe how Part a is satisfied within the system.',
-        'b': 'Part b:\n\nThis System: Describe how Part b is satisfied within the system for a component.',
-        'c': 'Part c:'
-    }
-
-    temp_doc_output: DocxDocument = Document(str(tmp_file))
-    for table in temp_doc_output.tables:
-        if 'AC-1 What is the solution and how is it implemented?' in table.cell(0, 0).text:
-            verify_responses(table, expected_data)
 
 
 def test_transform_ssp_invalid_level(tmp_path: pathlib.Path, tmp_trestle_dir: pathlib.Path, caplog: Any) -> None:

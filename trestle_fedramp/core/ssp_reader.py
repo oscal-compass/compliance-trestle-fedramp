@@ -155,7 +155,6 @@ class FedrampSSPReader:
         self,
         trestle_root: pathlib.Path,
         ssp_path: pathlib.Path,
-        include_components: Optional[List[str]] = None
     ) -> None:
         """
         Initialize FedRAMP SSP reader.
@@ -163,11 +162,9 @@ class FedrampSSPReader:
         Args:
             trestle_root: Trestle project root path.
             ssp_path: Path to the OSCAL SSP.
-            include_components: Optional list of component titles to include in the control responses.
         """
         self._root = trestle_root
         self._ssp: SystemSecurityPlan = load_validate_model_path(self._root, ssp_path)  # type: ignore
-        self._include_components = include_components
 
         profile_resolver = ProfileResolver()
         resolved_catalog: Catalog = profile_resolver.get_resolved_profile_catalog(
@@ -195,8 +192,7 @@ class FedrampSSPReader:
         """
         components_by_uuid: Dict[str, str] = {}
         for component in as_list(self._ssp.system_implementation.components):
-            if not self._include_components or component.title in self._include_components:
-                components_by_uuid[component.uuid] = component.title
+            components_by_uuid[component.uuid] = component.title
         return components_by_uuid
 
     def _load_profile_info(self, catalog_interface: CatalogInterface) -> Dict[str, str]:
