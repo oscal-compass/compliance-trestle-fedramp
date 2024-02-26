@@ -58,12 +58,12 @@ def test_transform_ssp_level_high(
     # Verify example control
     expected_data = {
         'a': (
-            'Part a:\n\nThis System: Describe how Part a is satisfied within the system.\n'
-            '[EXAMPLE]Policies: Describe how this policy component satisfies part a.'
+            'Part a:\nThis System: Describe how Part a is satisfied within the system.\n'
+            '\n[EXAMPLE]Policies: Describe how this policy component satisfies part a.\n'
         ),
         'b': (
-            'Part b:\n\nThis System: Describe how Part b is satisfied within the system for a component.\n'
-            '[EXAMPLE]Procedures: Describe how Part b is satisfied within the system for another component.'
+            'Part b:\nThis System: Describe how Part b is satisfied within the system for a component.\n'
+            '\n[EXAMPLE]Procedures: Describe how Part b is satisfied within the system for another component.\n'
         ),
         'c': 'Part c:'
     }

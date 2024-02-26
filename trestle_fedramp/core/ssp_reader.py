@@ -184,16 +184,8 @@ class FedrampSSPReader:
         self._comp_titles_by_uuid: Dict[str, str] = self._get_component_info()
 
     def _get_component_info(self) -> Dict[str, str]:
-        """
-        Get the component information mapped to UUID.
-
-        Notes: This will only include components that are in the include_components list if it is
-        provided.
-        """
-        components_by_uuid: Dict[str, str] = {}
-        for component in as_list(self._ssp.system_implementation.components):
-            components_by_uuid[component.uuid] = component.title
-        return components_by_uuid
+        """Get the component information mapped to UUID."""
+        return {component.uuid: component.title for component in as_list(self._ssp.system_implementation.components)}
 
     def _load_profile_info(self, catalog_interface: CatalogInterface) -> Dict[str, str]:
         """Load the profile and store the control by label."""
@@ -247,12 +239,12 @@ class FedrampSSPReader:
 
     def _get_responses_from_by_comp(self, type_with_bycomp: TypeWithByComps) -> str:
         """Get the control implementation description for each by component."""
-        control_response_text: str = ''
-        for by_component in as_list(type_with_bycomp.by_components):  # type: ignore
-            title = self._comp_titles_by_uuid.get(by_component.component_uuid, '')
-            if title and by_component.description:
-                control_response_text = control_response_text + '\n' + title + ': ' + by_component.description
-        return control_response_text
+        control_response_text_list: List[str] = [
+            f"{self._comp_titles_by_uuid.get(by_component.component_uuid, '')}: {by_component.description}"
+            for by_component in as_list(type_with_bycomp.by_components)
+            if by_component.description
+        ]
+        return '\n\n'.join(control_response_text_list)
 
     @staticmethod
     def get_control_origination_values(implemented_requirement: ImplementedRequirement) -> Optional[List[str]]:
@@ -263,10 +255,11 @@ class FedrampSSPReader:
             This is checking for the FedRAMP specific property in the OSCAL SSP,
             not the OSCAL control origination values.
         """
-        prop_values: List[str] = []
-        for prop in as_list(implemented_requirement.props):
-            if prop.name == CONTROL_ORIGINATION and prop.ns == NAMESPACE_FEDRAMP:
-                prop_values.append(prop.value)
+        prop_values: List[str] = [
+            prop.value
+            for prop in as_list(implemented_requirement.props)
+            if prop.name == CONTROL_ORIGINATION and prop.ns == NAMESPACE_FEDRAMP
+        ]
 
         if not prop_values:
             return None

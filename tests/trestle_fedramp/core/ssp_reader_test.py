@@ -64,12 +64,12 @@ def test_reader_ssp_data(tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str]) -> 
     assert 'b' in responses_dict
 
     assert responses_dict['a'] == (
-        '\nThis System: Describe how Part a is satisfied within the system.'
+        'This System: Describe how Part a is satisfied within the system.\n'
         '\n[EXAMPLE]Policies: Describe how this policy component satisfies part a.'
     )
 
     assert responses_dict['b'] == (
-        '\nThis System: Describe how Part b is satisfied within the system for a component.'
+        'This System: Describe how Part b is satisfied within the system for a component.\n'
         '\n[EXAMPLE]Procedures: Describe how Part b is satisfied within the system for '
         'another component.'
     )

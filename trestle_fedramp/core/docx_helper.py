@@ -173,6 +173,8 @@ class ControlImplementationDescriptions():
                 for cell in table.columns[0].cells[1:]:
                     label = self.get_part_id(cell.text)
                     if label in ssp_data.control_implementation_description:
-                        cell.add_paragraph(ssp_data.control_implementation_description[label])
+                        description_text: str = ssp_data.control_implementation_description[label]
+                        paragraph: Paragraph = cell.add_paragraph(description_text)
+                        paragraph.add_run().add_break()
             except TrestleError as e:
                 raise TrestleError(f'Error populating control implementation description for {control_id}: {e}')
