@@ -8,53 +8,7 @@ on:
       - main
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Don't mess with line endings
-      run: |
-        git config --global core.autocrlf false
-    - name: Don't mess with line endings
-      run: |
-        git config --global core.autocrlf false
-    - uses: actions/checkout@v2
-      with:
-        submodules: true
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ubuntu-latest-3.9-pip-${{ hashFiles('setup.cfg') }}
-        restore-keys: |
-          ubuntu-latest-3.9-pip-
-    - name: Install build tools
-      run: |
-        make develop
-    - name: Setup pre-commit
-      run: |
-        make pre-commit
-    - name: Install dependencies
-      run: |
-        make install
-    - name: Run md document formatting (mdformat)
-      run: |
-        make mdformat
-    - name: Run code formatting (yapf)
-      run: |
-        make code-format
-    - name: Run code linting (flake8)
-      run: |
-        make code-lint
-    - name: Run code typing check (mypy)
-      continue-on-error: true
-      run: |
-        make code-typing
-
-  test:
-    # This test
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -74,7 +28,6 @@ jobs:
         git config --global core.autocrlf false
     - uses: actions/checkout@v2
       with:
-        fetch-depth: 0
         submodules: true
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
@@ -90,6 +43,30 @@ jobs:
     - name: Install build tools
       run: |
         make develop
+    - name: Setup pre-commit
+      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8') }}
+      run: |
+        make pre-commit
+    - name: Install dependencies
+      run: |
+        make install
+    - name: Run md document formatting (mdformat)
+      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8') }}
+      run: |
+        make mdformat
+    - name: Run code formatting (yapf)
+      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8') }}
+      run: |
+        make code-format
+    - name: Run code linting (flake8)
+      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8') }}
+      run: |
+        make code-lint
+    - name: Run code typing check (mypy)
+      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8') }}
+      continue-on-error: true 
+      run: |
+        make code-typing
     - name: Pytest Fast
       if: ${{ !(matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8') }}
       run: |
@@ -99,68 +76,9 @@ jobs:
       run: |
         make test-cov
 
-    - name: Upload artifact
-      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8' }}
-      uses: actions/upload-artifact@v2
-      with:
-        name: coverage
-        path: coverage.xml
-
-  sonar:
-    if: github.repository == 'IBM/compliance-trestle-fedramp'
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-    - name: Don't mess with line endings
-      run: |
-        git config --global core.autocrlf false
-    - name: Don't mess with line endings
-      run: |
-        git config --global core.autocrlf false
-    - uses: actions/checkout@v2
-      with:
-        submodules: true
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-    - uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ubuntu-latest-3.9-pip-${{ hashFiles('setup.cfg') }}
-        restore-keys: |
-          ubuntu-latest-3.9-pip-
-    - name: Install build tools
-      run: |
-        make develop
-    - name: Get coverage
-      uses: actions/download-artifact@v2
-      with:
-        name: coverage
-    - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      with:
-        args: >
-          -Dsonar.python.coverage.reportPaths=coverage.xml
-          -Dsonar.tests=tests/
-          -Dsonar.sources=trestle_fedramp/ 
-          -Dsonar.python.version=3.8
-          -Dsonar.projectKey=compliance-trestle-fedramp
-          -Dsonar.organization=compliance-trestle
-    - name: SonarQube Quality Gate check
-      uses: sonarsource/sonarqube-quality-gate-action@master
-      # Force to fail step after specific time
-      timeout-minutes: 5
-      env:
-       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
   deploy:
-
     runs-on: ubuntu-latest
-    needs: sonar
+    needs: build
     if: github.ref == 'refs/heads/main' && github.repository == 'IBM/compliance-trestle-fedramp'
     steps:
     - uses: actions/checkout@v2
@@ -187,7 +105,7 @@ jobs:
     name: Merge main -> develop
     runs-on: ubuntu-latest
     needs: deploy
-    concurrency: 
+    concurrency:
       group: ${{ github.ref }}-${{ github.workflow }}-${{ github.job }}-main
       cancel-in-progress: true
     if: github.ref == 'refs/heads/main'
