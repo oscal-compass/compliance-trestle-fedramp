@@ -1,55 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns="http://csrc.nist.gov/ns/oscal/metaschema/1.0/supermodel"
-                xmlns:j="http://www.w3.org/2005/xpath-functions"
-                xmlns:m="http://csrc.nist.gov/ns/oscal/metaschema/1.0"
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:m="http://csrc.nist.gov/ns/oscal/metaschema/1.0"
+                xmlns="http://csrc.nist.gov/ns/oscal/metaschema/1.0/supermodel"
+                xmlns:j="http://www.w3.org/2005/xpath-functions"
                 xpath-default-namespace="http://csrc.nist.gov/ns/oscal/metaschema/1.0/supermodel"
                 version="3.0"
                 exclude-result-prefixes="#all">
 <!-- JSON to XML conversion: pipeline -->
    <xsl:output indent="true"/>
    <!-- Processing architecture -->
-   <!-- $file should be a path to the file -->
-   <xsl:param name="file" as="xs:string?"/>
-   <!-- or $json should be a JSON literal -->
-   <xsl:param name="json" as="xs:string?"/>
+   <!-- $file should be a URI, absolute or relative to the XSLT transformation-->
+   <xsl:param name="file" as="xs:anyURI?"/>
    <!-- Pass in $produce=supermodel to produce OSCAL M4 supermodel intermediate format -->
    <xsl:param name="produce" as="xs:string">xml</xsl:param>
    <xsl:template name="from-json">
       <xsl:if test="not(unparsed-text-available($file))" expand-text="true">
          <nm:ERROR xmlns:nm="http://csrc.nist.gov/ns/metaschema">No file found at { $file }</nm:ERROR>
       </xsl:if>
-      <xsl:variable name="source">
-         <xsl:choose>
-            <xsl:when test="matches($json,'\S')"><!-- $json is not empty, so we try it -->
-               <xsl:try xmlns:err="http://www.w3.org/2005/xqt-errors" select="json-to-xml($json)">
-                  <xsl:catch expand-text="true">
-                     <nm:ERROR xmlns:nm="http://csrc.nist.gov/ns/metaschema" code="{ $err:code }">{{ $err:description }}</nm:ERROR>
-                  </xsl:catch>
-               </xsl:try>
-            </xsl:when>
-            <xsl:otherwise>
-               <xsl:try xmlns:err="http://www.w3.org/2005/xqt-errors"
-                        select="unparsed-text($file) ! json-to-xml(.)">
-                  <xsl:catch expand-text="true">
-                     <nm:ERROR xmlns:nm="http://csrc.nist.gov/ns/metaschema" code="{ $err:code }">{{ $err:description }}</nm:ERROR>
-                  </xsl:catch>
-               </xsl:try>
-            </xsl:otherwise>
-         </xsl:choose>
-      </xsl:variable>
       <xsl:call-template name="from-xdm-json-xml">
-         <xsl:with-param name="source" select="$source"/>
+         <xsl:with-param name="source">
+            <xsl:try xmlns:err="http://www.w3.org/2005/xqt-errors"
+                     select="unparsed-text($file) ! json-to-xml(.)">
+               <xsl:catch expand-text="true">
+                  <nm:ERROR xmlns:nm="http://csrc.nist.gov/ns/metaschema" code="{ $err:code }">{{ $err:description }}</nm:ERROR>
+               </xsl:catch>
+            </xsl:try>
+         </xsl:with-param>
       </xsl:call-template>
    </xsl:template>
    <xsl:mode name="cast-md" on-no-match="shallow-copy"/>
-   <xsl:template match="/">
-      <nm:ERROR xmlns:nm="http://csrc.nist.gov/ns/metaschema">Error in XSLT invocation - an initial template (-it) is expected ('from-json' or 'from-xdm-json-xml'), but none is given</nm:ERROR>
-   </xsl:template>
-   <xsl:template name="from-xdm-json-xml" expand-text="true">
+   <xsl:template match="/" name="from-xdm-json-xml" expand-text="true">
       <xsl:param name="source">
-         <xsl:choose><!-- evaluating $file as URI (absolute or relative to stylesheet)-->
+         <xsl:choose><!-- evaluate { $file } as URI (absolute or relative to stylesheet)-->
             <xsl:when test="exists($file)">
                <xsl:try xmlns:err="http://www.w3.org/2005/xqt-errors" select="document($file)">
                   <xsl:catch expand-text="true">
@@ -129,7 +112,7 @@
          <xsl:apply-templates select="*[@key='remarks']"/>
       </assembly>
    </xsl:template>
-   <xsl:template match="j:array[@key='props']/j:map">
+   <xsl:template match="(j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='prop']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map)">
       <xsl:param name="with-key" select="true()"/>
       <!-- XML match="prop" -->
       <assembly name="property" gi="prop">
@@ -385,9 +368,29 @@
             <xsl:attribute name="key">merge</xsl:attribute>
          </xsl:if>
          <xsl:apply-templates select="*[@key='combine']"/>
-         <xsl:apply-templates select="*[@key='flat']"/>
          <xsl:apply-templates select="*[@key='as-is']"/>
          <xsl:apply-templates select="*[@key='custom']"/>
+      </assembly>
+   </xsl:template>
+   <xsl:template match="j:map[@key='combine']">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="combine" -->
+      <assembly as-type="empty" name="combine" key="combine" gi="combine">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">combine</xsl:attribute>
+         </xsl:if>
+         <xsl:apply-templates select="*[@key='method']"/>
+      </assembly>
+   </xsl:template>
+   <xsl:template match="j:map[@key='custom']">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="custom" -->
+      <assembly name="custom" key="custom" gi="custom">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">custom</xsl:attribute>
+         </xsl:if>
+         <xsl:apply-templates select="*[@key='groups']"/>
+         <xsl:apply-templates select="*[@key='insert-controls']"/>
       </assembly>
    </xsl:template>
    <xsl:template match="j:array[@key='insert-controls']/j:map">
@@ -1033,7 +1036,7 @@
          <xsl:apply-templates select="*[@key='description']"/>
          <xsl:apply-templates select="*[@key='start']"/>
          <xsl:apply-templates select="*[@key='end']"/>
-         <xsl:apply-templates select="*[@key='props']"/>
+         <xsl:apply-templates select="*[@key='prop']"/>
          <xsl:apply-templates select="*[@key='links']"/>
          <xsl:apply-templates select="*[@key='local-definitions']"/>
          <xsl:apply-templates select="*[@key='reviewed-controls']"/>
@@ -1104,7 +1107,7 @@
          <xsl:apply-templates select="*[@key='remarks']"/>
       </assembly>
    </xsl:template>
-   <xsl:template match="(j:array[@key='origins']/j:map | j:map[@key='origin'])">
+   <xsl:template match="(j:array[@key='origins']/j:map | j:array[@key='origins']/j:map | j:map[@key='origin'] | j:array[@key='origins']/j:map | j:array[@key='origins']/j:map | j:array[@key='origins']/j:map | j:array[@key='origins']/j:map | j:map[@key='origin'] | j:array[@key='origins']/j:map | j:array[@key='origins']/j:map)">
       <xsl:param name="with-key" select="true()"/>
       <!-- XML match="origin" -->
       <assembly name="origin" gi="origin">
@@ -1285,7 +1288,7 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
-   <xsl:template match="(j:array[@key='party-uuids']/j:string | j:string[@key='party-uuid'])">
+   <xsl:template match="(j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:string[@key='party-uuid'] | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:string[@key='party-uuid'] | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:string[@key='party-uuid'] | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:string[@key='party-uuid'] | j:array[@key='party-uuids']/j:string)">
       <xsl:param name="with-key" select="true()"/>
       <!-- XML match="party-uuid" -->
       <field collapsible="no"
@@ -1296,14 +1299,14 @@
          <xsl:apply-templates select="." mode="get-value-property"/>
       </field>
    </xsl:template>
-   <xsl:template match="(j:array[@key='party-uuids']/j:string | j:string[@key='party-uuid'])"
+   <xsl:template match="(j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:string[@key='party-uuid'] | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:string[@key='party-uuid'] | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:string[@key='party-uuid'] | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:array[@key='party-uuids']/j:string | j:string[@key='party-uuid'] | j:array[@key='party-uuids']/j:string)"
                  mode="get-value-property"
                  priority="7">
       <value as-type="uuid" in-json="string">
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
-   <xsl:template match="j:array[@key='values']/j:string">
+   <xsl:template match="(j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'])">
       <xsl:param name="with-key" select="true()"/>
       <!-- XML match="value" -->
       <field collapsible="no"
@@ -1314,7 +1317,7 @@
          <xsl:apply-templates select="." mode="get-value-property"/>
       </field>
    </xsl:template>
-   <xsl:template match="j:array[@key='values']/j:string"
+   <xsl:template match="(j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:array[@key='values']/j:string | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'] | j:string[@key='value'])"
                  mode="get-value-property"
                  priority="7">
       <value as-type="string" in-json="string">
@@ -1333,6 +1336,28 @@
    <xsl:template match="j:array[@key='hashes']/j:map" mode="get-value-property">
       <value as-type="string" key="value" in-json="string">
          <xsl:apply-templates mode="keep-value-property"/>
+      </value>
+   </xsl:template>
+   <xsl:template match="j:boolean[@key='as-is']">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="as-is" -->
+      <field collapsible="no"
+             as-type="boolean"
+             name="as-is"
+             key="as-is"
+             gi="as-is"
+             in-json="SCALAR">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">as-is</xsl:attribute>
+         </xsl:if>
+         <xsl:apply-templates select="." mode="get-value-property"/>
+      </field>
+   </xsl:template>
+   <xsl:template match="j:boolean[@key='as-is']"
+                 mode="get-value-property"
+                 priority="5">
+      <value as-type="boolean" in-json="boolean">
+         <xsl:value-of select="."/>
       </value>
    </xsl:template>
    <xsl:template match="(j:array[@key='system-ids']/j:map | j:map[@key='system-id'])">
@@ -1356,7 +1381,7 @@
          <xsl:apply-templates mode="keep-value-property"/>
       </value>
    </xsl:template>
-   <xsl:template match="j:array[@key='role-ids']/j:string">
+   <xsl:template match="(j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:array[@key='role-ids']/j:string | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:array[@key='role-ids']/j:string | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:array[@key='role-ids']/j:string | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'])">
       <xsl:param name="with-key" select="true()"/>
       <!-- XML match="role-id" -->
       <field collapsible="no"
@@ -1367,7 +1392,7 @@
          <xsl:apply-templates select="." mode="get-value-property"/>
       </field>
    </xsl:template>
-   <xsl:template match="j:array[@key='role-ids']/j:string"
+   <xsl:template match="(j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:array[@key='role-ids']/j:string | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:array[@key='role-ids']/j:string | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:array[@key='role-ids']/j:string | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'] | j:string[@key='role-id'])"
                  mode="get-value-property"
                  priority="7">
       <value as-type="token" in-json="string">
@@ -1389,28 +1414,6 @@
                  mode="get-value-property"
                  priority="9">
       <value as-type="string" in-json="string">
-         <xsl:value-of select="."/>
-      </value>
-   </xsl:template>
-   <xsl:template match="(j:map[@key='status'] | j:string[@key='status'])">
-      <xsl:param name="with-key" select="true()"/>
-      <!-- XML match="status" -->
-      <field collapsible="no"
-             as-type="token"
-             name="risk-status"
-             key="status"
-             gi="status"
-             in-json="SCALAR">
-         <xsl:if test="$with-key">
-            <xsl:attribute name="key">status</xsl:attribute>
-         </xsl:if>
-         <xsl:apply-templates select="." mode="get-value-property"/>
-      </field>
-   </xsl:template>
-   <xsl:template match="(j:map[@key='status'] | j:string[@key='status'])"
-                 mode="get-value-property"
-                 priority="7">
-      <value as-type="token" in-json="string">
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
@@ -1451,7 +1454,7 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
-   <xsl:template match="j:map[@key='catalog']/j:string[@key='uuid']" priority="1"><!-- XML match="catalog/@uuid" -->
+   <xsl:template match="j:map[@key='catalog']/j:string[@key='uuid']"><!-- XML match="catalog/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -1463,7 +1466,7 @@
    <xsl:template match="j:map[@key='catalog']/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="3"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='name']" priority="1"><!-- XML match="prop/@name" -->
+   <xsl:template match="(j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='prop']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map)/j:string[@key='name']"><!-- XML match="prop/@name" -->
       <flag in-json="string"
             as-type="token"
             name="name"
@@ -1472,10 +1475,10 @@
          <xsl:value-of select="."/>
       </flag>
    </xsl:template>
-   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='name']"
+   <xsl:template match="(j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='prop']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map)/j:string[@key='name']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='uuid']" priority="1"><!-- XML match="prop/@uuid" -->
+   <xsl:template match="(j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='prop']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map)/j:string[@key='uuid']"><!-- XML match="prop/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -1484,18 +1487,18 @@
          <xsl:value-of select="."/>
       </flag>
    </xsl:template>
-   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='uuid']"
+   <xsl:template match="(j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='prop']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map)/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='ns']" priority="1"><!-- XML match="prop/@ns" -->
+   <xsl:template match="(j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='prop']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map)/j:string[@key='ns']"><!-- XML match="prop/@ns" -->
       <flag in-json="string" as-type="uri" name="ns" key="ns" gi="ns">
          <xsl:value-of select="."/>
       </flag>
    </xsl:template>
-   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='ns']"
+   <xsl:template match="(j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='prop']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map)/j:string[@key='ns']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='value']" priority="1"><!-- XML match="prop/@value" -->
+   <xsl:template match="(j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='prop']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map)/j:string[@key='value']"><!-- XML match="prop/@value" -->
       <flag in-json="string"
             as-type="string"
             name="value"
@@ -1504,10 +1507,10 @@
          <xsl:value-of select="."/>
       </flag>
    </xsl:template>
-   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='value']"
+   <xsl:template match="(j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='prop']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map)/j:string[@key='value']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='class']" priority="1"><!-- XML match="prop/@class" -->
+   <xsl:template match="(j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='prop']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map)/j:string[@key='class']"><!-- XML match="prop/@class" -->
       <flag in-json="string"
             as-type="token"
             name="class"
@@ -1516,10 +1519,10 @@
          <xsl:value-of select="."/>
       </flag>
    </xsl:template>
-   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='class']"
+   <xsl:template match="(j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='prop']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map | j:array[@key='props']/j:map)/j:string[@key='class']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='links']/j:map/j:string[@key='href']" priority="1"><!-- XML match="link/@href" -->
+   <xsl:template match="j:array[@key='links']/j:map/j:string[@key='href']"><!-- XML match="link/@href" -->
       <flag in-json="string"
             as-type="uri-reference"
             name="href"
@@ -1531,7 +1534,7 @@
    <xsl:template match="j:array[@key='links']/j:map/j:string[@key='href']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='links']/j:map/j:string[@key='rel']" priority="1"><!-- XML match="link/@rel" -->
+   <xsl:template match="j:array[@key='links']/j:map/j:string[@key='rel']"><!-- XML match="link/@rel" -->
       <flag in-json="string"
             as-type="token"
             name="rel"
@@ -1568,7 +1571,7 @@
    <xsl:template match="j:map[@key='catalog']/j:map[@key='metadata']/j:array[@key='document-ids']/j:map/j:string[@key='scheme'] | j:map[@key='catalog']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:array[@key='document-ids']/j:map/j:string[@key='scheme'] | j:map[@key='profile']/j:map[@key='metadata']/j:array[@key='document-ids']/j:map/j:string[@key='scheme'] | j:map[@key='profile']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:array[@key='document-ids']/j:map/j:string[@key='scheme'] | j:map[@key='component-definition']/j:map[@key='metadata']/j:array[@key='document-ids']/j:map/j:string[@key='scheme'] | j:map[@key='component-definition']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:array[@key='document-ids']/j:map/j:string[@key='scheme'] | j:map[@key='system-security-plan']/j:map[@key='metadata']/j:array[@key='document-ids']/j:map/j:string[@key='scheme'] | j:map[@key='system-security-plan']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:array[@key='document-ids']/j:map/j:string[@key='scheme'] | j:map[@key='assessment-plan']/j:map[@key='metadata']/j:array[@key='document-ids']/j:map/j:string[@key='scheme'] | j:map[@key='assessment-plan']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:array[@key='document-ids']/j:map/j:string[@key='scheme'] | j:map[@key='assessment-results']/j:map[@key='metadata']/j:array[@key='document-ids']/j:map/j:string[@key='scheme'] | j:map[@key='assessment-results']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:array[@key='document-ids']/j:map/j:string[@key='scheme'] | j:map[@key='plan-of-action-and-milestones']/j:map[@key='metadata']/j:array[@key='document-ids']/j:map/j:string[@key='scheme'] | j:map[@key='plan-of-action-and-milestones']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:array[@key='document-ids']/j:map/j:string[@key='scheme']"
                  mode="keep-value-property"
                  priority="6"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='roles']/j:map/j:string[@key='id']" priority="1"><!-- XML match="role/@id" -->
+   <xsl:template match="j:array[@key='roles']/j:map/j:string[@key='id']"><!-- XML match="role/@id" -->
       <flag in-json="string" as-type="token" name="id" key="id" gi="id">
          <xsl:value-of select="."/>
       </flag>
@@ -1576,8 +1579,7 @@
    <xsl:template match="j:array[@key='roles']/j:map/j:string[@key='id']"
                  mode="keep-value-property"
                  priority="6"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='locations']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="location/@uuid" -->
+   <xsl:template match="j:array[@key='locations']/j:map/j:string[@key='uuid']"><!-- XML match="location/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -1614,8 +1616,7 @@
    <xsl:template match="j:map[@key='catalog']/j:map[@key='metadata']/j:array[@key='locations']/j:map/j:array[@key='telephone-numbers']/j:map/j:string[@key='type'] | j:map[@key='catalog']/j:map[@key='metadata']/j:array[@key='parties']/j:map/j:array[@key='telephone-numbers']/j:map/j:string[@key='type'] | j:map[@key='profile']/j:map[@key='metadata']/j:array[@key='locations']/j:map/j:array[@key='telephone-numbers']/j:map/j:string[@key='type'] | j:map[@key='profile']/j:map[@key='metadata']/j:array[@key='parties']/j:map/j:array[@key='telephone-numbers']/j:map/j:string[@key='type'] | j:map[@key='component-definition']/j:map[@key='metadata']/j:array[@key='locations']/j:map/j:array[@key='telephone-numbers']/j:map/j:string[@key='type'] | j:map[@key='component-definition']/j:map[@key='metadata']/j:array[@key='parties']/j:map/j:array[@key='telephone-numbers']/j:map/j:string[@key='type'] | j:map[@key='system-security-plan']/j:map[@key='metadata']/j:array[@key='locations']/j:map/j:array[@key='telephone-numbers']/j:map/j:string[@key='type'] | j:map[@key='system-security-plan']/j:map[@key='metadata']/j:array[@key='parties']/j:map/j:array[@key='telephone-numbers']/j:map/j:string[@key='type'] | j:map[@key='assessment-plan']/j:map[@key='metadata']/j:array[@key='locations']/j:map/j:array[@key='telephone-numbers']/j:map/j:string[@key='type'] | j:map[@key='assessment-plan']/j:map[@key='metadata']/j:array[@key='parties']/j:map/j:array[@key='telephone-numbers']/j:map/j:string[@key='type'] | j:map[@key='assessment-results']/j:map[@key='metadata']/j:array[@key='locations']/j:map/j:array[@key='telephone-numbers']/j:map/j:string[@key='type'] | j:map[@key='assessment-results']/j:map[@key='metadata']/j:array[@key='parties']/j:map/j:array[@key='telephone-numbers']/j:map/j:string[@key='type'] | j:map[@key='plan-of-action-and-milestones']/j:map[@key='metadata']/j:array[@key='locations']/j:map/j:array[@key='telephone-numbers']/j:map/j:string[@key='type'] | j:map[@key='plan-of-action-and-milestones']/j:map[@key='metadata']/j:array[@key='parties']/j:map/j:array[@key='telephone-numbers']/j:map/j:string[@key='type']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='parties']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="party/@uuid" -->
+   <xsl:template match="j:array[@key='parties']/j:map/j:string[@key='uuid']"><!-- XML match="party/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -1627,8 +1628,7 @@
    <xsl:template match="j:array[@key='parties']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="6"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='parties']/j:map/j:string[@key='type']"
-                 priority="1"><!-- XML match="party/@type" -->
+   <xsl:template match="j:array[@key='parties']/j:map/j:string[@key='type']"><!-- XML match="party/@type" -->
       <flag in-json="string"
             as-type="string"
             name="type"
@@ -1653,8 +1653,7 @@
    <xsl:template match="j:map[@key='catalog']/j:map[@key='metadata']/j:array[@key='parties']/j:map/j:array[@key='external-ids']/j:map/j:string[@key='scheme'] | j:map[@key='profile']/j:map[@key='metadata']/j:array[@key='parties']/j:map/j:array[@key='external-ids']/j:map/j:string[@key='scheme'] | j:map[@key='component-definition']/j:map[@key='metadata']/j:array[@key='parties']/j:map/j:array[@key='external-ids']/j:map/j:string[@key='scheme'] | j:map[@key='system-security-plan']/j:map[@key='metadata']/j:array[@key='parties']/j:map/j:array[@key='external-ids']/j:map/j:string[@key='scheme'] | j:map[@key='assessment-plan']/j:map[@key='metadata']/j:array[@key='parties']/j:map/j:array[@key='external-ids']/j:map/j:string[@key='scheme'] | j:map[@key='assessment-results']/j:map[@key='metadata']/j:array[@key='parties']/j:map/j:array[@key='external-ids']/j:map/j:string[@key='scheme'] | j:map[@key='plan-of-action-and-milestones']/j:map[@key='metadata']/j:array[@key='parties']/j:map/j:array[@key='external-ids']/j:map/j:string[@key='scheme']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='responsible-parties']/j:map/j:string[@key='role-id']"
-                 priority="1"><!-- XML match="responsible-party/@role-id" -->
+   <xsl:template match="j:array[@key='responsible-parties']/j:map/j:string[@key='role-id']"><!-- XML match="responsible-party/@role-id" -->
       <flag in-json="string"
             as-type="token"
             name="role-id"
@@ -1666,7 +1665,7 @@
    <xsl:template match="j:array[@key='responsible-parties']/j:map/j:string[@key='role-id']"
                  mode="keep-value-property"
                  priority="6"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='params']/j:map/j:string[@key='id']" priority="1"><!-- XML match="param/@id" -->
+   <xsl:template match="j:array[@key='params']/j:map/j:string[@key='id']"><!-- XML match="param/@id" -->
       <flag in-json="string" as-type="token" name="id" key="id" gi="id">
          <xsl:value-of select="."/>
       </flag>
@@ -1674,8 +1673,7 @@
    <xsl:template match="j:array[@key='params']/j:map/j:string[@key='id']"
                  mode="keep-value-property"
                  priority="5"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='params']/j:map/j:string[@key='class']"
-                 priority="1"><!-- XML match="param/@class" -->
+   <xsl:template match="j:array[@key='params']/j:map/j:string[@key='class']"><!-- XML match="param/@class" -->
       <flag in-json="string"
             as-type="token"
             name="class"
@@ -1687,13 +1685,11 @@
    <xsl:template match="j:array[@key='params']/j:map/j:string[@key='class']"
                  mode="keep-value-property"
                  priority="5"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='params']/j:map/j:string[@key='depends-on']"
-                 priority="1"><!-- XML match="param/@depends-on" -->
+   <xsl:template match="j:array[@key='params']/j:map/j:string[@key='depends-on']"><!-- XML match="param/@depends-on" -->
       <flag in-json="string"
             as-type="token"
             name="depends-on"
             key="depends-on"
-            deprecated="1.0.1"
             gi="depends-on">
          <xsl:value-of select="."/>
       </flag>
@@ -1701,7 +1697,7 @@
    <xsl:template match="j:array[@key='params']/j:map/j:string[@key='depends-on']"
                  mode="keep-value-property"
                  priority="5"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:map[@key='select']/j:string[@key='how-many']" priority="1"><!-- XML match="select/@how-many" -->
+   <xsl:template match="j:map[@key='select']/j:string[@key='how-many']"><!-- XML match="select/@how-many" -->
       <flag in-json="string"
             as-type="token"
             name="how-many"
@@ -1713,7 +1709,7 @@
    <xsl:template match="j:map[@key='select']/j:string[@key='how-many']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='controls']/j:map/j:string[@key='id']" priority="1"><!-- XML match="control/@id" -->
+   <xsl:template match="j:array[@key='controls']/j:map/j:string[@key='id']"><!-- XML match="control/@id" -->
       <flag in-json="string" as-type="token" name="id" key="id" gi="id">
          <xsl:value-of select="."/>
       </flag>
@@ -1721,8 +1717,7 @@
    <xsl:template match="j:array[@key='controls']/j:map/j:string[@key='id']"
                  mode="keep-value-property"
                  priority="5"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='controls']/j:map/j:string[@key='class']"
-                 priority="1"><!-- XML match="control/@class" -->
+   <xsl:template match="j:array[@key='controls']/j:map/j:string[@key='class']"><!-- XML match="control/@class" -->
       <flag in-json="string"
             as-type="token"
             name="class"
@@ -1734,7 +1729,7 @@
    <xsl:template match="j:array[@key='controls']/j:map/j:string[@key='class']"
                  mode="keep-value-property"
                  priority="5"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='id']" priority="1"><!-- XML match="part/@id" -->
+   <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='id']"><!-- XML match="part/@id" -->
       <flag in-json="string" as-type="token" name="id" key="id" gi="id">
          <xsl:value-of select="."/>
       </flag>
@@ -1742,7 +1737,7 @@
    <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='id']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='name']" priority="1"><!-- XML match="part/@name" -->
+   <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='name']"><!-- XML match="part/@name" -->
       <flag in-json="string"
             as-type="token"
             name="name"
@@ -1754,7 +1749,7 @@
    <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='name']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='ns']" priority="1"><!-- XML match="part/@ns" -->
+   <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='ns']"><!-- XML match="part/@ns" -->
       <flag in-json="string" as-type="uri" name="ns" key="ns" gi="ns">
          <xsl:value-of select="."/>
       </flag>
@@ -1762,7 +1757,7 @@
    <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='ns']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='class']" priority="1"><!-- XML match="part/@class" -->
+   <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='class']"><!-- XML match="part/@class" -->
       <flag in-json="string"
             as-type="token"
             name="class"
@@ -1774,7 +1769,7 @@
    <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='class']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='groups']/j:map/j:string[@key='id']" priority="1"><!-- XML match="group/@id" -->
+   <xsl:template match="j:array[@key='groups']/j:map/j:string[@key='id']"><!-- XML match="group/@id" -->
       <flag in-json="string" as-type="token" name="id" key="id" gi="id">
          <xsl:value-of select="."/>
       </flag>
@@ -1782,8 +1777,7 @@
    <xsl:template match="j:array[@key='groups']/j:map/j:string[@key='id']"
                  mode="keep-value-property"
                  priority="5"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='groups']/j:map/j:string[@key='class']"
-                 priority="1"><!-- XML match="group/@class" -->
+   <xsl:template match="j:array[@key='groups']/j:map/j:string[@key='class']"><!-- XML match="group/@class" -->
       <flag in-json="string"
             as-type="token"
             name="class"
@@ -1833,8 +1827,7 @@
    <xsl:template match="j:map[@key='catalog']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:array[@key='rlinks']/j:map/j:string[@key='media-type'] | j:map[@key='profile']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:array[@key='rlinks']/j:map/j:string[@key='media-type'] | j:map[@key='component-definition']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:array[@key='rlinks']/j:map/j:string[@key='media-type'] | j:map[@key='system-security-plan']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:array[@key='rlinks']/j:map/j:string[@key='media-type'] | j:map[@key='assessment-plan']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:array[@key='rlinks']/j:map/j:string[@key='media-type'] | j:map[@key='assessment-results']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:array[@key='rlinks']/j:map/j:string[@key='media-type'] | j:map[@key='plan-of-action-and-milestones']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:array[@key='rlinks']/j:map/j:string[@key='media-type']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='hashes']/j:map/j:string[@key='algorithm']"
-                 priority="3"><!-- XML match="hash/@algorithm" -->
+   <xsl:template match="j:array[@key='hashes']/j:map/j:string[@key='algorithm']"><!-- XML match="hash/@algorithm" -->
       <flag in-json="string"
             as-type="string"
             name="algorithm"
@@ -1871,7 +1864,7 @@
    <xsl:template match="j:map[@key='catalog']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:map[@key='base64']/j:string[@key='media-type'] | j:map[@key='profile']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:map[@key='base64']/j:string[@key='media-type'] | j:map[@key='component-definition']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:map[@key='base64']/j:string[@key='media-type'] | j:map[@key='system-security-plan']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:map[@key='base64']/j:string[@key='media-type'] | j:map[@key='assessment-plan']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:map[@key='base64']/j:string[@key='media-type'] | j:map[@key='assessment-results']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:map[@key='base64']/j:string[@key='media-type'] | j:map[@key='plan-of-action-and-milestones']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:map[@key='base64']/j:string[@key='media-type']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:map[@key='profile']/j:string[@key='uuid']" priority="1"><!-- XML match="profile/@uuid" -->
+   <xsl:template match="j:map[@key='profile']/j:string[@key='uuid']"><!-- XML match="profile/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -1883,8 +1876,7 @@
    <xsl:template match="j:map[@key='profile']/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="3"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='imports']/j:map/j:string[@key='href']"
-                 priority="1"><!-- XML match="import/@href" -->
+   <xsl:template match="j:array[@key='imports']/j:map/j:string[@key='href']"><!-- XML match="import/@href" -->
       <flag in-json="string"
             as-type="uri-reference"
             name="href"
@@ -1920,8 +1912,7 @@
    <xsl:template match="j:map[@key='profile']/j:array[@key='imports']/j:map/j:array[@key='include-controls']/j:map/j:array[@key='matching']/j:map/j:string[@key='pattern'] | j:map[@key='profile']/j:array[@key='imports']/j:map/j:array[@key='exclude-controls']/j:map/j:array[@key='matching']/j:map/j:string[@key='pattern'] | j:map[@key='profile']/j:map[@key='merge']/j:map[@key='custom']//j:array[@key='groups']/j:map/j:array[@key='insert-controls']/j:map/j:array[@key='include-controls']/j:map/j:array[@key='matching']/j:map/j:string[@key='pattern'] | j:map[@key='profile']/j:map[@key='merge']/j:map[@key='custom']//j:array[@key='groups']/j:map/j:array[@key='insert-controls']/j:map/j:array[@key='exclude-controls']/j:map/j:array[@key='matching']/j:map/j:string[@key='pattern'] | j:map[@key='profile']/j:map[@key='merge']/j:map[@key='custom']/j:array[@key='insert-controls']/j:map/j:array[@key='include-controls']/j:map/j:array[@key='matching']/j:map/j:string[@key='pattern'] | j:map[@key='profile']/j:map[@key='merge']/j:map[@key='custom']/j:array[@key='insert-controls']/j:map/j:array[@key='exclude-controls']/j:map/j:array[@key='matching']/j:map/j:string[@key='pattern']"
                  mode="keep-value-property"
                  priority="10"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:map[@key='profile']/j:map[@key='merge']/j:map[@key='combine']/j:string[@key='method']"
-                 priority="5"><!-- XML match="profile/merge/combine/@method" -->
+   <xsl:template match="j:map[@key='combine']/j:string[@key='method']"><!-- XML match="combine/@method" -->
       <flag in-json="string"
             as-type="string"
             name="method"
@@ -1930,10 +1921,10 @@
          <xsl:value-of select="."/>
       </flag>
    </xsl:template>
-   <xsl:template match="j:map[@key='profile']/j:map[@key='merge']/j:map[@key='combine']/j:string[@key='method']"
+   <xsl:template match="j:map[@key='combine']/j:string[@key='method']"
                  mode="keep-value-property"
                  priority="5"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='groups']/j:map/j:string[@key='id']" priority="1"><!-- XML match="group/@id" -->
+   <xsl:template match="j:array[@key='groups']/j:map/j:string[@key='id']"><!-- XML match="group/@id" -->
       <flag in-json="string" as-type="token" name="id" key="id" gi="id">
          <xsl:value-of select="."/>
       </flag>
@@ -1941,8 +1932,7 @@
    <xsl:template match="j:array[@key='groups']/j:map/j:string[@key='id']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='groups']/j:map/j:string[@key='class']"
-                 priority="1"><!-- XML match="group/@class" -->
+   <xsl:template match="j:array[@key='groups']/j:map/j:string[@key='class']"><!-- XML match="group/@class" -->
       <flag in-json="string"
             as-type="token"
             name="class"
@@ -1954,8 +1944,7 @@
    <xsl:template match="j:array[@key='groups']/j:map/j:string[@key='class']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='insert-controls']/j:map/j:string[@key='order']"
-                 priority="1"><!-- XML match="insert-controls/@order" -->
+   <xsl:template match="j:array[@key='insert-controls']/j:map/j:string[@key='order']"><!-- XML match="insert-controls/@order" -->
       <flag in-json="string"
             as-type="token"
             name="order"
@@ -1993,13 +1982,11 @@
    <xsl:template match="j:map[@key='profile']/j:map[@key='modify']/j:array[@key='set-parameters']/j:map/j:string[@key='class']"
                  mode="keep-value-property"
                  priority="6"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:map[@key='profile']/j:map[@key='modify']/j:array[@key='set-parameters']/j:map/j:string[@key='depends-on']"
-                 priority="6"><!-- XML match="profile/modify/set-parameter/@depends-on" -->
+   <xsl:template match="j:map[@key='profile']/j:map[@key='modify']/j:array[@key='set-parameters']/j:map/j:string[@key='depends-on']"><!-- XML match="profile/modify/set-parameter/@depends-on" -->
       <flag in-json="string"
             as-type="token"
             name="depends-on"
             key="depends-on"
-            deprecated="1.0.1"
             gi="depends-on">
          <xsl:value-of select="."/>
       </flag>
@@ -2019,8 +2006,7 @@
    <xsl:template match="j:array[@key='alters']/j:map/j:string[@key='control-id']"
                  mode="keep-value-property"
                  priority="6"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='removes']/j:map/j:string[@key='by-name']"
-                 priority="1"><!-- XML match="remove/@by-name" -->
+   <xsl:template match="j:array[@key='removes']/j:map/j:string[@key='by-name']"><!-- XML match="remove/@by-name" -->
       <flag in-json="string"
             as-type="token"
             name="by-name"
@@ -2032,8 +2018,7 @@
    <xsl:template match="j:array[@key='removes']/j:map/j:string[@key='by-name']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='removes']/j:map/j:string[@key='by-class']"
-                 priority="1"><!-- XML match="remove/@by-class" -->
+   <xsl:template match="j:array[@key='removes']/j:map/j:string[@key='by-class']"><!-- XML match="remove/@by-class" -->
       <flag in-json="string"
             as-type="token"
             name="by-class"
@@ -2045,8 +2030,7 @@
    <xsl:template match="j:array[@key='removes']/j:map/j:string[@key='by-class']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='removes']/j:map/j:string[@key='by-id']"
-                 priority="1"><!-- XML match="remove/@by-id" -->
+   <xsl:template match="j:array[@key='removes']/j:map/j:string[@key='by-id']"><!-- XML match="remove/@by-id" -->
       <flag in-json="string"
             as-type="token"
             name="by-id"
@@ -2058,8 +2042,7 @@
    <xsl:template match="j:array[@key='removes']/j:map/j:string[@key='by-id']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='removes']/j:map/j:string[@key='by-item-name']"
-                 priority="1"><!-- XML match="remove/@by-item-name" -->
+   <xsl:template match="j:array[@key='removes']/j:map/j:string[@key='by-item-name']"><!-- XML match="remove/@by-item-name" -->
       <flag in-json="string"
             as-type="token"
             name="by-item-name"
@@ -2071,8 +2054,7 @@
    <xsl:template match="j:array[@key='removes']/j:map/j:string[@key='by-item-name']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='removes']/j:map/j:string[@key='by-ns']"
-                 priority="1"><!-- XML match="remove/@by-ns" -->
+   <xsl:template match="j:array[@key='removes']/j:map/j:string[@key='by-ns']"><!-- XML match="remove/@by-ns" -->
       <flag in-json="string"
             as-type="token"
             name="by-ns"
@@ -2084,8 +2066,7 @@
    <xsl:template match="j:array[@key='removes']/j:map/j:string[@key='by-ns']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='adds']/j:map/j:string[@key='position']"
-                 priority="1"><!-- XML match="add/@position" -->
+   <xsl:template match="j:array[@key='adds']/j:map/j:string[@key='position']"><!-- XML match="add/@position" -->
       <flag in-json="string"
             as-type="token"
             name="position"
@@ -2097,7 +2078,7 @@
    <xsl:template match="j:array[@key='adds']/j:map/j:string[@key='position']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='adds']/j:map/j:string[@key='by-id']" priority="1"><!-- XML match="add/@by-id" -->
+   <xsl:template match="j:array[@key='adds']/j:map/j:string[@key='by-id']"><!-- XML match="add/@by-id" -->
       <flag in-json="string"
             as-type="token"
             name="by-id"
@@ -2109,8 +2090,7 @@
    <xsl:template match="j:array[@key='adds']/j:map/j:string[@key='by-id']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:map[@key='component-definition']/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="component-definition/@uuid" -->
+   <xsl:template match="j:map[@key='component-definition']/j:string[@key='uuid']"><!-- XML match="component-definition/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -2122,8 +2102,7 @@
    <xsl:template match="j:map[@key='component-definition']/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="3"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='import-component-definitions']/j:map/j:string[@key='href']"
-                 priority="1"><!-- XML match="import-component-definition/@href" -->
+   <xsl:template match="j:array[@key='import-component-definitions']/j:map/j:string[@key='href']"><!-- XML match="import-component-definition/@href" -->
       <flag in-json="string"
             as-type="uri-reference"
             name="href"
@@ -2135,8 +2114,7 @@
    <xsl:template match="j:array[@key='import-component-definitions']/j:map/j:string[@key='href']"
                  mode="keep-value-property"
                  priority="5"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='components']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="component/@uuid" -->
+   <xsl:template match="j:array[@key='components']/j:map/j:string[@key='uuid']"><!-- XML match="component/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -2160,8 +2138,7 @@
    <xsl:template match="j:array[@key='components']/j:map/j:string[@key='type']"
                  mode="keep-value-property"
                  priority="5"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='responsible-roles']/j:map/j:string[@key='role-id']"
-                 priority="1"><!-- XML match="responsible-role/@role-id" -->
+   <xsl:template match="j:array[@key='responsible-roles']/j:map/j:string[@key='role-id']"><!-- XML match="responsible-role/@role-id" -->
       <flag in-json="string"
             as-type="token"
             name="role-id"
@@ -2173,8 +2150,7 @@
    <xsl:template match="j:array[@key='responsible-roles']/j:map/j:string[@key='role-id']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='protocols']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="protocol/@uuid" -->
+   <xsl:template match="j:array[@key='protocols']/j:map/j:string[@key='uuid']"><!-- XML match="protocol/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -2186,8 +2162,7 @@
    <xsl:template match="j:array[@key='protocols']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='protocols']/j:map/j:string[@key='name']"
-                 priority="1"><!-- XML match="protocol/@name" -->
+   <xsl:template match="j:array[@key='protocols']/j:map/j:string[@key='name']"><!-- XML match="protocol/@name" -->
       <flag in-json="string"
             as-type="string"
             name="name"
@@ -2199,8 +2174,7 @@
    <xsl:template match="j:array[@key='protocols']/j:map/j:string[@key='name']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='port-ranges']/j:map/j:number[@key='start']"
-                 priority="1"><!-- XML match="port-range/@start" -->
+   <xsl:template match="j:array[@key='port-ranges']/j:map/j:number[@key='start']"><!-- XML match="port-range/@start" -->
       <flag in-json="number"
             as-type="nonNegativeInteger"
             name="start"
@@ -2212,8 +2186,7 @@
    <xsl:template match="j:array[@key='port-ranges']/j:map/j:number[@key='start']"
                  mode="keep-value-property"
                  priority="9"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='port-ranges']/j:map/j:number[@key='end']"
-                 priority="1"><!-- XML match="port-range/@end" -->
+   <xsl:template match="j:array[@key='port-ranges']/j:map/j:number[@key='end']"><!-- XML match="port-range/@end" -->
       <flag in-json="number"
             as-type="nonNegativeInteger"
             name="end"
@@ -2225,8 +2198,7 @@
    <xsl:template match="j:array[@key='port-ranges']/j:map/j:number[@key='end']"
                  mode="keep-value-property"
                  priority="9"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='port-ranges']/j:map/j:string[@key='transport']"
-                 priority="1"><!-- XML match="port-range/@transport" -->
+   <xsl:template match="j:array[@key='port-ranges']/j:map/j:string[@key='transport']"><!-- XML match="port-range/@transport" -->
       <flag in-json="string"
             as-type="token"
             name="transport"
@@ -2325,8 +2297,7 @@
    <xsl:template match="j:map[@key='component-definition']/j:array[@key='components']/j:map/j:array[@key='control-implementations']/j:map/j:array[@key='implemented-requirements']/j:map/j:array[@key='statements']/j:map/j:string[@key='uuid'] | j:map[@key='component-definition']/j:array[@key='capabilities']/j:map/j:array[@key='control-implementations']/j:map/j:array[@key='implemented-requirements']/j:map/j:array[@key='statements']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="11"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='capabilities']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="capability/@uuid" -->
+   <xsl:template match="j:array[@key='capabilities']/j:map/j:string[@key='uuid']"><!-- XML match="capability/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -2338,8 +2309,7 @@
    <xsl:template match="j:array[@key='capabilities']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="5"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='capabilities']/j:map/j:string[@key='name']"
-                 priority="1"><!-- XML match="capability/@name" -->
+   <xsl:template match="j:array[@key='capabilities']/j:map/j:string[@key='name']"><!-- XML match="capability/@name" -->
       <flag in-json="string"
             as-type="string"
             name="name"
@@ -2351,8 +2321,7 @@
    <xsl:template match="j:array[@key='capabilities']/j:map/j:string[@key='name']"
                  mode="keep-value-property"
                  priority="5"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='incorporates-components']/j:map/j:string[@key='component-uuid']"
-                 priority="1"><!-- XML match="incorporates-component/@component-uuid" -->
+   <xsl:template match="j:array[@key='incorporates-components']/j:map/j:string[@key='component-uuid']"><!-- XML match="incorporates-component/@component-uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="component-uuid"
@@ -2364,8 +2333,7 @@
    <xsl:template match="j:array[@key='incorporates-components']/j:map/j:string[@key='component-uuid']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:map[@key='system-security-plan']/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="system-security-plan/@uuid" -->
+   <xsl:template match="j:map[@key='system-security-plan']/j:string[@key='uuid']"><!-- XML match="system-security-plan/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -2377,7 +2345,7 @@
    <xsl:template match="j:map[@key='system-security-plan']/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="3"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:map[@key='import-profile']/j:string[@key='href']" priority="1"><!-- XML match="import-profile/@href" -->
+   <xsl:template match="j:map[@key='import-profile']/j:string[@key='href']"><!-- XML match="import-profile/@href" -->
       <flag in-json="string"
             as-type="uri-reference"
             name="href"
@@ -2389,8 +2357,7 @@
    <xsl:template match="j:map[@key='import-profile']/j:string[@key='href']"
                  mode="keep-value-property"
                  priority="4"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="(j:array[@key='system-ids']/j:map | j:map[@key='system-id'])/j:string[@key='identifier-type']"
-                 priority="1"><!-- XML match="system-id/@identifier-type" -->
+   <xsl:template match="(j:array[@key='system-ids']/j:map | j:map[@key='system-id'])/j:string[@key='identifier-type']"><!-- XML match="system-id/@identifier-type" -->
       <flag in-json="string"
             as-type="uri"
             name="identifier-type"
@@ -2441,8 +2408,7 @@
    <xsl:template match="j:map[@key='system-security-plan']/j:map[@key='system-characteristics']/j:map[@key='status']/j:string[@key='state']"
                  mode="keep-value-property"
                  priority="5"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='diagrams']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="diagram/@uuid" -->
+   <xsl:template match="j:array[@key='diagrams']/j:map/j:string[@key='uuid']"><!-- XML match="diagram/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -2467,7 +2433,7 @@
    <xsl:template match="j:map[@key='system-security-plan']/j:map[@key='system-implementation']/j:array[@key='leveraged-authorizations']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="6"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='users']/j:map/j:string[@key='uuid']" priority="1"><!-- XML match="user/@uuid" -->
+   <xsl:template match="j:array[@key='users']/j:map/j:string[@key='uuid']"><!-- XML match="user/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -2479,8 +2445,7 @@
    <xsl:template match="j:array[@key='users']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="6"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='components']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="component/@uuid" -->
+   <xsl:template match="j:array[@key='components']/j:map/j:string[@key='uuid']"><!-- XML match="component/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -2517,8 +2482,7 @@
    <xsl:template match="j:map[@key='system-security-plan']/j:map[@key='system-implementation']/j:array[@key='components']/j:map/j:map[@key='status']/j:string[@key='state'] | j:map[@key='assessment-plan']/j:map[@key='local-definitions']/j:array[@key='components']/j:map/j:map[@key='status']/j:string[@key='state'] | j:map[@key='assessment-plan']/j:map[@key='assessment-assets']/j:array[@key='components']/j:map/j:map[@key='status']/j:string[@key='state'] | j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:map[@key='local-definitions']/j:array[@key='components']/j:map/j:map[@key='status']/j:string[@key='state'] | j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:map[@key='local-definitions']/j:map[@key='assessment-assets']/j:array[@key='components']/j:map/j:map[@key='status']/j:string[@key='state'] | j:map[@key='plan-of-action-and-milestones']/j:map[@key='local-definitions']/j:array[@key='components']/j:map/j:map[@key='status']/j:string[@key='state']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='inventory-items']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="inventory-item/@uuid" -->
+   <xsl:template match="j:array[@key='inventory-items']/j:map/j:string[@key='uuid']"><!-- XML match="inventory-item/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -2593,8 +2557,7 @@
    <xsl:template match="j:map[@key='system-security-plan']/j:map[@key='control-implementation']/j:array[@key='implemented-requirements']/j:map/j:array[@key='statements']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='by-components']/j:map/j:string[@key='component-uuid']"
-                 priority="1"><!-- XML match="by-component/@component-uuid" -->
+   <xsl:template match="j:array[@key='by-components']/j:map/j:string[@key='component-uuid']"><!-- XML match="by-component/@component-uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="component-uuid"
@@ -2606,8 +2569,7 @@
    <xsl:template match="j:array[@key='by-components']/j:map/j:string[@key='component-uuid']"
                  mode="keep-value-property"
                  priority="10"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='by-components']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="by-component/@uuid" -->
+   <xsl:template match="j:array[@key='by-components']/j:map/j:string[@key='uuid']"><!-- XML match="by-component/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -2619,8 +2581,7 @@
    <xsl:template match="j:array[@key='by-components']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="10"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:map[@key='implementation-status']/j:string[@key='state']"
-                 priority="1"><!-- XML match="implementation-status/@state" -->
+   <xsl:template match="j:map[@key='implementation-status']/j:string[@key='state']"><!-- XML match="implementation-status/@state" -->
       <flag in-json="string"
             as-type="token"
             name="state"
@@ -2720,8 +2681,7 @@
    <xsl:template match="j:map[@key='system-security-plan']/j:map[@key='control-implementation']/j:array[@key='implemented-requirements']/j:map/j:array[@key='statements']/j:map/j:array[@key='by-components']/j:map/j:array[@key='satisfied']/j:map/j:string[@key='responsibility-uuid'] | j:map[@key='system-security-plan']/j:map[@key='control-implementation']/j:array[@key='implemented-requirements']/j:map/j:array[@key='by-components']/j:map/j:array[@key='satisfied']/j:map/j:string[@key='responsibility-uuid']"
                  mode="keep-value-property"
                  priority="12"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:map[@key='assessment-plan']/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="assessment-plan/@uuid" -->
+   <xsl:template match="j:map[@key='assessment-plan']/j:string[@key='uuid']"><!-- XML match="assessment-plan/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -2733,7 +2693,7 @@
    <xsl:template match="j:map[@key='assessment-plan']/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="3"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:map[@key='import-ssp']/j:string[@key='href']" priority="1"><!-- XML match="import-ssp/@href" -->
+   <xsl:template match="j:map[@key='import-ssp']/j:string[@key='href']"><!-- XML match="import-ssp/@href" -->
       <flag in-json="string"
             as-type="uri-reference"
             name="href"
@@ -2757,8 +2717,7 @@
    <xsl:template match="j:array[@key='objectives-and-methods']/j:map/j:string[@key='control-id']"
                  mode="keep-value-property"
                  priority="6"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='activities']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="activity/@uuid" -->
+   <xsl:template match="j:array[@key='activities']/j:map/j:string[@key='uuid']"><!-- XML match="activity/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -2807,7 +2766,7 @@
    <xsl:template match="j:array[@key='include-objectives']/j:map/j:string[@key='objective-id'] | j:array[@key='exclude-objectives']/j:map/j:string[@key='objective-id']"
                  mode="keep-value-property"
                  priority="14"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='uuid']" priority="1"><!-- XML match="part/@uuid" -->
+   <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='uuid']"><!-- XML match="part/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -2819,7 +2778,7 @@
    <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="6"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='name']" priority="1"><!-- XML match="part/@name" -->
+   <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='name']"><!-- XML match="part/@name" -->
       <flag in-json="string"
             as-type="token"
             name="name"
@@ -2831,7 +2790,7 @@
    <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='name']"
                  mode="keep-value-property"
                  priority="6"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='ns']" priority="1"><!-- XML match="part/@ns" -->
+   <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='ns']"><!-- XML match="part/@ns" -->
       <flag in-json="string" as-type="uri" name="ns" key="ns" gi="ns">
          <xsl:value-of select="."/>
       </flag>
@@ -2839,7 +2798,7 @@
    <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='ns']"
                  mode="keep-value-property"
                  priority="6"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='class']" priority="1"><!-- XML match="part/@class" -->
+   <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='class']"><!-- XML match="part/@class" -->
       <flag in-json="string"
             as-type="token"
             name="class"
@@ -2851,8 +2810,7 @@
    <xsl:template match="j:array[@key='parts']/j:map/j:string[@key='class']"
                  mode="keep-value-property"
                  priority="6"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='assessment-subjects']/j:map/j:string[@key='type'] | j:array[@key='subjects']/j:map/j:string[@key='type']"
-                 priority="1"><!-- XML match="assessment-subject/@type | subject/@type" -->
+   <xsl:template match="j:array[@key='assessment-subjects']/j:map/j:string[@key='type'] | j:array[@key='subjects']/j:map/j:string[@key='type']"><!-- XML match="assessment-subject/@type | subject/@type" -->
       <flag in-json="string"
             as-type="token"
             name="type"
@@ -2914,8 +2872,7 @@
    <xsl:template match="j:map[@key='assessment-plan']/j:map[@key='assessment-assets']/j:array[@key='assessment-platforms']/j:map/j:array[@key='uses-components']/j:map/j:string[@key='component-uuid'] | j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:map[@key='local-definitions']/j:map[@key='assessment-assets']/j:array[@key='assessment-platforms']/j:map/j:array[@key='uses-components']/j:map/j:string[@key='component-uuid']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='tasks']/j:map/j:string[@key='uuid'] | j:array[@key='tasks']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="task/@uuid | assessment-task/@uuid" -->
+   <xsl:template match="j:array[@key='tasks']/j:map/j:string[@key='uuid'] | j:array[@key='tasks']/j:map/j:string[@key='uuid']"><!-- XML match="task/@uuid | assessment-task/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -2927,8 +2884,7 @@
    <xsl:template match="j:array[@key='tasks']/j:map/j:string[@key='uuid'] | j:array[@key='tasks']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="5"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='tasks']/j:map/j:string[@key='type'] | j:array[@key='tasks']/j:map/j:string[@key='type']"
-                 priority="1"><!-- XML match="task/@type | assessment-task/@type" -->
+   <xsl:template match="j:array[@key='tasks']/j:map/j:string[@key='type'] | j:array[@key='tasks']/j:map/j:string[@key='type']"><!-- XML match="task/@type | assessment-task/@type" -->
       <flag in-json="string"
             as-type="token"
             name="type"
@@ -3031,8 +2987,7 @@
    <xsl:template match="j:map[@key='assessment-plan']//j:array[@key='tasks']/j:map/j:array[@key='associated-activities']/j:map/j:string[@key='activity-uuid'] | j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:map[@key='local-definitions']//j:array[@key='tasks']/j:map/j:array[@key='associated-activities']/j:map/j:string[@key='activity-uuid'] | j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map//j:array[@key='tasks']/j:map/j:array[@key='associated-activities']/j:map/j:string[@key='activity-uuid'] | j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map//j:array[@key='tasks']/j:map/j:array[@key='associated-activities']/j:map/j:string[@key='activity-uuid']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:map[@key='assessment-results']/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="assessment-results/@uuid" -->
+   <xsl:template match="j:map[@key='assessment-results']/j:string[@key='uuid']"><!-- XML match="assessment-results/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -3044,7 +2999,7 @@
    <xsl:template match="j:map[@key='assessment-results']/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="3"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:map[@key='import-ap']/j:string[@key='href']" priority="1"><!-- XML match="import-ap/@href" -->
+   <xsl:template match="j:map[@key='import-ap']/j:string[@key='href']"><!-- XML match="import-ap/@href" -->
       <flag in-json="string"
             as-type="uri-reference"
             name="href"
@@ -3056,8 +3011,7 @@
    <xsl:template match="j:map[@key='import-ap']/j:string[@key='href']"
                  mode="keep-value-property"
                  priority="4"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='results']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="result/@uuid" -->
+   <xsl:template match="j:array[@key='results']/j:map/j:string[@key='uuid']"><!-- XML match="result/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -3082,8 +3036,7 @@
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:map[@key='assessment-log']/j:array[@key='entries']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='logged-by']/j:map/j:string[@key='party-uuid']"
-                 priority="1"><!-- XML match="logged-by/@party-uuid" -->
+   <xsl:template match="j:array[@key='logged-by']/j:map/j:string[@key='party-uuid']"><!-- XML match="logged-by/@party-uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="party-uuid"
@@ -3095,8 +3048,7 @@
    <xsl:template match="j:array[@key='logged-by']/j:map/j:string[@key='party-uuid']"
                  mode="keep-value-property"
                  priority="10"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='logged-by']/j:map/j:string[@key='role-id']"
-                 priority="1"><!-- XML match="logged-by/@role-id" -->
+   <xsl:template match="j:array[@key='logged-by']/j:map/j:string[@key='role-id']"><!-- XML match="logged-by/@role-id" -->
       <flag in-json="string"
             as-type="token"
             name="role-id"
@@ -3108,8 +3060,7 @@
    <xsl:template match="j:array[@key='logged-by']/j:map/j:string[@key='role-id']"
                  mode="keep-value-property"
                  priority="10"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='related-tasks']/j:map/j:string[@key='task-uuid']"
-                 priority="1"><!-- XML match="related-task/@task-uuid" -->
+   <xsl:template match="j:array[@key='related-tasks']/j:map/j:string[@key='task-uuid']"><!-- XML match="related-task/@task-uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="task-uuid"
@@ -3134,8 +3085,7 @@
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:map[@key='assessment-log']/j:array[@key='entries']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:string[@key='subject-placeholder-uuid'] | j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='observations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:string[@key='subject-placeholder-uuid'] | j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:string[@key='subject-placeholder-uuid'] | j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='characterizations']/j:map/j:map[@key='origin']/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:string[@key='subject-placeholder-uuid'] | j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:string[@key='subject-placeholder-uuid'] | j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:map[@key='risk-log']/j:array[@key='entries']/j:map/j:array[@key='related-responses']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:string[@key='subject-placeholder-uuid'] | j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='findings']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:string[@key='subject-placeholder-uuid'] | j:map[@key='plan-of-action-and-milestones']/j:array[@key='observations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:string[@key='subject-placeholder-uuid'] | j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:string[@key='subject-placeholder-uuid'] | j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='characterizations']/j:map/j:map[@key='origin']/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:string[@key='subject-placeholder-uuid'] | j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:string[@key='subject-placeholder-uuid'] | j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:map[@key='risk-log']/j:array[@key='entries']/j:map/j:array[@key='related-responses']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:string[@key='subject-placeholder-uuid']"
                  mode="keep-value-property"
                  priority="11"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='observations']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="observation/@uuid" -->
+   <xsl:template match="j:array[@key='observations']/j:map/j:string[@key='uuid']"><!-- XML match="observation/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -3147,7 +3097,7 @@
    <xsl:template match="j:array[@key='observations']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='actors']/j:map/j:string[@key='type']" priority="1"><!-- XML match="actor/@type" -->
+   <xsl:template match="j:array[@key='actors']/j:map/j:string[@key='type']"><!-- XML match="actor/@type" -->
       <flag in-json="string"
             as-type="token"
             name="type"
@@ -3159,8 +3109,7 @@
    <xsl:template match="j:array[@key='actors']/j:map/j:string[@key='type']"
                  mode="keep-value-property"
                  priority="11"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='actors']/j:map/j:string[@key='actor-uuid']"
-                 priority="1"><!-- XML match="actor/@actor-uuid" -->
+   <xsl:template match="j:array[@key='actors']/j:map/j:string[@key='actor-uuid']"><!-- XML match="actor/@actor-uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="actor-uuid"
@@ -3172,8 +3121,7 @@
    <xsl:template match="j:array[@key='actors']/j:map/j:string[@key='actor-uuid']"
                  mode="keep-value-property"
                  priority="11"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='actors']/j:map/j:string[@key='role-id']"
-                 priority="1"><!-- XML match="actor/@role-id" -->
+   <xsl:template match="j:array[@key='actors']/j:map/j:string[@key='role-id']"><!-- XML match="actor/@role-id" -->
       <flag in-json="string"
             as-type="token"
             name="role-id"
@@ -3222,7 +3170,7 @@
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='observations']/j:map/j:array[@key='relevant-evidence']/j:map/j:string[@key='href'] | j:map[@key='plan-of-action-and-milestones']/j:array[@key='observations']/j:map/j:array[@key='relevant-evidence']/j:map/j:string[@key='href']"
                  mode="keep-value-property"
                  priority="9"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='risks']/j:map/j:string[@key='uuid']" priority="1"><!-- XML match="risk/@uuid" -->
+   <xsl:template match="j:array[@key='risks']/j:map/j:string[@key='uuid']"><!-- XML match="risk/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -3234,8 +3182,7 @@
    <xsl:template match="j:array[@key='risks']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='threat-ids']/j:map/j:string[@key='system']"
-                 priority="1"><!-- XML match="threat-id/@system" -->
+   <xsl:template match="j:array[@key='threat-ids']/j:map/j:string[@key='system']"><!-- XML match="threat-id/@system" -->
       <flag in-json="string"
             as-type="uri"
             name="system"
@@ -3247,8 +3194,7 @@
    <xsl:template match="j:array[@key='threat-ids']/j:map/j:string[@key='system']"
                  mode="keep-value-property"
                  priority="9"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='threat-ids']/j:map/j:string[@key='href']"
-                 priority="1"><!-- XML match="threat-id/@href" -->
+   <xsl:template match="j:array[@key='threat-ids']/j:map/j:string[@key='href']"><!-- XML match="threat-id/@href" -->
       <flag in-json="string"
             as-type="uri-reference"
             name="href"
@@ -3403,8 +3349,7 @@
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='related-observations']/j:map/j:string[@key='observation-uuid'] | j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='related-observations']/j:map/j:string[@key='observation-uuid']"
                  mode="keep-value-property"
                  priority="9"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='findings']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="finding/@uuid" -->
+   <xsl:template match="j:array[@key='findings']/j:map/j:string[@key='uuid']"><!-- XML match="finding/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -3416,7 +3361,7 @@
    <xsl:template match="j:array[@key='findings']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:map[@key='target']/j:string[@key='type']" priority="1"><!-- XML match="target/@type" -->
+   <xsl:template match="j:map[@key='target']/j:string[@key='type']"><!-- XML match="target/@type" -->
       <flag in-json="string"
             as-type="string"
             name="type"
@@ -3428,7 +3373,7 @@
    <xsl:template match="j:map[@key='target']/j:string[@key='type']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:map[@key='target']/j:string[@key='target-id']" priority="1"><!-- XML match="target/@target-id" -->
+   <xsl:template match="j:map[@key='target']/j:string[@key='target-id']"><!-- XML match="target/@target-id" -->
       <flag in-json="string"
             as-type="token"
             name="target-id"
@@ -3492,8 +3437,7 @@
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='findings']/j:map/j:array[@key='related-risks']/j:map/j:string[@key='risk-uuid']"
                  mode="keep-value-property"
                  priority="9"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="plan-of-action-and-milestones/@uuid" -->
+   <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:string[@key='uuid']"><!-- XML match="plan-of-action-and-milestones/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -3505,8 +3449,7 @@
    <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="3"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='poam-items']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="poam-item/@uuid" -->
+   <xsl:template match="j:array[@key='poam-items']/j:map/j:string[@key='uuid']"><!-- XML match="poam-item/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -4640,7 +4583,7 @@
       <!-- XML match="catalog/param/select/choice" -->
       <field collapsible="no"
              as-type="markup-line"
-             name="choice"
+             name="parameter-choice"
              gi="choice"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -4832,7 +4775,7 @@
       <!-- XML match="catalog//control/param/select/choice" -->
       <field collapsible="no"
              as-type="markup-line"
-             name="choice"
+             name="parameter-choice"
              gi="choice"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -5117,7 +5060,7 @@
       <!-- XML match="catalog//group/param/select/choice" -->
       <field collapsible="no"
              as-type="markup-line"
-             name="choice"
+             name="parameter-choice"
              gi="choice"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -5402,7 +5345,7 @@
       <!-- XML match="catalog//group//control/param/select/choice" -->
       <field collapsible="no"
              as-type="markup-line"
-             name="choice"
+             name="parameter-choice"
              gi="choice"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -6697,62 +6640,6 @@
          <xsl:apply-templates select="*[@key='pattern']"/>
       </assembly>
    </xsl:template>
-   <xsl:template match="j:map[@key='profile']/j:map[@key='merge']/j:map[@key='combine']"
-                 priority="4">
-      <xsl:param name="with-key" select="true()"/>
-      <!-- XML match="profile/merge/combine" -->
-      <assembly as-type="empty" name="combine" key="combine" gi="combine">
-         <xsl:if test="$with-key">
-            <xsl:attribute name="key">combine</xsl:attribute>
-         </xsl:if>
-         <xsl:apply-templates select="*[@key='method']"/>
-      </assembly>
-   </xsl:template>
-   <xsl:template match="j:map[@key='profile']/j:map[@key='merge']/j:map[@key='flat']"
-                 priority="5">
-      <xsl:param name="with-key" select="true()"/>
-      <!-- XML match="profile/merge/flat" -->
-      <assembly as-type="empty" name="flat" key="flat" gi="flat">
-         <xsl:if test="$with-key">
-            <xsl:attribute name="key">flat</xsl:attribute>
-         </xsl:if>
-      </assembly>
-   </xsl:template>
-   <xsl:template match="j:map[@key='profile']/j:map[@key='merge']/j:boolean[@key='as-is']"
-                 priority="5">
-      <xsl:param name="with-key" select="true()"/>
-      <!-- XML match="profile/merge/as-is" -->
-      <field collapsible="no"
-             as-type="boolean"
-             name="as-is"
-             key="as-is"
-             gi="as-is"
-             in-json="SCALAR">
-         <xsl:if test="$with-key">
-            <xsl:attribute name="key">as-is</xsl:attribute>
-         </xsl:if>
-         <xsl:apply-templates select="." mode="get-value-property"/>
-      </field>
-   </xsl:template>
-   <xsl:template match="j:map[@key='profile']/j:map[@key='merge']/j:boolean[@key='as-is']"
-                 mode="get-value-property"
-                 priority="5">
-      <value as-type="boolean" in-json="boolean">
-         <xsl:value-of select="."/>
-      </value>
-   </xsl:template>
-   <xsl:template match="j:map[@key='profile']/j:map[@key='merge']/j:map[@key='custom']"
-                 priority="5">
-      <xsl:param name="with-key" select="true()"/>
-      <!-- XML match="profile/merge/custom" -->
-      <assembly name="custom" key="custom" gi="custom">
-         <xsl:if test="$with-key">
-            <xsl:attribute name="key">custom</xsl:attribute>
-         </xsl:if>
-         <xsl:apply-templates select="*[@key='groups']"/>
-         <xsl:apply-templates select="*[@key='insert-controls']"/>
-      </assembly>
-   </xsl:template>
    <xsl:template match="j:map[@key='profile']/j:map[@key='merge']/j:map[@key='custom']//j:array[@key='groups']/j:map/j:string[@key='title']"
                  priority="8">
       <xsl:param name="with-key" select="true()"/>
@@ -6932,7 +6819,7 @@
       <!-- XML match="profile/merge/custom//group/param/select/choice" -->
       <field collapsible="no"
              as-type="markup-line"
-             name="choice"
+             name="parameter-choice"
              gi="choice"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -7360,7 +7247,7 @@
       <!-- XML match="profile/modify/set-parameter/select/choice" -->
       <field collapsible="no"
              as-type="markup-line"
-             name="choice"
+             name="parameter-choice"
              gi="choice"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -7552,7 +7439,7 @@
       <!-- XML match="profile/modify/alter/add/param/select/choice" -->
       <field collapsible="no"
              as-type="markup-line"
-             name="choice"
+             name="parameter-choice"
              gi="choice"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -8979,7 +8866,7 @@
       <!-- XML match="component-definition/component/control-implementation/set-parameter/value" -->
       <field collapsible="no"
              as-type="string"
-             name="value"
+             name="parameter-value"
              gi="value"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -9061,7 +8948,7 @@
       <!-- XML match="component-definition/component/control-implementation/implemented-requirement/set-parameter/value" -->
       <field collapsible="no"
              as-type="string"
-             name="value"
+             name="parameter-value"
              gi="value"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -9319,7 +9206,7 @@
       <!-- XML match="component-definition/capability/control-implementation/set-parameter/value" -->
       <field collapsible="no"
              as-type="string"
-             name="value"
+             name="parameter-value"
              gi="value"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -9401,7 +9288,7 @@
       <!-- XML match="component-definition/capability/control-implementation/implemented-requirement/set-parameter/value" -->
       <field collapsible="no"
              as-type="string"
-             name="value"
+             name="parameter-value"
              gi="value"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -11440,6 +11327,54 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='system-security-plan']/j:map[@key='system-characteristics']/j:map[@key='authorization-boundary']/j:array[@key='diagrams']/j:map/j:string[@key='remarks']"
+                 priority="7">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="system-security-plan/system-characteristics/authorization-boundary/diagram/remarks" -->
+      <field in-xml="WITH_WRAPPER"
+             collapsible="no"
+             as-type="markup-multiline"
+             name="remarks"
+             key="remarks"
+             gi="remarks"
+             in-json="SCALAR">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">remarks</xsl:attribute>
+         </xsl:if>
+         <xsl:apply-templates select="." mode="get-value-property"/>
+      </field>
+   </xsl:template>
+   <xsl:template match="j:map[@key='system-security-plan']/j:map[@key='system-characteristics']/j:map[@key='authorization-boundary']/j:array[@key='diagrams']/j:map/j:string[@key='remarks']"
+                 mode="get-value-property"
+                 priority="7">
+      <value as-type="markup-multiline" in-json="string">
+         <xsl:value-of select="."/>
+      </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='system-security-plan']/j:map[@key='system-characteristics']/j:map[@key='authorization-boundary']/j:string[@key='remarks']"
+                 priority="5">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="system-security-plan/system-characteristics/authorization-boundary/remarks" -->
+      <field in-xml="WITH_WRAPPER"
+             collapsible="no"
+             as-type="markup-multiline"
+             name="remarks"
+             key="remarks"
+             gi="remarks"
+             in-json="SCALAR">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">remarks</xsl:attribute>
+         </xsl:if>
+         <xsl:apply-templates select="." mode="get-value-property"/>
+      </field>
+   </xsl:template>
+   <xsl:template match="j:map[@key='system-security-plan']/j:map[@key='system-characteristics']/j:map[@key='authorization-boundary']/j:string[@key='remarks']"
+                 mode="get-value-property"
+                 priority="5">
+      <value as-type="markup-multiline" in-json="string">
+         <xsl:value-of select="."/>
+      </value>
+   </xsl:template>
    <xsl:template match="j:map[@key='system-security-plan']/j:map[@key='system-characteristics']/j:map[@key='network-architecture']/j:string[@key='description']"
                  priority="5">
       <xsl:param name="with-key" select="true()"/>
@@ -11557,6 +11492,30 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='system-security-plan']/j:map[@key='system-characteristics']/j:map[@key='network-architecture']/j:array[@key='diagrams']/j:map/j:string[@key='remarks']"
+                 priority="7">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="system-security-plan/system-characteristics/network-architecture/diagram/remarks" -->
+      <field in-xml="WITH_WRAPPER"
+             collapsible="no"
+             as-type="markup-multiline"
+             name="remarks"
+             key="remarks"
+             gi="remarks"
+             in-json="SCALAR">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">remarks</xsl:attribute>
+         </xsl:if>
+         <xsl:apply-templates select="." mode="get-value-property"/>
+      </field>
+   </xsl:template>
+   <xsl:template match="j:map[@key='system-security-plan']/j:map[@key='system-characteristics']/j:map[@key='network-architecture']/j:array[@key='diagrams']/j:map/j:string[@key='remarks']"
+                 mode="get-value-property"
+                 priority="7">
+      <value as-type="markup-multiline" in-json="string">
+         <xsl:value-of select="."/>
+      </value>
+   </xsl:template>
    <xsl:template match="j:map[@key='system-security-plan']/j:map[@key='system-characteristics']/j:map[@key='data-flow']/j:string[@key='description']"
                  priority="5">
       <xsl:param name="with-key" select="true()"/>
@@ -11671,6 +11630,30 @@
                  mode="get-value-property"
                  priority="7">
       <value as-type="markup-line" in-json="string">
+         <xsl:value-of select="."/>
+      </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='system-security-plan']/j:map[@key='system-characteristics']/j:map[@key='data-flow']/j:array[@key='diagrams']/j:map/j:string[@key='remarks']"
+                 priority="7">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="system-security-plan/system-characteristics/data-flow/diagram/remarks" -->
+      <field in-xml="WITH_WRAPPER"
+             collapsible="no"
+             as-type="markup-multiline"
+             name="remarks"
+             key="remarks"
+             gi="remarks"
+             in-json="SCALAR">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">remarks</xsl:attribute>
+         </xsl:if>
+         <xsl:apply-templates select="." mode="get-value-property"/>
+      </field>
+   </xsl:template>
+   <xsl:template match="j:map[@key='system-security-plan']/j:map[@key='system-characteristics']/j:map[@key='data-flow']/j:array[@key='diagrams']/j:map/j:string[@key='remarks']"
+                 mode="get-value-property"
+                 priority="7">
+      <value as-type="markup-multiline" in-json="string">
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
@@ -12290,7 +12273,7 @@
       <!-- XML match="system-security-plan/control-implementation/set-parameter/value" -->
       <field collapsible="no"
              as-type="string"
-             name="value"
+             name="parameter-value"
              gi="value"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -12348,7 +12331,7 @@
       <!-- XML match="system-security-plan/control-implementation/implemented-requirement/set-parameter/value" -->
       <field collapsible="no"
              as-type="string"
-             name="value"
+             name="parameter-value"
              gi="value"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -12497,7 +12480,7 @@
       <!-- XML match="system-security-plan/control-implementation/implemented-requirement/statement/by-component/set-parameter/value" -->
       <field collapsible="no"
              as-type="string"
-             name="value"
+             name="parameter-value"
              gi="value"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -12983,7 +12966,7 @@
       <!-- XML match="system-security-plan/control-implementation/implemented-requirement/by-component/set-parameter/value" -->
       <field collapsible="no"
              as-type="string"
-             name="value"
+             name="parameter-value"
              gi="value"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -15348,6 +15331,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-plan']/j:map[@key='local-definitions']/j:array[@key='activities']/j:map/j:array[@key='steps']/j:map/j:map[@key='reviewed-controls']/j:array[@key='control-selections']/j:map/j:map[@key='include-all']"
+                 priority="12">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-plan/local-definitions/activity/step/reviewed-controls/control-selection/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-plan']/j:map[@key='local-definitions']/j:array[@key='activities']/j:map/j:array[@key='steps']/j:map/j:map[@key='reviewed-controls']/j:array[@key='control-selections']/j:map/j:array[@key='include-controls']/j:map"
                  priority="13">
       <xsl:param name="with-key" select="true()"/>
@@ -15464,6 +15460,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='assessment-plan']/j:map[@key='local-definitions']/j:array[@key='activities']/j:map/j:array[@key='steps']/j:map/j:map[@key='reviewed-controls']/j:array[@key='control-objective-selections']/j:map/j:map[@key='include-all']"
+                 priority="12">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-plan/local-definitions/activity/step/reviewed-controls/control-objective-selection/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='assessment-plan']/j:map[@key='local-definitions']/j:array[@key='activities']/j:map/j:array[@key='steps']/j:map/j:array[@key='responsible-roles']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="12">
@@ -15596,6 +15605,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-plan']/j:map[@key='local-definitions']/j:array[@key='activities']/j:map/j:map[@key='related-controls']/j:array[@key='control-selections']/j:map/j:map[@key='include-all']"
+                 priority="10">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-plan/local-definitions/activity/related-controls/control-selection/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-plan']/j:map[@key='local-definitions']/j:array[@key='activities']/j:map/j:map[@key='related-controls']/j:array[@key='control-selections']/j:map/j:array[@key='include-controls']/j:map"
                  priority="11">
       <xsl:param name="with-key" select="true()"/>
@@ -15712,6 +15734,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='assessment-plan']/j:map[@key='local-definitions']/j:array[@key='activities']/j:map/j:map[@key='related-controls']/j:array[@key='control-objective-selections']/j:map/j:map[@key='include-all']"
+                 priority="10">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-plan/local-definitions/activity/related-controls/control-objective-selection/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='assessment-plan']/j:map[@key='local-definitions']/j:array[@key='activities']/j:map/j:array[@key='responsible-roles']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="10">
@@ -15927,6 +15962,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-plan']/j:map[@key='reviewed-controls']/j:array[@key='control-selections']/j:map/j:map[@key='include-all']"
+                 priority="7">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-plan/reviewed-controls/control-selection/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-plan']/j:map[@key='reviewed-controls']/j:array[@key='control-selections']/j:map/j:array[@key='include-controls']/j:map"
                  priority="8">
       <xsl:param name="with-key" select="true()"/>
@@ -16044,6 +16092,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-plan']/j:map[@key='reviewed-controls']/j:array[@key='control-objective-selections']/j:map/j:map[@key='include-all']"
+                 priority="7">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-plan/reviewed-controls/control-objective-selection/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-plan']/j:array[@key='assessment-subjects']/j:map/j:string[@key='description']"
                  priority="5">
       <xsl:param name="with-key" select="true()"/>
@@ -16090,6 +16151,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='assessment-plan']/j:array[@key='assessment-subjects']/j:map/j:map[@key='include-all']"
+                 priority="6">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-plan/assessment-subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='assessment-plan']/j:array[@key='assessment-subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="10">
@@ -16644,6 +16718,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-plan']//j:array[@key='tasks']/j:map/j:array[@key='associated-activities']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="10">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-plan//task/associated-activity/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-plan']//j:array[@key='tasks']/j:map/j:array[@key='associated-activities']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="14">
       <xsl:param name="with-key" select="true()"/>
@@ -16736,6 +16823,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='assessment-plan']//j:array[@key='tasks']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="8">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-plan//task/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='assessment-plan']//j:array[@key='tasks']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="12">
@@ -18316,6 +18416,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:map[@key='local-definitions']/j:array[@key='activities']/j:map/j:array[@key='steps']/j:map/j:map[@key='reviewed-controls']/j:array[@key='control-selections']/j:map/j:map[@key='include-all']"
+                 priority="12">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/local-definitions/activity/step/reviewed-controls/control-selection/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:map[@key='local-definitions']/j:array[@key='activities']/j:map/j:array[@key='steps']/j:map/j:map[@key='reviewed-controls']/j:array[@key='control-selections']/j:map/j:array[@key='include-controls']/j:map"
                  priority="13">
       <xsl:param name="with-key" select="true()"/>
@@ -18432,6 +18545,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:map[@key='local-definitions']/j:array[@key='activities']/j:map/j:array[@key='steps']/j:map/j:map[@key='reviewed-controls']/j:array[@key='control-objective-selections']/j:map/j:map[@key='include-all']"
+                 priority="12">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/local-definitions/activity/step/reviewed-controls/control-objective-selection/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:map[@key='local-definitions']/j:array[@key='activities']/j:map/j:array[@key='steps']/j:map/j:array[@key='responsible-roles']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="12">
@@ -18564,6 +18690,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:map[@key='local-definitions']/j:array[@key='activities']/j:map/j:map[@key='related-controls']/j:array[@key='control-selections']/j:map/j:map[@key='include-all']"
+                 priority="10">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/local-definitions/activity/related-controls/control-selection/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:map[@key='local-definitions']/j:array[@key='activities']/j:map/j:map[@key='related-controls']/j:array[@key='control-selections']/j:map/j:array[@key='include-controls']/j:map"
                  priority="11">
       <xsl:param name="with-key" select="true()"/>
@@ -18680,6 +18819,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:map[@key='local-definitions']/j:array[@key='activities']/j:map/j:map[@key='related-controls']/j:array[@key='control-objective-selections']/j:map/j:map[@key='include-all']"
+                 priority="10">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/local-definitions/activity/related-controls/control-objective-selection/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:map[@key='local-definitions']/j:array[@key='activities']/j:map/j:array[@key='responsible-roles']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="10">
@@ -19763,6 +19915,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:map[@key='local-definitions']//j:array[@key='tasks']/j:map/j:array[@key='associated-activities']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="13">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/local-definitions//assessment-task/associated-activity/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:map[@key='local-definitions']//j:array[@key='tasks']/j:map/j:array[@key='associated-activities']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="17">
       <xsl:param name="with-key" select="true()"/>
@@ -19855,6 +20020,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:map[@key='local-definitions']//j:array[@key='tasks']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="11">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/local-definitions//assessment-task/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:map[@key='local-definitions']//j:array[@key='tasks']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="15">
@@ -20033,6 +20211,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:map[@key='reviewed-controls']/j:array[@key='control-selections']/j:map/j:map[@key='include-all']"
+                 priority="9">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/reviewed-controls/control-selection/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:map[@key='reviewed-controls']/j:array[@key='control-selections']/j:map/j:array[@key='include-controls']/j:map"
                  priority="10">
       <xsl:param name="with-key" select="true()"/>
@@ -20149,6 +20340,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:map[@key='reviewed-controls']/j:array[@key='control-objective-selections']/j:map/j:map[@key='include-all']"
+                 priority="9">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/reviewed-controls/control-objective-selection/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='attestations']/j:map"
                  priority="6">
@@ -20489,6 +20693,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:map[@key='assessment-log']/j:array[@key='entries']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="13">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/assessment-log/entry/related-task/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:map[@key='assessment-log']/j:array[@key='entries']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="17">
       <xsl:param name="with-key" select="true()"/>
@@ -20595,6 +20812,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:map[@key='assessment-log']/j:array[@key='entries']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="14">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/assessment-log/entry/related-task/identified-subject/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:map[@key='assessment-log']/j:array[@key='entries']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="18">
@@ -20866,6 +21096,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='observations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="14">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/observation/origin/related-task/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='observations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="18">
       <xsl:param name="with-key" select="true()"/>
@@ -20972,6 +21215,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='observations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="15">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/observation/origin/related-task/identified-subject/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='observations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="19">
@@ -21277,6 +21533,29 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:string[@key='status']"
+                 priority="7">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/risk/status" -->
+      <field collapsible="no"
+             as-type="token"
+             name="status"
+             key="status"
+             gi="status"
+             in-json="SCALAR">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">status</xsl:attribute>
+         </xsl:if>
+         <xsl:apply-templates select="." mode="get-value-property"/>
+      </field>
+   </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:string[@key='status']"
+                 mode="get-value-property"
+                 priority="7">
+      <value as-type="token" in-json="string">
+         <xsl:value-of select="."/>
+      </value>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='origins']/j:map/j:array[@key='actors']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="13">
       <xsl:param name="with-key" select="true()"/>
@@ -21393,6 +21672,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="14">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/risk/origin/related-task/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="18">
       <xsl:param name="with-key" select="true()"/>
@@ -21499,6 +21791,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="15">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/risk/origin/related-task/identified-subject/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="19">
@@ -21685,6 +21990,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='characterizations']/j:map/j:map[@key='origin']/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="15">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/risk/characterization/origin/related-task/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='characterizations']/j:map/j:map[@key='origin']/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="19">
       <xsl:param name="with-key" select="true()"/>
@@ -21791,6 +22109,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='characterizations']/j:map/j:map[@key='origin']/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="16">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/risk/characterization/origin/related-task/identified-subject/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='characterizations']/j:map/j:map[@key='origin']/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="20">
@@ -22219,6 +22550,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="16">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/risk/response/origin/related-task/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="20">
       <xsl:param name="with-key" select="true()"/>
@@ -22325,6 +22669,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="17">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/risk/response/origin/related-task/identified-subject/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="21">
@@ -22754,6 +23111,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map//j:array[@key='tasks']/j:map/j:array[@key='associated-activities']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="16">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/risk/response//task/associated-activity/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map//j:array[@key='tasks']/j:map/j:array[@key='associated-activities']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="20">
       <xsl:param name="with-key" select="true()"/>
@@ -22846,6 +23216,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map//j:array[@key='tasks']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="14">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/risk/response//task/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map//j:array[@key='tasks']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="18">
@@ -23189,6 +23572,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:map[@key='risk-log']/j:array[@key='entries']/j:map/j:array[@key='related-responses']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="17">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/risk/risk-log/entry/related-response/related-task/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:map[@key='risk-log']/j:array[@key='entries']/j:map/j:array[@key='related-responses']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="21">
       <xsl:param name="with-key" select="true()"/>
@@ -23295,6 +23691,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:map[@key='risk-log']/j:array[@key='entries']/j:map/j:array[@key='related-responses']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="18">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/risk/risk-log/entry/related-response/related-task/identified-subject/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='risks']/j:map/j:map[@key='risk-log']/j:array[@key='entries']/j:map/j:array[@key='related-responses']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="22">
@@ -23536,6 +23945,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='findings']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="14">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/finding/origin/related-task/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='findings']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="18">
       <xsl:param name="with-key" select="true()"/>
@@ -23642,6 +24064,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='findings']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="15">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="assessment-results/result/finding/origin/related-task/identified-subject/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='assessment-results']/j:array[@key='results']/j:map/j:array[@key='findings']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="19">
@@ -25429,6 +25864,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='observations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="12">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="plan-of-action-and-milestones/observation/origin/related-task/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='observations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="16">
       <xsl:param name="with-key" select="true()"/>
@@ -25535,6 +25983,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='observations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="13">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="plan-of-action-and-milestones/observation/origin/related-task/identified-subject/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='observations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="17">
@@ -25840,6 +26301,29 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:string[@key='status']"
+                 priority="5">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="plan-of-action-and-milestones/risk/status" -->
+      <field collapsible="no"
+             as-type="token"
+             name="status"
+             key="status"
+             gi="status"
+             in-json="SCALAR">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">status</xsl:attribute>
+         </xsl:if>
+         <xsl:apply-templates select="." mode="get-value-property"/>
+      </field>
+   </xsl:template>
+   <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:string[@key='status']"
+                 mode="get-value-property"
+                 priority="5">
+      <value as-type="token" in-json="string">
+         <xsl:value-of select="."/>
+      </value>
+   </xsl:template>
    <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='origins']/j:map/j:array[@key='actors']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="11">
       <xsl:param name="with-key" select="true()"/>
@@ -25956,6 +26440,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="12">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="plan-of-action-and-milestones/risk/origin/related-task/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="16">
       <xsl:param name="with-key" select="true()"/>
@@ -26062,6 +26559,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="13">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="plan-of-action-and-milestones/risk/origin/related-task/identified-subject/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="17">
@@ -26248,6 +26758,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='characterizations']/j:map/j:map[@key='origin']/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="13">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="plan-of-action-and-milestones/risk/characterization/origin/related-task/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='characterizations']/j:map/j:map[@key='origin']/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="17">
       <xsl:param name="with-key" select="true()"/>
@@ -26354,6 +26877,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='characterizations']/j:map/j:map[@key='origin']/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="14">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="plan-of-action-and-milestones/risk/characterization/origin/related-task/identified-subject/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='characterizations']/j:map/j:map[@key='origin']/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="18">
@@ -26782,6 +27318,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="14">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="plan-of-action-and-milestones/risk/response/origin/related-task/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="18">
       <xsl:param name="with-key" select="true()"/>
@@ -26888,6 +27437,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="15">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="plan-of-action-and-milestones/risk/response/origin/related-task/identified-subject/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map/j:array[@key='origins']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="19">
@@ -27317,6 +27879,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map//j:array[@key='tasks']/j:map/j:array[@key='associated-activities']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="14">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="plan-of-action-and-milestones/risk/response//task/associated-activity/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map//j:array[@key='tasks']/j:map/j:array[@key='associated-activities']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="18">
       <xsl:param name="with-key" select="true()"/>
@@ -27409,6 +27984,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map//j:array[@key='tasks']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="12">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="plan-of-action-and-milestones/risk/response//task/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:array[@key='remediations']/j:map//j:array[@key='tasks']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="16">
@@ -27752,6 +28340,19 @@
          <xsl:value-of select="."/>
       </value>
    </xsl:template>
+   <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:map[@key='risk-log']/j:array[@key='entries']/j:map/j:array[@key='related-responses']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="15">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="plan-of-action-and-milestones/risk/risk-log/entry/related-response/related-task/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
+   </xsl:template>
    <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:map[@key='risk-log']/j:array[@key='entries']/j:map/j:array[@key='related-responses']/j:map/j:array[@key='related-tasks']/j:map/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="19">
       <xsl:param name="with-key" select="true()"/>
@@ -27858,6 +28459,19 @@
       <value as-type="markup-line" in-json="string">
          <xsl:value-of select="."/>
       </value>
+   </xsl:template>
+   <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:map[@key='risk-log']/j:array[@key='entries']/j:map/j:array[@key='related-responses']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:map[@key='include-all']"
+                 priority="16">
+      <xsl:param name="with-key" select="true()"/>
+      <!-- XML match="plan-of-action-and-milestones/risk/risk-log/entry/related-response/related-task/identified-subject/subject/include-all" -->
+      <assembly as-type="empty"
+                name="include-all"
+                key="include-all"
+                gi="include-all">
+         <xsl:if test="$with-key">
+            <xsl:attribute name="key">include-all</xsl:attribute>
+         </xsl:if>
+      </assembly>
    </xsl:template>
    <xsl:template match="j:map[@key='plan-of-action-and-milestones']/j:array[@key='risks']/j:map/j:map[@key='risk-log']/j:array[@key='entries']/j:map/j:array[@key='related-responses']/j:map/j:array[@key='related-tasks']/j:map/j:map[@key='identified-subject']/j:array[@key='subjects']/j:map/j:array[@key='include-subjects']/j:map/j:array[@key='links']/j:map/j:string[@key='text']"
                  priority="20">

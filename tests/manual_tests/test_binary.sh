@@ -15,16 +15,22 @@
 # This script is designed to test whether the bdist is behaving correctly.
 # Note that it encodes the stanndard testing protocol and should be updated.
 
+echo $SAXON_PYTHONPATH
 mkdir tmp_bin_test
 echo '---- setting up venv ----' 
 python -m venv tmp_bin_test/venv
 echo '---- venv setup done ----'
 ls tmp_bin_test
-echo '---- Building bdist ----'
+echo '---- Buiilding bdist ----'
 python setup.py bdist_wheel
-echo '---- Building bdist DONE ----'
+echo '---- Buiilding bdist DONE ----'
 echo '---- Enabling venv ----'
 source tmp_bin_test/venv/bin/activate
+echo '---- setting PYTHON PATH  ----'
+echo $PYTHONPATH
+export PYTHONPATH=$PYTHONPATH:$SAXON_PYTHONPATH
+echo $PYTHONPATH
+echo '----  PRINTED PYTHON PATH  ----'
 python -m pip install dist/*.whl
 python -m pip install pytest
 # this is required to get away from the damn base directory

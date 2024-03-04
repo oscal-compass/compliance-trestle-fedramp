@@ -49,7 +49,3 @@ site
 tmp_bin_test
 .mypy_cache
 
-# Output
-fedramp-validation-report.xml
-fedramp-validation-report.html
-

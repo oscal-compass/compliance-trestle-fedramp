@@ -20,9 +20,9 @@ import sys
 
 from pkg_resources import resource_filename
 
-from saxonche import PySaxonProcessor
+import saxonc
 
-from trestle.common.err import TrestleError
+from trestle.core.err import TrestleError
 
 import trestle_fedramp.const as const
 
@@ -56,26 +56,26 @@ class JsonXmlConverter:
         if not xsl_path.exists():
             raise TrestleError(f'xslt converter {xsl_path} does not exist')
 
-        xml_str: str = ''
-        with PySaxonProcessor(license=False) as saxon_proc:
-            # set initial template global property
-            saxon_proc.set_configuration_property('it', self.initial_template)
-            xslt_proc = saxon_proc.new_xslt30_processor()
+        saxon_proc = saxonc.PySaxonProcessor(license=False)
+        xslt_proc = saxon_proc.new_xslt30_processor()
 
-            # Create data URI from JSON SSP content
-            content_base64_encoded = base64.b64encode(json_content.encode('utf-8')).decode('utf-8')
-            data_uri = f'data:application/json;base64,{content_base64_encoded}'
+        # set initial template name in XSL file
+        xslt_proc.set_property('it', self.initial_template)
 
-            # Set the input json file parameter for conversion
-            xslt_proc.set_parameter(
-                # Pass data URI to process in-memory json content
-                self.file_param_name,
-                saxon_proc.make_string_value(data_uri)
+        # Create data URI from JSON SSP content
+        content_base64_encoded = base64.b64encode(json_content.encode('utf-8')).decode('utf-8')
+        data_uri = f'data:application/json;base64,{content_base64_encoded}'
 
-                # To use file instead of content - self.file_param_name, saxon_proc.make_string_value(str(file_path))
-            )
+        # Set the input json file parameter for conversion
+        xslt_proc.set_parameter(
+            # Pass data URI to process in-memory json content
+            self.file_param_name,
+            saxon_proc.make_string_value(data_uri)
 
-            # Convert the model to XML as a string
-            xml_str = xslt_proc.transform_to_string(source_file=str(xsl_path), stylesheet_file=str(xsl_path))
+            # To use file instead of content - self.file_param_name, saxon_proc.make_string_value(str(file_path))
+        )
+
+        # Convert the model to XML as a string
+        xml_str = xslt_proc.transform_to_string(source_file=str(xsl_path), stylesheet_file=str(xsl_path))
 
         return xml_str

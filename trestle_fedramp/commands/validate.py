@@ -20,11 +20,10 @@ import json
 import logging
 import pathlib
 
-import trestle.common.log as log
-from trestle.common.file_utils import load_file
+import trestle.utils.log as log
 from trestle.core import parser
 from trestle.core.commands.command_docs import CommandBase
-from trestle.core.commands.common import return_codes
+from trestle.utils import fs
 
 from trestle_fedramp.core.fedramp import FedrampValidator
 
@@ -52,24 +51,24 @@ class ValidateCmd(CommandBase):
         model_file = pathlib.Path(args.file).resolve()
         if not model_file.exists():
             logger.warning(f'Input file {args.file} does not exist.')
-            return return_codes.CmdReturnCodes.COMMAND_ERROR.value
+            return 1
 
         output_dir = pathlib.Path(args.output_dir).resolve()
         if not output_dir.exists():
             logger.warning(f'Output dir {args.output_dir} does not exist.')
-            return return_codes.CmdReturnCodes.COMMAND_ERROR.value
+            return 1
 
         try:
-            data = load_file(model_file)
+            data = fs.load_file(model_file)
             model = parser.root_key(data)
             if model != 'system-security-plan':
                 logger.warning(f'Validation for {model} is not supported.')
-                return return_codes.CmdReturnCodes.COMMAND_ERROR.value
+                return 1
             data_str = json.dumps(data)
             validator = FedrampValidator()
             valid = validator.validate_ssp(data_str, str(model_file).split('.')[-1], output_dir)
         except Exception as error:
             logger.error(f'Unexpected error: {error}')
-            return return_codes.CmdReturnCodes.COMMAND_ERROR.value
+            return 1
 
-        return return_codes.CmdReturnCodes.SUCCESS.value if valid else return_codes.CmdReturnCodes.COMMAND_ERROR.value
+        return 0 if valid else 1

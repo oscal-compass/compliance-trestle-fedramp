@@ -24,7 +24,7 @@ import pytest
 from pytest import MonkeyPatch
 
 from trestle.cli import Trestle
-from trestle.common.err import TrestleError
+from trestle.core.err import TrestleError
 
 
 @pytest.fixture(scope='function')

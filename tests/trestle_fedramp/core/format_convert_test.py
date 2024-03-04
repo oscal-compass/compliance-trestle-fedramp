@@ -21,7 +21,7 @@ import pytest
 
 from tests import test_utils
 
-from trestle.common.err import TrestleError
+from trestle.core.err import TrestleError
 
 from trestle_fedramp.core.format_convert import JsonXmlConverter
 

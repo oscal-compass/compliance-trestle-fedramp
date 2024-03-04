@@ -17,9 +17,9 @@
 
 import pathlib
 
-JSON_FEDRAMP_SAR_PATH = pathlib.Path('fedramp-source/dist/content/rev5/templates/sar/json/').resolve()
+JSON_FEDRAMP_SAR_PATH = pathlib.Path('fedramp-source/dist/content/templates/sar/json/').resolve()
 JSON_FEDRAMP_SAR_NAME = 'FedRAMP-SAR-OSCAL-Template.json'
-JSON_FEDRAMP_SSP_PATH = pathlib.Path('fedramp-source/dist/content/rev5/templates/ssp/json/').resolve()
+JSON_FEDRAMP_SSP_PATH = pathlib.Path('fedramp-source/dist/content/templates/ssp/json/').resolve()
 JSON_FEDRAMP_SSP_NAME = 'FedRAMP-SSP-OSCAL-Template.json'
-XML_FEDRAMP_SSP_PATH = pathlib.Path('fedramp-source/dist/content/rev5/templates/ssp/xml/').resolve()
+XML_FEDRAMP_SSP_PATH = pathlib.Path('fedramp-source/dist/content/templates/ssp/xml/').resolve()
 XML_FEDRAMP_SSP_NAME = 'FedRAMP-SSP-OSCAL-Template.xml'

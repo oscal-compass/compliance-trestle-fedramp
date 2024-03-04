@@ -1,55 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns="http://csrc.nist.gov/ns/oscal/metaschema/1.0/supermodel"
-                xmlns:j="http://www.w3.org/2005/xpath-functions"
-                xmlns:m="http://csrc.nist.gov/ns/oscal/metaschema/1.0"
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:m="http://csrc.nist.gov/ns/oscal/metaschema/1.0"
+                xmlns="http://csrc.nist.gov/ns/oscal/metaschema/1.0/supermodel"
+                xmlns:j="http://www.w3.org/2005/xpath-functions"
                 xpath-default-namespace="http://csrc.nist.gov/ns/oscal/metaschema/1.0/supermodel"
                 version="3.0"
                 exclude-result-prefixes="#all">
 <!-- JSON to XML conversion: pipeline -->
    <xsl:output indent="true"/>
    <!-- Processing architecture -->
-   <!-- $file should be a path to the file -->
-   <xsl:param name="file" as="xs:string?"/>
-   <!-- or $json should be a JSON literal -->
-   <xsl:param name="json" as="xs:string?"/>
+   <!-- $file should be a URI, absolute or relative to the XSLT transformation-->
+   <xsl:param name="file" as="xs:anyURI?"/>
    <!-- Pass in $produce=supermodel to produce OSCAL M4 supermodel intermediate format -->
    <xsl:param name="produce" as="xs:string">xml</xsl:param>
    <xsl:template name="from-json">
       <xsl:if test="not(unparsed-text-available($file))" expand-text="true">
          <nm:ERROR xmlns:nm="http://csrc.nist.gov/ns/metaschema">No file found at { $file }</nm:ERROR>
       </xsl:if>
-      <xsl:variable name="source">
-         <xsl:choose>
-            <xsl:when test="matches($json,'\S')"><!-- $json is not empty, so we try it -->
-               <xsl:try xmlns:err="http://www.w3.org/2005/xqt-errors" select="json-to-xml($json)">
-                  <xsl:catch expand-text="true">
-                     <nm:ERROR xmlns:nm="http://csrc.nist.gov/ns/metaschema" code="{ $err:code }">{{ $err:description }}</nm:ERROR>
-                  </xsl:catch>
-               </xsl:try>
-            </xsl:when>
-            <xsl:otherwise>
-               <xsl:try xmlns:err="http://www.w3.org/2005/xqt-errors"
-                        select="unparsed-text($file) ! json-to-xml(.)">
-                  <xsl:catch expand-text="true">
-                     <nm:ERROR xmlns:nm="http://csrc.nist.gov/ns/metaschema" code="{ $err:code }">{{ $err:description }}</nm:ERROR>
-                  </xsl:catch>
-               </xsl:try>
-            </xsl:otherwise>
-         </xsl:choose>
-      </xsl:variable>
       <xsl:call-template name="from-xdm-json-xml">
-         <xsl:with-param name="source" select="$source"/>
+         <xsl:with-param name="source">
+            <xsl:try xmlns:err="http://www.w3.org/2005/xqt-errors"
+                     select="unparsed-text($file) ! json-to-xml(.)">
+               <xsl:catch expand-text="true">
+                  <nm:ERROR xmlns:nm="http://csrc.nist.gov/ns/metaschema" code="{ $err:code }">{{ $err:description }}</nm:ERROR>
+               </xsl:catch>
+            </xsl:try>
+         </xsl:with-param>
       </xsl:call-template>
    </xsl:template>
    <xsl:mode name="cast-md" on-no-match="shallow-copy"/>
-   <xsl:template match="/">
-      <nm:ERROR xmlns:nm="http://csrc.nist.gov/ns/metaschema">Error in XSLT invocation - an initial template (-it) is expected ('from-json' or 'from-xdm-json-xml'), but none is given</nm:ERROR>
-   </xsl:template>
-   <xsl:template name="from-xdm-json-xml" expand-text="true">
+   <xsl:template match="/" name="from-xdm-json-xml" expand-text="true">
       <xsl:param name="source">
-         <xsl:choose><!-- evaluating $file as URI (absolute or relative to stylesheet)-->
+         <xsl:choose><!-- evaluate { $file } as URI (absolute or relative to stylesheet)-->
             <xsl:when test="exists($file)">
                <xsl:try xmlns:err="http://www.w3.org/2005/xqt-errors" select="document($file)">
                   <xsl:catch expand-text="true">
@@ -381,8 +364,7 @@
          <xsl:apply-templates mode="keep-value-property"/>
       </value>
    </xsl:template>
-   <xsl:template match="j:map[@key='component-definition']/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="component-definition/@uuid" -->
+   <xsl:template match="j:map[@key='component-definition']/j:string[@key='uuid']"><!-- XML match="component-definition/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -394,7 +376,7 @@
    <xsl:template match="j:map[@key='component-definition']/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="3"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='name']" priority="1"><!-- XML match="prop/@name" -->
+   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='name']"><!-- XML match="prop/@name" -->
       <flag in-json="string"
             as-type="token"
             name="name"
@@ -406,7 +388,7 @@
    <xsl:template match="j:array[@key='props']/j:map/j:string[@key='name']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='uuid']" priority="1"><!-- XML match="prop/@uuid" -->
+   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='uuid']"><!-- XML match="prop/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -418,7 +400,7 @@
    <xsl:template match="j:array[@key='props']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='ns']" priority="1"><!-- XML match="prop/@ns" -->
+   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='ns']"><!-- XML match="prop/@ns" -->
       <flag in-json="string" as-type="uri" name="ns" key="ns" gi="ns">
          <xsl:value-of select="."/>
       </flag>
@@ -426,7 +408,7 @@
    <xsl:template match="j:array[@key='props']/j:map/j:string[@key='ns']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='value']" priority="1"><!-- XML match="prop/@value" -->
+   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='value']"><!-- XML match="prop/@value" -->
       <flag in-json="string"
             as-type="string"
             name="value"
@@ -438,7 +420,7 @@
    <xsl:template match="j:array[@key='props']/j:map/j:string[@key='value']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='class']" priority="1"><!-- XML match="prop/@class" -->
+   <xsl:template match="j:array[@key='props']/j:map/j:string[@key='class']"><!-- XML match="prop/@class" -->
       <flag in-json="string"
             as-type="token"
             name="class"
@@ -450,7 +432,7 @@
    <xsl:template match="j:array[@key='props']/j:map/j:string[@key='class']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='links']/j:map/j:string[@key='href']" priority="1"><!-- XML match="link/@href" -->
+   <xsl:template match="j:array[@key='links']/j:map/j:string[@key='href']"><!-- XML match="link/@href" -->
       <flag in-json="string"
             as-type="uri-reference"
             name="href"
@@ -462,7 +444,7 @@
    <xsl:template match="j:array[@key='links']/j:map/j:string[@key='href']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='links']/j:map/j:string[@key='rel']" priority="1"><!-- XML match="link/@rel" -->
+   <xsl:template match="j:array[@key='links']/j:map/j:string[@key='rel']"><!-- XML match="link/@rel" -->
       <flag in-json="string"
             as-type="token"
             name="rel"
@@ -499,7 +481,7 @@
    <xsl:template match="j:map[@key='component-definition']/j:map[@key='metadata']/j:array[@key='document-ids']/j:map/j:string[@key='scheme'] | j:map[@key='component-definition']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:array[@key='document-ids']/j:map/j:string[@key='scheme']"
                  mode="keep-value-property"
                  priority="6"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='roles']/j:map/j:string[@key='id']" priority="1"><!-- XML match="role/@id" -->
+   <xsl:template match="j:array[@key='roles']/j:map/j:string[@key='id']"><!-- XML match="role/@id" -->
       <flag in-json="string" as-type="token" name="id" key="id" gi="id">
          <xsl:value-of select="."/>
       </flag>
@@ -507,8 +489,7 @@
    <xsl:template match="j:array[@key='roles']/j:map/j:string[@key='id']"
                  mode="keep-value-property"
                  priority="6"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='locations']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="location/@uuid" -->
+   <xsl:template match="j:array[@key='locations']/j:map/j:string[@key='uuid']"><!-- XML match="location/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -545,8 +526,7 @@
    <xsl:template match="j:map[@key='component-definition']/j:map[@key='metadata']/j:array[@key='locations']/j:map/j:array[@key='telephone-numbers']/j:map/j:string[@key='type'] | j:map[@key='component-definition']/j:map[@key='metadata']/j:array[@key='parties']/j:map/j:array[@key='telephone-numbers']/j:map/j:string[@key='type']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='parties']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="party/@uuid" -->
+   <xsl:template match="j:array[@key='parties']/j:map/j:string[@key='uuid']"><!-- XML match="party/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -558,8 +538,7 @@
    <xsl:template match="j:array[@key='parties']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="6"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='parties']/j:map/j:string[@key='type']"
-                 priority="1"><!-- XML match="party/@type" -->
+   <xsl:template match="j:array[@key='parties']/j:map/j:string[@key='type']"><!-- XML match="party/@type" -->
       <flag in-json="string"
             as-type="string"
             name="type"
@@ -584,8 +563,7 @@
    <xsl:template match="j:map[@key='component-definition']/j:map[@key='metadata']/j:array[@key='parties']/j:map/j:array[@key='external-ids']/j:map/j:string[@key='scheme']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='responsible-parties']/j:map/j:string[@key='role-id']"
-                 priority="1"><!-- XML match="responsible-party/@role-id" -->
+   <xsl:template match="j:array[@key='responsible-parties']/j:map/j:string[@key='role-id']"><!-- XML match="responsible-party/@role-id" -->
       <flag in-json="string"
             as-type="token"
             name="role-id"
@@ -597,8 +575,7 @@
    <xsl:template match="j:array[@key='responsible-parties']/j:map/j:string[@key='role-id']"
                  mode="keep-value-property"
                  priority="6"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='import-component-definitions']/j:map/j:string[@key='href']"
-                 priority="1"><!-- XML match="import-component-definition/@href" -->
+   <xsl:template match="j:array[@key='import-component-definitions']/j:map/j:string[@key='href']"><!-- XML match="import-component-definition/@href" -->
       <flag in-json="string"
             as-type="uri-reference"
             name="href"
@@ -610,8 +587,7 @@
    <xsl:template match="j:array[@key='import-component-definitions']/j:map/j:string[@key='href']"
                  mode="keep-value-property"
                  priority="5"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='components']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="component/@uuid" -->
+   <xsl:template match="j:array[@key='components']/j:map/j:string[@key='uuid']"><!-- XML match="component/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -635,8 +611,7 @@
    <xsl:template match="j:array[@key='components']/j:map/j:string[@key='type']"
                  mode="keep-value-property"
                  priority="5"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='responsible-roles']/j:map/j:string[@key='role-id']"
-                 priority="1"><!-- XML match="responsible-role/@role-id" -->
+   <xsl:template match="j:array[@key='responsible-roles']/j:map/j:string[@key='role-id']"><!-- XML match="responsible-role/@role-id" -->
       <flag in-json="string"
             as-type="token"
             name="role-id"
@@ -648,8 +623,7 @@
    <xsl:template match="j:array[@key='responsible-roles']/j:map/j:string[@key='role-id']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='protocols']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="protocol/@uuid" -->
+   <xsl:template match="j:array[@key='protocols']/j:map/j:string[@key='uuid']"><!-- XML match="protocol/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -661,8 +635,7 @@
    <xsl:template match="j:array[@key='protocols']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='protocols']/j:map/j:string[@key='name']"
-                 priority="1"><!-- XML match="protocol/@name" -->
+   <xsl:template match="j:array[@key='protocols']/j:map/j:string[@key='name']"><!-- XML match="protocol/@name" -->
       <flag in-json="string"
             as-type="string"
             name="name"
@@ -674,8 +647,7 @@
    <xsl:template match="j:array[@key='protocols']/j:map/j:string[@key='name']"
                  mode="keep-value-property"
                  priority="7"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='port-ranges']/j:map/j:number[@key='start']"
-                 priority="1"><!-- XML match="port-range/@start" -->
+   <xsl:template match="j:array[@key='port-ranges']/j:map/j:number[@key='start']"><!-- XML match="port-range/@start" -->
       <flag in-json="number"
             as-type="nonNegativeInteger"
             name="start"
@@ -687,8 +659,7 @@
    <xsl:template match="j:array[@key='port-ranges']/j:map/j:number[@key='start']"
                  mode="keep-value-property"
                  priority="9"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='port-ranges']/j:map/j:number[@key='end']"
-                 priority="1"><!-- XML match="port-range/@end" -->
+   <xsl:template match="j:array[@key='port-ranges']/j:map/j:number[@key='end']"><!-- XML match="port-range/@end" -->
       <flag in-json="number"
             as-type="nonNegativeInteger"
             name="end"
@@ -700,8 +671,7 @@
    <xsl:template match="j:array[@key='port-ranges']/j:map/j:number[@key='end']"
                  mode="keep-value-property"
                  priority="9"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='port-ranges']/j:map/j:string[@key='transport']"
-                 priority="1"><!-- XML match="port-range/@transport" -->
+   <xsl:template match="j:array[@key='port-ranges']/j:map/j:string[@key='transport']"><!-- XML match="port-range/@transport" -->
       <flag in-json="string"
             as-type="token"
             name="transport"
@@ -800,8 +770,7 @@
    <xsl:template match="j:map[@key='component-definition']/j:array[@key='components']/j:map/j:array[@key='control-implementations']/j:map/j:array[@key='implemented-requirements']/j:map/j:array[@key='statements']/j:map/j:string[@key='uuid'] | j:map[@key='component-definition']/j:array[@key='capabilities']/j:map/j:array[@key='control-implementations']/j:map/j:array[@key='implemented-requirements']/j:map/j:array[@key='statements']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="11"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='capabilities']/j:map/j:string[@key='uuid']"
-                 priority="1"><!-- XML match="capability/@uuid" -->
+   <xsl:template match="j:array[@key='capabilities']/j:map/j:string[@key='uuid']"><!-- XML match="capability/@uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="uuid"
@@ -813,8 +782,7 @@
    <xsl:template match="j:array[@key='capabilities']/j:map/j:string[@key='uuid']"
                  mode="keep-value-property"
                  priority="5"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='capabilities']/j:map/j:string[@key='name']"
-                 priority="1"><!-- XML match="capability/@name" -->
+   <xsl:template match="j:array[@key='capabilities']/j:map/j:string[@key='name']"><!-- XML match="capability/@name" -->
       <flag in-json="string"
             as-type="string"
             name="name"
@@ -826,8 +794,7 @@
    <xsl:template match="j:array[@key='capabilities']/j:map/j:string[@key='name']"
                  mode="keep-value-property"
                  priority="5"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='incorporates-components']/j:map/j:string[@key='component-uuid']"
-                 priority="1"><!-- XML match="incorporates-component/@component-uuid" -->
+   <xsl:template match="j:array[@key='incorporates-components']/j:map/j:string[@key='component-uuid']"><!-- XML match="incorporates-component/@component-uuid" -->
       <flag in-json="string"
             as-type="uuid"
             name="component-uuid"
@@ -877,8 +844,7 @@
    <xsl:template match="j:map[@key='component-definition']/j:map[@key='back-matter']/j:array[@key='resources']/j:map/j:array[@key='rlinks']/j:map/j:string[@key='media-type']"
                  mode="keep-value-property"
                  priority="8"><!-- Not keeping the flag here. --></xsl:template>
-   <xsl:template match="j:array[@key='hashes']/j:map/j:string[@key='algorithm']"
-                 priority="3"><!-- XML match="hash/@algorithm" -->
+   <xsl:template match="j:array[@key='hashes']/j:map/j:string[@key='algorithm']"><!-- XML match="hash/@algorithm" -->
       <flag in-json="string"
             as-type="string"
             name="algorithm"
@@ -2061,7 +2027,7 @@
       <!-- XML match="component-definition/component/control-implementation/set-parameter/value" -->
       <field collapsible="no"
              as-type="string"
-             name="value"
+             name="parameter-value"
              gi="value"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -2143,7 +2109,7 @@
       <!-- XML match="component-definition/component/control-implementation/implemented-requirement/set-parameter/value" -->
       <field collapsible="no"
              as-type="string"
-             name="value"
+             name="parameter-value"
              gi="value"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -2401,7 +2367,7 @@
       <!-- XML match="component-definition/capability/control-implementation/set-parameter/value" -->
       <field collapsible="no"
              as-type="string"
-             name="value"
+             name="parameter-value"
              gi="value"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>
@@ -2483,7 +2449,7 @@
       <!-- XML match="component-definition/capability/control-implementation/implemented-requirement/set-parameter/value" -->
       <field collapsible="no"
              as-type="string"
-             name="value"
+             name="parameter-value"
              gi="value"
              in-json="SCALAR">
          <xsl:apply-templates select="." mode="get-value-property"/>

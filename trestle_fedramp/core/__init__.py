@@ -12,3 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Initialization for saxon resources."""
+
+import atexit
+
+import saxonc
+
+
+def saxon_release():
+    """Free saxonc resources."""
+    saxon_proc = saxonc.PySaxonProcessor(license=False)
+    saxon_proc.release()
+
+
+atexit.register(saxon_release)
