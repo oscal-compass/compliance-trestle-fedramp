@@ -14,8 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+OSCAL_RELEASE_TAG := "v1.0.6"
 
-develop:
+submodules: 
+	git submodule update --init
+
+develop: submodules
 	python -m pip install -e .[dev] --upgrade --upgrade-strategy eager --
 
 pre-commit: 
@@ -28,10 +32,10 @@ install:
 	python -m pip install  --upgrade pip setuptools
 	python -m pip install . --upgrade --upgrade-strategy eager
 
-code-format: pre-commit-update
+code-format:
 	pre-commit run yapf --all-files
 
-code-lint: pre-commit-update
+code-lint:
 	pre-commit run flake8 --all-files
 
 code-typing:
@@ -63,21 +67,22 @@ release::
 	semantic-release publish
 
 
-mdformat: pre-commit-update
+mdformat:
 	pre-commit run mdformat --all-files
 
 
-fedramp-copy:
-	mkdir -p trestle_fedramp/resources/fedramp-source/content/baselines/rev4
-	cp -R fedramp-source/dist/content/baselines/rev4/xml trestle_fedramp/resources/fedramp-source/content/baselines/rev4/
+
+download_release_artifacts:
+	@./scripts/download_oscal_converters.sh $(OSCAL_RELEASE_TAG) trestle_fedramp/resources/nist-source/xml/convert/
+
+fedramp-copy: download_release_artifacts
+	mkdir -p trestle_fedramp/resources/fedramp-source/content/baselines/rev5
+	cp -R fedramp-source/dist/content/rev5/baselines/xml/ trestle_fedramp/resources/fedramp-source/content/baselines/rev5/
 	mkdir -p trestle_fedramp/resources/fedramp-source/content/resources
-	cp -R fedramp-source/dist/content/resources/xml trestle_fedramp/resources/fedramp-source/content/resources/
+	cp -R fedramp-source/dist/content/rev5/resources/xml/ trestle_fedramp/resources/fedramp-source/content/resources/
 	mkdir -p trestle_fedramp/resources/fedramp-source/vendor
-	cp ssp.xsl trestle_fedramp/resources/fedramp-source/
+	cp ssp.sch.xsl trestle_fedramp/resources/fedramp-source/ssp.xsl
 	cp fedramp-source/vendor/svrl2html.xsl trestle_fedramp/resources/fedramp-source/vendor/
-	mkdir -p trestle_fedramp/resources/nist-source/xml
-	cp -R nist-source/xml/convert trestle_fedramp/resources/nist-source/xml/
-	cp oscal_ssp_json-to-xml-converter-new.xsl trestle_fedramp/resources/nist-source/xml/convert/
 
 
 # POSIX ONLY

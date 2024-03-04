@@ -21,7 +21,7 @@ import pytest
 
 from tests import test_utils
 
-from trestle.core.err import TrestleError
+from trestle.common.err import TrestleError
 
 from trestle_fedramp import const
 from trestle_fedramp.core.fedramp import FedrampValidator
@@ -56,14 +56,14 @@ def test_validate_ssp(tmp_path: pathlib.Path) -> None:
     with open(file_path, 'r') as f:
         json_content = f.read()
     validator = FedrampValidator()
-    success = validator.validate_ssp(json_content, 'json')
+    success = validator.validate_ssp(json_content, 'json', tmp_path)
     assert not success
 
     file_path = pathlib.Path(test_utils.XML_FEDRAMP_SSP_PATH) / test_utils.XML_FEDRAMP_SSP_NAME
     with open(file_path, 'r') as f:
         xml_content = f.read()
     validator = FedrampValidator()
-    success = validator.validate_ssp(xml_content, 'xml')
+    success = validator.validate_ssp(xml_content, 'xml', tmp_path)
     assert not success
 
 

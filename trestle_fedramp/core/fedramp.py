@@ -16,12 +16,13 @@
 import logging
 import pathlib
 import sys
+import tempfile
 
 from pkg_resources import resource_filename
 
-import saxonc
+from saxonche import (PySaxonApiError, PySaxonProcessor, PyXslt30Processor)
 
-from trestle.core.err import TrestleError
+from trestle.common.err import TrestleError
 
 import trestle_fedramp.const as const
 from trestle_fedramp.core.format_convert import JsonXmlConverter
@@ -75,39 +76,71 @@ class FedrampValidator:
         else:
             raise TrestleError(f'Unknown SSP format {data_format}')
 
+        # Create a temporary directory for short-lived files
+        with tempfile.TemporaryDirectory(dir=output_dir) as temp_dir:
+            working_dir = pathlib.Path(temp_dir)
+            return self._validate_xml_content(xml_content, working_dir, output_dir)
+
+    def _validate_xml_content(self, xml_content: str, working_dir: pathlib.Path, output_dir: pathlib.Path) -> bool:
+        """Validate the given xml content as per FedRAMP validation rules."""
         logger.info('Validating SSP')
-        saxon_proc = saxonc.PySaxonProcessor(license=False)
-        xslt_proc = saxon_proc.new_xslt30_processor()
+        try:
+            saxon_proc = PySaxonProcessor(license=False)
+            xslt_proc = self._get_xslt_processor(saxon_proc)
 
-        # Set parameters for FedRAMP baselines and fedramp-values files
-        xslt_proc.set_parameter('baselines-base-path', saxon_proc.make_string_value(str(self.baselines_path)))
-        xslt_proc.set_parameter('registry-base-path', saxon_proc.make_string_value(str(self.registry_path)))
-        # Set to True to validate external resource references
-        xslt_proc.set_parameter('param-use-remote-resources', saxon_proc.make_boolean_value(False))
+            # write the xml content to a file in the working dir
+            # this is needed because the xslt processor requires a file path
+            source_file = working_dir / 'ssp.xml'
+            with open(str(source_file), 'w') as f:
+                f.write(xml_content)
+                logger.debug(f'SSP written to file: {source_file}')
 
-        # Validate the SSP, returning an SVRL document as a string
-        node = saxon_proc.parse_xml(xml_text=xml_content)
-        svrl_str = xslt_proc.transform_to_string(xdm_node=node, stylesheet_file=str(self.ssp_xsl_path))
+            # Validate the SSP, returning an SVRL document as a string
+            svrl_str = xslt_proc.transform_to_string(
+                source_file=str(source_file),
+                stylesheet_file=str(self.ssp_xsl_path),
+            )
 
-        svrl_node = saxon_proc.parse_xml(xml_text=svrl_str)
-        xpath_proc = saxon_proc.new_xpath_processor()
-        xpath_proc.set_context(xdm_item=svrl_node)
+            svrl_node = saxon_proc.parse_xml(xml_text=svrl_str)
+            xpath_proc = saxon_proc.new_xpath_processor()
+            xpath_proc.set_context(xdm_item=svrl_node)
 
-        value = xpath_proc.evaluate('//*:failed-assert')
-        if value is not None:
-            output = output_dir / 'fedramp-validation-report.xml'
-            with open(str(output), 'w') as f:
-                f.write(str(value))
-                logger.info(f'Failed assertion written to file: {output}')
-
-            # transform svrl output to html
-            if self.svrl_xsl_path is not None:
-                html = xslt_proc.transform_to_string(xdm_node=svrl_node, stylesheet_file=str(self.svrl_xsl_path))
-                output = output_dir / 'fedramp-validation-report.html'
+            value = xpath_proc.evaluate('//*:failed-assert')
+            if value is not None:
+                output = output_dir / 'fedramp-validation-report.xml'
                 with open(str(output), 'w') as f:
-                    f.write(html)
-                    logger.info(f'HTML output of Failed assertion written to file: {output}')
-            # there are failures; validation failed
-            return False
+                    f.write(str(value))
+                    logger.info(f'Failed assertion written to file: {output}')
 
-        return True
+                # transform svrl output to html
+                if self.svrl_xsl_path is not None:
+
+                    # Write svrl output to file
+                    svrl_output = working_dir / 'svrl.xml'
+                    with open(str(svrl_output), 'w') as f:
+                        f.write(svrl_str)
+                        logger.debug(f'SVRL written to file: {svrl_output}')
+
+                    html = xslt_proc.transform_to_string(
+                        source_file=str(svrl_output), stylesheet_file=str(self.svrl_xsl_path)
+                    )
+                    output = output_dir / 'fedramp-validation-report.html'
+                    with open(str(output), 'w') as f:
+                        f.write(html)
+                        logger.info(f'HTML output of Failed assertion written to file: {output}')
+                # there are failures; validation failed
+                return False
+
+            return True
+        except PySaxonApiError as e:
+            raise TrestleError(f'Error during SSP validation: {e}')
+
+    def _get_xslt_processor(self, saxon_processor: PySaxonProcessor) -> PyXslt30Processor:
+        """Create a new XSLT processor and set parameters."""
+        xslt_processor = saxon_processor.new_xslt30_processor()
+        # Set parameters for FedRAMP baselines and fedramp-values files
+        xslt_processor.set_parameter('baselines-base-path', saxon_processor.make_string_value(str(self.baselines_path)))
+        xslt_processor.set_parameter('registry-base-path', saxon_processor.make_string_value(str(self.registry_path)))
+        # Set to True to validate external resource references
+        xslt_processor.set_parameter('param-use-remote-resources', saxon_processor.make_boolean_value(False))
+        return xslt_processor
