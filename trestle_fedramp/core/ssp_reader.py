@@ -24,10 +24,10 @@ Control Implementation Description -> Dictionary of response for each part
 
 import pathlib
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional
 
 from trestle.common.common_types import TypeWithByComps
-from trestle.common.const import CONTROL_ORIGINATION, NAMESPACE_FEDRAMP
+from trestle.common.const import CONTROL_ORIGINATION, IMPLEMENTATION_STATUS, NAMESPACE_FEDRAMP
 from trestle.common.list_utils import as_list
 from trestle.common.load_validate import load_validate_model_path
 from trestle.core.catalog.catalog_interface import CatalogInterface
@@ -36,90 +36,8 @@ from trestle.core.profile_resolver import ProfileResolver
 from trestle.oscal.catalog import Catalog
 from trestle.oscal.ssp import ImplementedRequirement, SystemSecurityPlan
 
-from trestle_fedramp.const import (
-    FEDRAMP_CO_VALUES,
-    FEDRAMP_HYBRID,
-    FEDRAMP_SHARED,
-    FEDRAMP_SHORT_CUST_CONFIGURED,
-    FEDRAMP_SHORT_CUST_PROVIDED,
-    FEDRAMP_SHORT_INHERITED,
-    FEDRAMP_SHORT_SP_CORPORATE,
-    FEDRAMP_SHORT_SP_SYSTEM,
-    FEDRAMP_SHORT_TO_LONG_NAME,
-)
-
-
-class ControlOrigination:
-    """Represents the FedRAMP control origination mapping per FedRAMP validation rules."""
-
-    customer_sp: List[str] = [FEDRAMP_SHORT_CUST_CONFIGURED, FEDRAMP_SHORT_CUST_PROVIDED]
-    provider_sp: List[str] = [FEDRAMP_SHORT_SP_CORPORATE, FEDRAMP_SHORT_SP_SYSTEM]
-
-    @classmethod
-    def get_long_names(cls, control_origination_values: List[str]) -> List[str]:
-        """
-        Get the long name for control origination value(s).
-
-        Args:
-            control_origination_values: List of control origination values.
-
-        Returns:
-            Long names for the control origination value or combination of values.
-
-        Notes:
-            The input values can be a single or set control origination properties values.
-            Any set with sp-corporate and sp-system is considered as hybrid and any set with customer
-            and specific system is considered as shared.
-
-        """
-        # Validate the input values
-        if not control_origination_values:
-            raise ValueError('Control origination values are empty')
-
-        for value in control_origination_values:
-            if value not in FEDRAMP_CO_VALUES:
-                raise ValueError(f'Invalid control origination value: {value}. Use one of {FEDRAMP_CO_VALUES}')
-
-        long_names: Set[str] = set()
-
-        # Inherited can be combined with other values
-        if FEDRAMP_SHORT_INHERITED in control_origination_values:
-            fedramp_inherited_long = FEDRAMP_SHORT_TO_LONG_NAME[FEDRAMP_SHORT_INHERITED]
-            long_names.add(fedramp_inherited_long)
-
-        # If the values are in the provider and customer set, then it is shared
-        # This would encompass hybrid if both service provider values are present
-        # with customer values.
-        if cls.is_shared(control_origination_values):
-            long_names.add(FEDRAMP_SHARED)
-        elif cls._is_hybrid(control_origination_values):
-            long_names.add(FEDRAMP_HYBRID)
-        else:
-            # Add individual long names if they don't belong to shared or hybrid
-            for value in control_origination_values:
-                long_names.add(FEDRAMP_SHORT_TO_LONG_NAME[value])
-
-        return list(long_names)
-
-    @staticmethod
-    def _is_hybrid(control_origination_values: List[str]) -> bool:
-        """Check if the control origination values are hybrid."""
-        return (
-            FEDRAMP_SHORT_SP_CORPORATE in control_origination_values
-            and FEDRAMP_SHORT_SP_SYSTEM in control_origination_values
-        )
-
-    @classmethod
-    def is_shared(cls, control_origination_values: List[str]) -> bool:
-        """Check if the control origination values are shared."""
-        control_origination_set: Set[str] = set(control_origination_values)
-
-        # If the values contain both customer and provider values, then it is shared
-        if control_origination_set.intersection(cls.provider_sp) and control_origination_set.intersection(
-                cls.customer_sp):
-            return True
-
-        return False
+from trestle_fedramp.const import FEDRAMP_IS_SHORT_TO_LONG_NAME
+from trestle_fedramp.core.fedramp_values import ControlOrigination
 
 
 @dataclass
@@ -137,6 +55,7 @@ class FedrampSSPData:
 
     control_implementation_description: Dict[str, str]
     control_origination: Optional[List[str]]
+    implementation_status: Optional[str]
 
 
 # FedRAMP data by control label
@@ -208,9 +127,11 @@ class FedrampSSPReader:
                 control_origination: Optional[List[str]] = self.get_control_origination_values(implemented_requirement)
                 control_implementation_description: Dict[
                     str, str] = self.get_control_implementation_description(implemented_requirement)
+                implementation_status: Optional[str] = self.get_implementation_status(implemented_requirement)
                 control_dict[label] = FedrampSSPData(
                     control_origination=control_origination,
-                    control_implementation_description=control_implementation_description
+                    control_implementation_description=control_implementation_description,
+                    implementation_status=implementation_status
                 )
         return control_dict
 
@@ -245,6 +166,30 @@ class FedrampSSPReader:
             if by_component.description
         ]
         return '\n\n'.join(control_response_text_list)
+
+    @staticmethod
+    def get_implementation_status(implemented_requirement: ImplementedRequirement) -> Optional[str]:
+        """Get the implementation status."""
+        prop_values: List[str] = [
+            prop.value
+            for prop in as_list(implemented_requirement.props)
+            if prop.name == IMPLEMENTATION_STATUS and prop.ns == NAMESPACE_FEDRAMP
+        ]
+
+        if not prop_values:
+            return None
+        elif len(prop_values) > 1:
+            raise ValueError('Multiple implementation status properties found for a single implemented requirement')
+
+        implementation_status_value = prop_values[0]
+
+        if implementation_status_value not in FEDRAMP_IS_SHORT_TO_LONG_NAME:
+            raise ValueError(
+                f'Invalid implementation status value: {implementation_status_value}. '
+                f'Use one of {list(FEDRAMP_IS_SHORT_TO_LONG_NAME.keys())}'
+            )
+
+        return FEDRAMP_IS_SHORT_TO_LONG_NAME[implementation_status_value]
 
     @staticmethod
     def get_control_origination_values(implemented_requirement: ImplementedRequirement) -> Optional[List[str]]:

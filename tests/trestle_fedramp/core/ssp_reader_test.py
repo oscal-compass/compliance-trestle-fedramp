@@ -16,7 +16,7 @@
 """Testing reading OSCAL SSP data for FedRAMP transformation."""
 
 import pathlib
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
 import pytest
 
@@ -26,18 +26,7 @@ from trestle.core.generators import generate_sample_model
 from trestle.oscal import ssp
 from trestle.oscal.common import Property
 
-from trestle_fedramp.const import (
-    FEDRAMP_CUST_CONFIGURED,
-    FEDRAMP_HYBRID,
-    FEDRAMP_INHERITED,
-    FEDRAMP_SHARED,
-    FEDRAMP_SHORT_CUST_CONFIGURED,
-    FEDRAMP_SHORT_INHERITED,
-    FEDRAMP_SHORT_SP_CORPORATE,
-    FEDRAMP_SHORT_SP_SYSTEM,
-    FEDRAMP_SP_CORPORATE
-)
-from trestle_fedramp.core.ssp_reader import (ControlOrigination, FedrampControlDict, FedrampSSPReader)
+from trestle_fedramp.core.ssp_reader import FedrampControlDict, FedrampSSPReader
 
 
 def test_reader_ssp_data(tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str]) -> None:
@@ -55,6 +44,11 @@ def test_reader_ssp_data(tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str]) -> 
     assert ssp_control_dict['AC-1'].control_origination == ['Service Provider System Specific']
     assert ssp_control_dict['AC-2'].control_origination == ['Shared (Service Provider and Customer Responsibility)']
     assert ssp_control_dict['AU-1'].control_origination == ['Service Provider Corporate']
+
+    # Verify status
+    assert ssp_control_dict['AC-1'].implementation_status == 'Planned'
+    assert ssp_control_dict['AC-2'].implementation_status == 'Implemented'
+    assert ssp_control_dict['AU-1'].implementation_status == 'Partially Implemented'
 
     # Verify the control implementation descriptions
     responses_dict: Dict[str, str] = ssp_control_dict['AC-1'].control_implementation_description
@@ -75,50 +69,6 @@ def test_reader_ssp_data(tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str]) -> 
     )
 
 
-# Control origination tests
-
-
-def test_control_origination() -> None:
-    """Test valid and invalid control origination values."""
-    # Validate combinations of control origination values.
-    long_names: List[str] = ControlOrigination.get_long_names([FEDRAMP_SHORT_SP_CORPORATE, FEDRAMP_SHORT_SP_SYSTEM])
-    assert long_names == [FEDRAMP_HYBRID]
-
-    # Shared should take precedence over the other values.
-    long_names = ControlOrigination.get_long_names(
-        [FEDRAMP_SHORT_SP_CORPORATE, FEDRAMP_SHORT_SP_SYSTEM, FEDRAMP_SHORT_CUST_CONFIGURED]
-    )
-    assert long_names == [FEDRAMP_SHARED]
-
-    # Combination with inherited
-    long_names = ControlOrigination.get_long_names(
-        [FEDRAMP_SHORT_SP_CORPORATE, FEDRAMP_SHORT_CUST_CONFIGURED, FEDRAMP_SHORT_INHERITED]
-    )
-
-    assert len(long_names) == 2
-    assert FEDRAMP_SHARED in long_names
-    assert FEDRAMP_INHERITED in long_names
-
-    # Neither shared nor hybrid
-    long_names = ControlOrigination.get_long_names([FEDRAMP_SHORT_INHERITED, FEDRAMP_SHORT_CUST_CONFIGURED])
-
-    assert len(long_names) == 2
-    assert FEDRAMP_INHERITED in long_names
-    assert FEDRAMP_CUST_CONFIGURED in long_names
-
-    # Single value
-    long_names = ControlOrigination.get_long_names([FEDRAMP_SHORT_SP_CORPORATE])
-    assert long_names == [FEDRAMP_SP_CORPORATE]
-
-    # Assert that if the input is not a valid control origination value, it raises a ValueError.
-    with pytest.raises(ValueError, match='Invalid control origination value: invalid. Use one of .*'):
-        ControlOrigination.get_long_names([FEDRAMP_SHORT_CUST_CONFIGURED, 'invalid'])
-
-    # Validate error for empty list.
-    with pytest.raises(ValueError, match='Control origination values are empty'):
-        ControlOrigination.get_long_names([])
-
-
 def test_get_control_origination() -> None:
     """Test getting control origination from the implemented requirement."""
     impl_req = generate_sample_model(ssp.ImplementedRequirement)
@@ -137,3 +87,40 @@ def test_get_control_origination() -> None:
 
     # This should return the long name of the control origination value.
     assert FedrampSSPReader.get_control_origination_values(impl_req) == ['Service Provider Corporate']
+
+
+# Negative test cases for implementation status
+
+
+def test_get_implementation_status_failures() -> None:
+    """Testing failure cases for getting the implementation status."""
+    # Wrong namespace
+    impl_req = generate_sample_model(ssp.ImplementedRequirement)
+    impl_req.props = []
+    impl_req.props.append(
+        Property(name='implementation-status', value='planned', ns='https://example.com')  # type: ignore
+    )
+
+    assert FedrampSSPReader.get_implementation_status(impl_req) is None
+
+    # Too many implementation status properties
+    impl_req.props = []
+    impl_req.props.extend(
+        [
+            Property(name='implementation-status', value='planned', ns=NAMESPACE_FEDRAMP),  # type: ignore
+            Property(name='implementation-status', value='implemented', ns=NAMESPACE_FEDRAMP)  # type: ignore
+        ]
+    )
+
+    with pytest.raises(ValueError,
+                       match='Multiple implementation status properties found for a single implemented requirement'):
+        FedrampSSPReader.get_implementation_status(impl_req)
+
+    # Invalid implementation status value
+    impl_req.props = []
+    impl_req.props.append(
+        Property(name='implementation-status', value='invalid', ns=NAMESPACE_FEDRAMP)  # type: ignore
+    )
+
+    with pytest.raises(ValueError, match='Invalid implementation status value: invalid. Use one of .*'):
+        FedrampSSPReader.get_implementation_status(impl_req)

@@ -2543,7 +2543,7 @@
             {
               "name": "implementation-status",
               "ns": "https://fedramp.gov/ns/oscal",
-              "value": "planned",
+              "value": "implemented",
               "remarks": "Describe the plan to complete the implementation."
             },
             {
@@ -2714,7 +2714,7 @@
             {
               "name": "implementation-status",
               "ns": "https://fedramp.gov/ns/oscal",
-              "value": "planned",
+              "value": "partial",
               "remarks": "Describe the plan to complete the implementation."
             },
             {
@@ -2848,7 +2848,7 @@
             {
               "name": "implementation-status",
               "ns": "https://fedramp.gov/ns/oscal",
-              "value": "planned",
+              "value": "implemented",
               "remarks": "Describe the plan to complete the implementation."
             },
             {
