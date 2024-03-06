@@ -14,14 +14,13 @@
 """Classes for populate FedRAMP Docx template."""
 
 import logging
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from docx.document import Document  # type: ignore
 from docx.table import Table, _Cell  # type: ignore
 from docx.text.paragraph import Paragraph  # type: ignore
 
 from trestle.common.err import TrestleError
-from trestle.common.list_utils import as_list
 
 import trestle_fedramp.const as const
 from trestle_fedramp.core.ssp_reader import FedrampControlDict, FedrampSSPData
@@ -83,15 +82,32 @@ class ControlSummaries():
     def __init__(self) -> None:
         """Initialize the ControlSummaries class."""
         # Control origination is always the last row in the table
-        self.control_origination_cell: Tuple[int, int] = (-1, 0)
+        self._control_origination_cell: Tuple[int, int] = (-1, 0)
+        self._control_origination_index_values: Dict[str, int] = {
+            const.FEDRAMP_SP_CORPORATE: 1,
+            const.FEDRAMP_SP_SYSTEM: 2,
+            const.FEDRAMP_HYBRID: 3,
+            const.FEDRAMP_CUST_CONFIGURED: 4,
+            const.FEDRAMP_CUST_PROVIDED: 5,
+            const.FEDRAMP_SHARED: 6,
+            const.FEDRAMP_INHERITED: 7
+        }
+        # Implementation status is always the second last row in the table
+        self._implementation_status_cell: Tuple[int, int] = (-2, 0)
+        self._implementation_status_index_values: Dict[str, int] = {
+            const.FEDRAMP_IMPLEMENTED: 1,
+            const.FEDRAMP_PARTIAL: 2,
+            const.FEDRAMP_PLANNED: 3,
+            const.FEDRAMP_ALTERNATIVE: 4,
+            const.FEDRAMP_NOT_APPLICABLE: 5
+        }
 
     @staticmethod
     def is_control_summary_table(row_header: str) -> bool:
         """Check if the table is a control summary table."""
         return row_header.endswith(const.CONTROL_SUMMARY)
 
-    @staticmethod
-    def get_control_origination_index(control_origination: str) -> int:
+    def get_control_origination_index(self, control_origination: str) -> int:
         """
         Get paragraph index in the control origination cell by control origination string.
 
@@ -102,19 +118,24 @@ class ControlSummaries():
             The paragraph index location in the control origination cell
             in the control summary table.
         """
-        data: Dict[str, int] = {
-            const.FEDRAMP_SP_CORPORATE: 1,
-            const.FEDRAMP_SP_SYSTEM: 2,
-            const.FEDRAMP_HYBRID: 3,
-            const.FEDRAMP_CUST_CONFIGURED: 4,
-            const.FEDRAMP_CUST_PROVIDED: 5,
-            const.FEDRAMP_SHARED: 6,
-            const.FEDRAMP_INHERITED: 7
-        }
-        try:
-            return data[control_origination]
-        except KeyError:
+        if control_origination not in self._control_origination_index_values:
             raise TrestleError(f'Invalid FedRAMP control origination value: {control_origination}')
+        return self._control_origination_index_values[control_origination]
+
+    def get_implementation_status_index(self, implementation_status: str) -> int:
+        """
+        Get paragraph index in the implementation status cell by implementation status string.
+
+        Args:
+            implementation_status: The implementation status string.
+
+        Returns:
+            The paragraph index location in the implementation status cell
+            in the control summary table.
+        """
+        if implementation_status not in self._implementation_status_index_values:
+            raise TrestleError(f'Invalid FedRAMP implementation status value: {implementation_status}')
+        return self._implementation_status_index_values[implementation_status]
 
     def _set_checkbox(self, paragraph: Paragraph) -> None:
         """Check the checkbox in the paragraph."""
@@ -134,17 +155,33 @@ class ControlSummaries():
         logger.debug(f'Checkbox text found in the paragraph with text: {paragraph.text}')
         checkbox_text.text = const.CHECKED_BOX_ICON
 
+    def _set_control_origination(self, control_origination_cell: _Cell, control_origination_values: List[str]) -> None:
+        """Set the control origination in the cell."""
+        for control_origination in control_origination_values:
+            co_paragraph_index_loc = self.get_control_origination_index(control_origination)
+            # Control origination is always the last row in the table
+            if co_paragraph_index_loc > len(control_origination_cell.paragraphs):
+                raise TrestleError(f'Invalid control origination: {control_origination}')
+            co_paragraph: Paragraph = control_origination_cell.paragraphs[co_paragraph_index_loc]
+            self._set_checkbox(co_paragraph)
+
+    def _set_implementation_status(self, implementation_status_cell: _Cell, implementation_status: str) -> None:
+        """Set the implementation status in the cell."""
+        is_paragraph_index_loc = self.get_implementation_status_index(implementation_status)
+        is_paragraph: Paragraph = implementation_status_cell.paragraphs[is_paragraph_index_loc]
+        if is_paragraph_index_loc > len(implementation_status_cell.paragraphs):
+            raise TrestleError(f'Invalid implementation status: {implementation_status}')
+        self._set_checkbox(is_paragraph)
+
     def populate_table(self, table: Table, control_id: str, ssp_data: FedrampSSPData) -> None:
         """Populate the table with the SSP data."""
         try:
-            control_origination_cell: _Cell = table.cell(*self.control_origination_cell)
-            for control_origination in as_list(ssp_data.control_origination):
-                co_paragraph_index_loc = self.get_control_origination_index(control_origination)
-                # Control origination is always the last row in the table
-                if co_paragraph_index_loc > len(control_origination_cell.paragraphs):
-                    raise TrestleError(f'Invalid control origination for {control_id}: {control_origination}')
-                co_paragraph: Paragraph = control_origination_cell.paragraphs[co_paragraph_index_loc]
-                self._set_checkbox(co_paragraph)
+            if ssp_data.control_origination:
+                control_origination_cell: _Cell = table.cell(*self._control_origination_cell)
+                self._set_control_origination(control_origination_cell, ssp_data.control_origination)
+            if ssp_data.implementation_status:
+                implementation_status_cell: _Cell = table.cell(*self._implementation_status_cell)
+                self._set_implementation_status(implementation_status_cell, ssp_data.implementation_status)
         except Exception as e:
             raise TrestleError(f'Error populating control summary for {control_id}: {e}')
 

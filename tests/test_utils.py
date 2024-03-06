@@ -16,7 +16,7 @@
 """Test utils module."""
 
 import pathlib
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from docx.table import Table, _Cell  # type: ignore
 from docx.text.paragraph import Paragraph  # type: ignore
@@ -35,21 +35,16 @@ JSON_TEST_DATA_PATH = pathlib.Path('tests/data/json/').resolve()
 TEST_SSP_JSON = 'simplified_fedramp_ssp_template.json'
 
 
-def verify_checkboxes(cell: _Cell, ssp_data: FedrampSSPData) -> None:
-    """Verify the checkboxes are populated correctly."""
-    checked_list: List[int] = []
-    checked_list_text: str = ''
-    for i, paragraph in enumerate(cell.paragraphs):
-        if checkbox_is_set(paragraph) and checkbox_text_is_set(paragraph):
-            checked_list.append(i)
-            checked_list_text += paragraph.text
-
+def verify_control_origination_checkboxes(cell: _Cell, ssp_data: FedrampSSPData) -> None:
+    """Verify the control origination checkboxes are populated correctly."""
+    checked_list, checked_list_text = get_checked_list(cell)
     if ssp_data.control_origination is None:
         assert len(checked_list) == 0
     else:
         expected_checklist_list: List[int] = []
+        control_summaries = ControlSummaries()
         for control_origination in ssp_data.control_origination:
-            index_loc: int = ControlSummaries.get_control_origination_index(control_origination)
+            index_loc: int = control_summaries.get_control_origination_index(control_origination)
             expected_checklist_list.append(index_loc)
 
             # Check that the actual text is correct in the paragraph
@@ -58,6 +53,32 @@ def verify_checkboxes(cell: _Cell, ssp_data: FedrampSSPData) -> None:
             assert control_origination in checked_list_text
 
         assert checked_list == expected_checklist_list
+
+
+def verify_implementation_status_checkboxes(cell: _Cell, ssp_data: FedrampSSPData) -> None:
+    """Verify the implementation status checkboxes are populated correctly."""
+    checked_list, checked_list_text = get_checked_list(cell)
+    if ssp_data.implementation_status is None:
+        assert len(checked_list) == 0
+    else:
+        control_summaries = ControlSummaries()
+        implementation_status = control_summaries.get_implementation_status_index(ssp_data.implementation_status)
+
+        assert checked_list == [implementation_status]
+
+        # Verify the text is what is expected
+        assert ssp_data.implementation_status in checked_list_text
+
+
+def get_checked_list(cell: _Cell) -> Tuple[List[int], str]:
+    """Get the checked list."""
+    checked_list: List[int] = []
+    checked_list_text: str = ''
+    for i, paragraph in enumerate(cell.paragraphs):
+        if checkbox_is_set(paragraph) and checkbox_text_is_set(paragraph):
+            checked_list.append(i)
+            checked_list_text += paragraph.text
+    return checked_list, checked_list_text
 
 
 def checkbox_is_set(paragraph: Paragraph) -> bool:

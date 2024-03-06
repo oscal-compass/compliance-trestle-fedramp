@@ -19,7 +19,7 @@ from docx.document import Document as DocxDocument  # type: ignore
 
 import pytest
 
-from tests.test_utils import verify_checkboxes
+from tests.test_utils import verify_control_origination_checkboxes, verify_implementation_status_checkboxes
 
 from trestle.common.err import TrestleError
 
@@ -41,7 +41,8 @@ def test_fedramp_docx_populate(docx_document: DocxDocument, test_ssp_control_dic
         if control_summaries.is_control_summary_table(row_header):
             control_id = fedramp_docx.get_control_id(row_header)
             data: FedrampSSPData = test_ssp_control_dict.get(control_id, FedrampSSPData({}, None, None))
-            verify_checkboxes(table.cell(*control_summaries.control_origination_cell), data)
+            verify_control_origination_checkboxes(table.cell(*control_summaries._control_origination_cell), data)
+            verify_implementation_status_checkboxes(table.cell(*control_summaries._implementation_status_cell), data)
         if control_implementation_description.is_control_implementation_table(row_header):
             control_id = fedramp_docx.get_control_id(row_header)
             data = test_ssp_control_dict.get(control_id, FedrampSSPData({}, None, None))
@@ -63,12 +64,12 @@ def test_fedramp_docx_with_invalid_input(docx_document: DocxDocument) -> None:
     }
     fedramp_docx = FedrampDocx(docx_document, invalid_control_dict)
 
-    with pytest.raises(TrestleError, match='.*Invalid control origination for AC-1: Inherited'):
+    with pytest.raises(TrestleError, match='.*Invalid control origination: Inherited'):
         fedramp_docx.populate()
 
 
-def test_fedramp_docx_with_non_existent_control_origination(docx_document: DocxDocument) -> None:
-    """Trigger and error with a non-existent control origination."""
+def test_fedramp_docx_with_non_existent_values(docx_document: DocxDocument) -> None:
+    """Trigger and error with a non-existent control origination and implementation status."""
     # AC-1 does not have an control origination inherited value
     invalid_control_dict: FedrampControlDict = {
         'AC-1': FedrampSSPData(
@@ -78,6 +79,12 @@ def test_fedramp_docx_with_non_existent_control_origination(docx_document: DocxD
     fedramp_docx = FedrampDocx(docx_document, invalid_control_dict)
 
     with pytest.raises(TrestleError, match='.*Invalid FedRAMP control origination value: invalid'):
+        fedramp_docx.populate()
+
+    invalid_control_dict['AC-1'].control_origination = [const.FEDRAMP_SP_CORPORATE]  # Reset the control origination
+    invalid_control_dict['AC-1'].implementation_status = 'invalid'
+
+    with pytest.raises(TrestleError, match='.*Invalid FedRAMP implementation status value: invalid'):
         fedramp_docx.populate()
 
 
