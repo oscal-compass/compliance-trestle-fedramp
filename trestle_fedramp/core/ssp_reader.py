@@ -16,28 +16,36 @@ Read and prepare OSCAL SSP information for template.
 
 The OSCAL SSP is stored in the FedRAMPControlDict in a way that
 would be expected by the FedRAMP Template without knowledge of the
-template structure.
+template structure/format.
 Control ID -> Labels
 Control Origination Property -> Control Origination String Value(s)
 Control Implementation Description -> Dictionary of response for each part
+Control Parameters -> Dictionary of parameter values for each part and location in the prose to match the
+expected FedRAMP values
 """
 
+import logging
 import pathlib
+import re
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 from trestle.common.common_types import TypeWithByComps
-from trestle.common.const import CONTROL_ORIGINATION, IMPLEMENTATION_STATUS, NAMESPACE_FEDRAMP
-from trestle.common.list_utils import as_list
+from trestle.common.const import CONTROL_ORIGINATION, IMPLEMENTATION_STATUS, NAMESPACE_FEDRAMP, STATEMENT
+from trestle.common.err import TrestleError
+from trestle.common.list_utils import as_filtered_list, as_list
 from trestle.common.load_validate import load_validate_model_path
 from trestle.core.catalog.catalog_interface import CatalogInterface
-from trestle.core.control_interface import ControlInterface
+from trestle.core.control_interface import ControlInterface, ParameterRep
 from trestle.core.profile_resolver import ProfileResolver
-from trestle.oscal.catalog import Catalog
-from trestle.oscal.ssp import ImplementedRequirement, SystemSecurityPlan
+from trestle.oscal import common
+from trestle.oscal.catalog import Catalog, Control
+from trestle.oscal.ssp import ImplementedRequirement, SetParameter, SystemSecurityPlan
 
 from trestle_fedramp.const import FEDRAMP_IS_SHORT_TO_LONG_NAME
 from trestle_fedramp.core.fedramp_values import ControlOrigination
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -47,13 +55,16 @@ class FedrampSSPData:
 
     Fields:
         control_implementation_description: Dictionary of control implementation description by control part
+        parameters: Dictionary of parameters by control part and prose placement in the SSP (e.g AC(1)(a))
         control_origination: Top level control origination values list
+        implementation_status: Implementation status value
 
     Notes: To conform to the convention used by Trestle to denote information at
-    the control level, will be '' in the control_implementation_description dictionary.
+    the control level, will be '' in the control_implementation_description and parameters dictionaries.
     """
 
     control_implementation_description: Dict[str, str]
+    parameters: Dict[str, str]
     control_origination: Optional[List[str]]
     implementation_status: Optional[str]
 
@@ -89,15 +100,17 @@ class FedrampSSPReader:
         resolved_catalog: Catalog = profile_resolver.get_resolved_profile_catalog(
             self._root,
             self._ssp.import_profile.href,
+            param_rep=ParameterRep.VALUE_OR_LABEL_OR_CHOICES,
             block_params=False,
             params_format='[.]',
             show_value_warnings=True,
         )
-        catalog_interface = CatalogInterface(resolved_catalog)
+        self.catalog_interface = CatalogInterface(resolved_catalog)
 
         # Setup dictionaries for control and statement mapping
-        self._control_labels_by_id: Dict[str, str] = self._load_profile_info(catalog_interface=catalog_interface)
-        self._statement_labels_by_id: Dict[str, Dict[str, str]] = catalog_interface.get_statement_part_id_map(False)
+        self._control_labels_by_id: Dict[str, str] = self._load_label_info()
+        self._statement_labels_by_id: Dict[str, Dict[str,
+                                                     str]] = self.catalog_interface.get_statement_part_id_map(False)
 
         # Setup dictionaries for component title. Only include components that are in the include_components list.
         self._comp_titles_by_uuid: Dict[str, str] = self._get_component_info()
@@ -106,11 +119,11 @@ class FedrampSSPReader:
         """Get the component information mapped to UUID."""
         return {component.uuid: component.title for component in as_list(self._ssp.system_implementation.components)}
 
-    def _load_profile_info(self, catalog_interface: CatalogInterface) -> Dict[str, str]:
+    def _load_label_info(self) -> Dict[str, str]:
         """Load the profile and store the control by label."""
         controls_by_label: Dict[str, str] = {}
 
-        for control in catalog_interface.get_all_controls_from_dict():
+        for control in self.catalog_interface.get_all_controls_from_dict():
             label = ControlInterface.get_label(control)
             if label:
                 controls_by_label[control.id] = label
@@ -128,10 +141,12 @@ class FedrampSSPReader:
                 control_implementation_description: Dict[
                     str, str] = self.get_control_implementation_description(implemented_requirement)
                 implementation_status: Optional[str] = self.get_implementation_status(implemented_requirement)
+                parameters: Dict[str, str] = self.get_control_parameters(implemented_requirement)
                 control_dict[label] = FedrampSSPData(
                     control_origination=control_origination,
                     control_implementation_description=control_implementation_description,
-                    implementation_status=implementation_status
+                    implementation_status=implementation_status,
+                    parameters=parameters
                 )
         return control_dict
 
@@ -160,12 +175,87 @@ class FedrampSSPReader:
 
     def _get_responses_from_by_comp(self, type_with_bycomp: TypeWithByComps) -> str:
         """Get the control implementation description for each by component."""
-        control_response_text_list: List[str] = [
+        control_response_text_list: List[str] = [  # type: ignore
             f"{self._comp_titles_by_uuid.get(by_component.component_uuid, '')}: {by_component.description}"
-            for by_component in as_list(type_with_bycomp.by_components)
+            for by_component in as_list(type_with_bycomp.by_components)  # type: ignore
             if by_component.description
         ]
         return '\n\n'.join(control_response_text_list)
+
+    def get_control_parameters(self, implemented_requirement: ImplementedRequirement) -> Dict[str, str]:
+        """Get the control parameters."""
+        parameters: Dict[str, str] = {}
+        control: Optional[Control] = self.catalog_interface.get_control(implemented_requirement.control_id)
+        if control is None:
+            raise TrestleError(f'Control {implemented_requirement.control_id} not found in the catalog')
+
+        control_parameters = ControlInterface.get_control_param_dict(control, False)
+        # Replace all of the parameter with the resolved values from the catalog, profile, or set parameters
+        for param_id, param in control_parameters.items():
+            logger.debug(f'Using parameter key {param_id} for control {implemented_requirement.control_id}')
+            # Set parameters can be set at the by_comp level, but only supporting at the control level
+            # for now since that is used in compliance-trestle during
+            # SSP markdown editing.
+            if implemented_requirement.set_parameters:
+                self._update_param(param, implemented_requirement.set_parameters)
+            param_str = ControlInterface.param_to_str(param, ParameterRep.VALUE_OR_LABEL_OR_CHOICES, False, False)
+            parameters[param_id] = param_str if param_str else ''
+
+        parameters_by_part_name: Dict[str, str] = {}
+        label = self._control_labels_by_id.get(implemented_requirement.control_id, '')
+        for part in as_filtered_list(control.parts, lambda p: p.name == STATEMENT):
+            self._get_parameters_by_part(part, label, parameters, parameters_by_part_name)
+        return parameters_by_part_name
+
+    def _update_param(self, parameter: common.Parameter, set_params: List[SetParameter]) -> None:
+        """Update the parameter value from the implemented requirement."""
+        for set_param in as_filtered_list(set_params, lambda p: p.param_id == parameter.id):
+            if set_param.values:
+                logger.debug(f'Updating parameter {parameter.id} with values {set_param.values}')
+                parameter.values = set_param.values
+                return
+
+    def _get_parameters_by_part(
+        self, part: common.Part, label: str, parameters: Dict[str, str], parameters_by_part_name: Dict[str, str]
+    ) -> None:
+        """
+        Get the control parameters for a specific part.
+
+        Notes:
+            Map them to the control part and prose location in the way that is expected by the FedRAMP template
+            The pattern is 'control(part)(subpart) or 'control(part)'. If there are multiple associated parameters
+            they are separated list in order with a dash in the key (e.g. AT-3(b)-1).
+        """
+        part_label = ControlInterface.get_label(part)
+        part_label = part_label[:-1] if part_label and part_label.endswith('.') else part_label
+        if part_label:
+            label = f'{label}({part_label})'
+        if part.prose:
+            params_ids = self.find_params_in_text(part.prose)
+            if len(params_ids) == 1:
+                parameters_by_part_name[label] = parameters.get(params_ids[0], '')
+            elif params_ids:
+                for i, param_id in enumerate(params_ids):
+                    parameters_by_part_name[f'{label}-{i+1}'] = parameters.get(param_id, '')
+        for subpart in as_list(part.parts):
+            self._get_parameters_by_part(subpart, label, parameters, parameters_by_part_name)
+
+    def find_params_in_text(self, text: str) -> List[str]:
+        """Find the parameters in the text."""
+        # Logic adapted from
+        # https://github.com/oscal-compass/compliance-trestle/blob/main/trestle/core/control_interface.py#L836
+        param_ids: List[str] = []
+        staches: List[str] = re.findall(r'{{.*?}}', text)
+        if not staches:
+            return param_ids
+        # now have list of all staches including braces, e.g. ['{{foo}}', '{{bar}}']
+        # clean the staches so they just have the param ids
+        for stache in staches:
+            # remove braces so these are just param_ids but may have extra chars
+            stache_contents = stache[2:(-2)]
+            param_id = stache_contents.replace('insert: param,', '').strip()
+            param_ids.append(param_id)
+        return param_ids
 
     @staticmethod
     def get_implementation_status(implemented_requirement: ImplementedRequirement) -> Optional[str]:

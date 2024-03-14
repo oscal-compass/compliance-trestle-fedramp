@@ -2741,6 +2741,26 @@
               ]
             }
           ],
+          "set-parameters": [
+            {
+              "param-id": "au-1_prm_1",
+              "values": [
+                "organization-defined personnel or roles"
+              ]
+            },
+            {
+              "param-id": "au-01_odp.05",
+              "values": [
+                "at least every 3 years"
+              ]
+            },
+            {
+              "param-id": "au-01_odp.07",
+              "values": [
+                "at least annually"
+              ]
+            }
+          ],
           "statements": [
             {
               "statement-id": "au-1_smt",
@@ -2749,27 +2769,7 @@
                 {
                   "component-uuid": "60f92bcf-f353-4236-9803-2a5d417555f4",
                   "uuid": "e985ae45-6ab4-4f12-8699-3ebf87e35bd5",
-                  "description": "Describe how the control is satisfied within the system.",
-                  "set-parameters": [
-                    {
-                      "param-id": "au-1_prm_1",
-                      "values": [
-                        "organization-defined personnel or roles"
-                      ]
-                    },
-                    {
-                      "param-id": "au-1_prm_2",
-                      "values": [
-                        "at least every 3 years"
-                      ]
-                    },
-                    {
-                      "param-id": "au-1_prm_3",
-                      "values": [
-                        "at least annually"
-                      ]
-                    }
-                  ]
+                  "description": "Describe how the control is satisfied within the system."
                 }
               ]
             },

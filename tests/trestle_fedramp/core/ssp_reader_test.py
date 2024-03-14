@@ -68,6 +68,25 @@ def test_reader_ssp_data(tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str]) -> 
         'another component.'
     )
 
+    # Verify the parameter values and overrides for an example control
+    param_dict = ssp_control_dict['AU-1'].parameters
+    assert len(param_dict) == 7
+    assert 'AU-1(a)' in param_dict
+    assert 'AU-1(a)(1)' in param_dict
+    assert 'AU-1(b)' in param_dict
+    assert 'AU-1(c)(1)-1' in param_dict
+    assert 'AU-1(c)(1)-2' in param_dict
+    assert 'AU-1(c)(1)-1' in param_dict
+    assert 'AU-1(c)(2)-2' in param_dict
+
+    assert param_dict['AU-1(a)'] == 'organization-defined personnel or roles'
+    assert param_dict['AU-1(a)(1)'] == 'organization-level; mission/business process-level; system-level'
+    assert param_dict['AU-1(b)'] == 'official'
+    assert param_dict['AU-1(c)(1)-1'] == 'at least every 3 years'
+    assert param_dict['AU-1(c)(1)-2'] == 'events'
+    assert param_dict['AU-1(c)(2)-1'] == 'at least annually'
+    assert param_dict['AU-1(c)(2)-2'] == 'events'
+
 
 def test_get_control_origination() -> None:
     """Test getting control origination from the implemented requirement."""

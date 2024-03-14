@@ -96,27 +96,35 @@ def docx_document() -> Iterator[DocxDocument]:
 def test_ssp_control_dict() -> Iterator[FedrampControlDict]:
     """Return a dictionary of control data."""
     control_dict: FedrampControlDict = {
-        'AC-1': FedrampSSPData({'a': 'Part a example for AC-1'}, control_origination=None, implementation_status=None),
+        'AC-1': FedrampSSPData(
+            control_implementation_description={'a': 'Part a example for AC-1'},
+            parameters={},
+            control_origination=None,
+            implementation_status=None
+        ),
         'AC-2(1)': FedrampSSPData(
-            {'': 'Overall description for AC-2(1)'},
+            control_implementation_description={'': 'Overall description for AC-2(1)'},
+            parameters={},
             control_origination=[const.FEDRAMP_SP_SYSTEM],
             implementation_status=const.FEDRAMP_PLANNED
         ),
         'AC-20': FedrampSSPData(
-            {
+            control_implementation_description={
                 'a': 'Part a example for AC-20',
                 'b': 'Part b example for AC-20',
             },
+            parameters={},
             control_origination=[const.FEDRAMP_SP_CORPORATE, const.FEDRAMP_INHERITED],
             implementation_status=const.FEDRAMP_PARTIAL
         ),
         'CM-6': FedrampSSPData(
-            {
+            control_implementation_description={
                 'a': 'Part a example for CM-6',
                 'b': 'Part b example for CM-6',
                 'c': 'Part c example for CM-6',
                 'd': 'Part d example for CM-6',
             },
+            parameters={},
             control_origination=[const.FEDRAMP_SHARED],
             implementation_status=const.FEDRAMP_IMPLEMENTED
         )
