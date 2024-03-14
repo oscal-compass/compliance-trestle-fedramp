@@ -111,9 +111,9 @@ def test_get_implementation_status_failures() -> None:
             Property(name='implementation-status', value='implemented', ns=NAMESPACE_FEDRAMP)  # type: ignore
         ]
     )
+    impl_req.control_id = 'ac-1'
 
-    with pytest.raises(ValueError,
-                       match='Multiple implementation status properties found for a single implemented requirement'):
+    with pytest.raises(ValueError, match='Multiple implementation status properties found for control id .*'):
         FedrampSSPReader.get_implementation_status(impl_req)
 
     # Invalid implementation status value

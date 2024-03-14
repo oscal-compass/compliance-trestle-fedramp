@@ -179,7 +179,10 @@ class FedrampSSPReader:
         if not prop_values:
             return None
         elif len(prop_values) > 1:
-            raise ValueError('Multiple implementation status properties found for a single implemented requirement')
+            raise ValueError(
+                'Multiple implementation status properties found for control id '
+                f'{implemented_requirement.control_id} implemented requirement'
+            )
 
         implementation_status_value = prop_values[0]
 
