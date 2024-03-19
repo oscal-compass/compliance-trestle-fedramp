@@ -19,7 +19,12 @@ from docx.document import Document as DocxDocument  # type: ignore
 
 import pytest
 
-from tests.test_utils import verify_control_origination_checkboxes, verify_implementation_status_checkboxes
+from tests.test_utils import (
+    verify_control_origination_checkboxes,
+    verify_implementation_status_checkboxes,
+    verify_parameters,
+    verify_responses,
+)
 
 from trestle.common.err import TrestleError
 
@@ -43,13 +48,13 @@ def test_fedramp_docx_populate(docx_document: DocxDocument, test_ssp_control_dic
             data: FedrampSSPData = test_ssp_control_dict.get(control_id, FedrampSSPData({}, {}, None, None))
             verify_control_origination_checkboxes(table.cell(*control_summaries._control_origination_cell), data)
             verify_implementation_status_checkboxes(table.cell(*control_summaries._implementation_status_cell), data)
+            # Check that the parameters are in the cell text (partial match)
+            verify_parameters(table, data.parameters, partial_match=True)
         if control_implementation_description.is_control_implementation_table(row_header):
             control_id = fedramp_docx.get_control_id(row_header)
             data = test_ssp_control_dict.get(control_id, FedrampSSPData({}, {}, None, None))
-            for cell in table.columns[0].cells[1:]:
-                label = control_implementation_description.get_part_id(cell.text)
-                content = data.control_implementation_description.get(label, '')
-                assert content in cell.text
+            # Check that the responses are in the cell text (partial match)
+            verify_responses(table, data.control_implementation_description, partial_match=True)
 
 
 def test_fedramp_docx_with_invalid_input(docx_document: DocxDocument) -> None:

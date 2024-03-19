@@ -73,6 +73,7 @@ CHECKBOX_XPATH = './/w:sdt//w:sdtPr//w14:checkbox'
 BOX_ICON_XPATH = './/w:sdt//w:sdtContent//w:r//w:t'
 CHECKED_BOX_ICON = '☒'
 FEDRAMP_STATEMENT_PREFIX = 'Part'
+FEDRAMP_PARAMETER_PREFIX = 'Parameter'
 
 # Implementation Status FedRAMP
 

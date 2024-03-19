@@ -100,7 +100,7 @@ def checkbox_text_is_set(paragraph: Paragraph) -> bool:
     return False
 
 
-def verify_responses(implementation_table: Table, responses: Dict[str, str]) -> None:
+def verify_responses(implementation_table: Table, responses: Dict[str, str], partial_match: bool = False) -> None:
     """Verify the responses are populated correctly."""
     for row in implementation_table.columns[0].cells[1:]:
         label = ControlImplementationDescriptions.get_part_id(row.text)
@@ -108,6 +108,21 @@ def verify_responses(implementation_table: Table, responses: Dict[str, str]) -> 
         # get_part_id retrieves the label correctly for the first part
         # empty cells only
         label = label.split('\n')[0].strip(':')
-        assert label in responses
-        content = responses.get(label)
-        assert content == row.text
+        if label in responses:
+            content = responses.get(label)
+            if partial_match:
+                assert content in row.text
+            else:
+                assert content == row.text
+
+
+def verify_parameters(summary_table: Table, parameters: Dict[str, str], partial_match: bool = False) -> None:
+    """Verify the responses are populated correctly."""
+    for row in summary_table.columns[0].cells[2:]:
+        label = ControlSummaries.get_parameter_id(row.text)
+        if label and label in parameters:
+            value = parameters.get(label)
+            if partial_match:
+                assert value in row.text
+            else:
+                assert value == row.text

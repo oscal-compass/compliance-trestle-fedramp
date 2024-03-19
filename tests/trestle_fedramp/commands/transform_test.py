@@ -27,12 +27,13 @@ from typing import Any, Tuple
 from docx import Document  # type: ignore
 from docx.document import Document as DocxDocument  # type: ignore
 
-from tests.test_utils import verify_responses
+from tests.test_utils import verify_parameters, verify_responses
 
 from trestle_fedramp.commands.transform import SSPTransformCmd
 
 test_docx_file = 'test.docx'
-example_control = 'AC-1 What is the solution and how is it implemented?'
+example_control_implementation = 'AC-1 What is the solution and how is it implemented?'
+example_control_summary = 'AC-1 Control Summary Information'
 
 
 def test_transform_ssp_level_high(
@@ -56,7 +57,7 @@ def test_transform_ssp_level_high(
     assert tmp_file.exists()
 
     # Verify example control
-    expected_data = {
+    expected_impl_data = {
         'a': (
             'Part a:\nThis System: Describe how Part a is satisfied within the system.\n'
             '\n[EXAMPLE]Policies: Describe how this policy component satisfies part a.\n'
@@ -68,10 +69,22 @@ def test_transform_ssp_level_high(
         'c': 'Part c:'
     }
 
+    expected_param_data = {
+        'AC-1(a)': 'Parameter AC-1(a): organization-defined personnel or roles',
+        'AC-1(a)(1)': 'Parameter AC-1(a)(1): organization-level; mission/business process-level; system-level',
+        'AC-1(b)': 'Parameter AC-1(b): official',
+        'AC-1(c)(1)-1': 'Parameter AC-1(c)(1)-1: at least every 3 years',
+        'AC-1(c)(1)-2': 'Parameter AC-1(c)(1)-2: events',
+        'AC-1(c)(2)-1': 'Parameter AC-1(c)(2)-1: at least annually',
+        'AC-1(c)(2)-2': 'Parameter AC-1(c)(2)-2: events'
+    }
+
     temp_doc_output: DocxDocument = Document(str(tmp_file))
     for table in temp_doc_output.tables:
-        if example_control in table.cell(0, 0).text:
-            verify_responses(table, expected_data)
+        if example_control_implementation in table.cell(0, 0).text:
+            verify_responses(table, expected_impl_data)
+        if example_control_summary in table.cell(0, 0).text:
+            verify_parameters(table, expected_param_data)
 
 
 def test_transform_ssp_level_moderate(

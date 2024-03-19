@@ -101,6 +101,7 @@ class ControlSummaries():
             const.FEDRAMP_ALTERNATIVE: 4,
             const.FEDRAMP_NOT_APPLICABLE: 5
         }
+        self._parameter_start_row = 2
 
     @staticmethod
     def is_control_summary_table(row_header: str) -> bool:
@@ -173,6 +174,32 @@ class ControlSummaries():
             raise TrestleError(f'Invalid implementation status: {implementation_status}')
         self._set_checkbox(is_paragraph)
 
+    def _set_parameter_values(self, table: Table, parameter_values: Dict[str, str]) -> None:
+        """
+        Set the parameter values in the cell.
+
+        Args:
+            parameter_cells: The list of parameter cells.
+            parameter_values: The parameter values.
+
+        Notes: In the control summary table parameters start in the second row after responsible role and
+        continue for a non-standard number of rows until the implementation status is reached. All other values
+        of the control summary stable have a standard location and number of rows.
+        """
+        for cell in table.columns[0].cells[self._parameter_start_row:]:
+            label = self.get_parameter_id(cell.text)
+            parameter_text = parameter_values.get(label, '')
+            if parameter_text:
+                cell.text = cell.text + ' ' + parameter_text
+
+    @staticmethod
+    def get_parameter_id(row_text: str) -> str:
+        """Get the parameter id from the row text."""
+        if row_text.startswith(const.FEDRAMP_PARAMETER_PREFIX):
+            return row_text.split(' ')[1].strip(':')
+        else:
+            return ''
+
     def populate_table(self, table: Table, control_id: str, ssp_data: FedrampSSPData) -> None:
         """Populate the table with the SSP data."""
         try:
@@ -182,6 +209,8 @@ class ControlSummaries():
             if ssp_data.implementation_status:
                 implementation_status_cell: _Cell = table.cell(*self._implementation_status_cell)
                 self._set_implementation_status(implementation_status_cell, ssp_data.implementation_status)
+            if ssp_data.parameters:
+                self._set_parameter_values(table, ssp_data.parameters)
         except Exception as e:
             raise TrestleError(f'Error populating control summary for {control_id}: {e}')
 

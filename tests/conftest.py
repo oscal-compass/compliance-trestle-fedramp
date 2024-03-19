@@ -97,14 +97,27 @@ def test_ssp_control_dict() -> Iterator[FedrampControlDict]:
     """Return a dictionary of control data."""
     control_dict: FedrampControlDict = {
         'AC-1': FedrampSSPData(
-            control_implementation_description={'a': 'Part a example for AC-1'},
-            parameters={},
+            control_implementation_description={
+                'a': 'Part a example for AC-1', 'b': 'Part b example for AC-1', 'c': 'Part c example for AC-1'
+            },
+            parameters={
+                'AC-1(a)': 'AC-1(a) parameter example',
+                'AC-1(a)(1)': 'AC-1(a)(1) parameter example',
+                'AC-1(b)': 'AC-1(b) parameter example',
+                'AC-1(c)(1)-1': 'AC-1(c)(1)-1 parameter example',
+                'AC-1(c)(1)-2': 'AC-1(c)(1)-2 parameter example',
+                'AC-1(c)(2)-1': 'AC-1(c)(2)-1 parameter example',
+                'AC-1(c)(2)-2': 'AC-1(c)(2)-2 parameter example',
+            },
             control_origination=None,
             implementation_status=None
         ),
         'AC-2(1)': FedrampSSPData(
             control_implementation_description={'': 'Overall description for AC-2(1)'},
-            parameters={},
+            parameters={
+                'AC-2(2)-1': 'AC-2(2)-1 parameter example',
+                'AC-2(2)-2': 'AC-2(2)-2 parameter example',
+            },
             control_origination=[const.FEDRAMP_SP_SYSTEM],
             implementation_status=const.FEDRAMP_PLANNED
         ),
@@ -113,7 +126,10 @@ def test_ssp_control_dict() -> Iterator[FedrampControlDict]:
                 'a': 'Part a example for AC-20',
                 'b': 'Part b example for AC-20',
             },
-            parameters={},
+            parameters={
+                'AC-20(a)': 'AC-20(a) parameter example',
+                'AC-20(b)': 'AC-20(b) parameter example',
+            },
             control_origination=[const.FEDRAMP_SP_CORPORATE, const.FEDRAMP_INHERITED],
             implementation_status=const.FEDRAMP_PARTIAL
         ),
@@ -124,7 +140,11 @@ def test_ssp_control_dict() -> Iterator[FedrampControlDict]:
                 'c': 'Part c example for CM-6',
                 'd': 'Part d example for CM-6',
             },
-            parameters={},
+            parameters={
+                'CM-6(a)': 'CM-6(a) parameter example',
+                'CM-6(c)-1': 'CM-6(c)-1 parameter example',
+                'CM-6(c)-2': 'CM-6(c)-2 parameter example',
+            },
             control_origination=[const.FEDRAMP_SHARED],
             implementation_status=const.FEDRAMP_IMPLEMENTED
         )
