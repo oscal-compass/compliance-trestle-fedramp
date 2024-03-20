@@ -80,12 +80,12 @@ def test_reader_ssp_data(tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str]) -> 
     assert 'AU-1(c)(2)-2' in param_dict
 
     assert param_dict['AU-1(a)'] == 'organization-defined personnel or roles'
-    assert param_dict['AU-1(a)(1)'] == 'organization-level; mission/business process-level; system-level'
-    assert param_dict['AU-1(b)'] == 'official'
+    assert param_dict['AU-1(a)(1)'] == ''
+    assert param_dict['AU-1(b)'] == ''
     assert param_dict['AU-1(c)(1)-1'] == 'at least every 3 years'
-    assert param_dict['AU-1(c)(1)-2'] == 'events'
+    assert param_dict['AU-1(c)(1)-2'] == ''
     assert param_dict['AU-1(c)(2)-1'] == 'at least annually'
-    assert param_dict['AU-1(c)(2)-2'] == 'events'
+    assert param_dict['AU-1(c)(2)-2'] == ''
 
 
 def test_get_control_origination() -> None:

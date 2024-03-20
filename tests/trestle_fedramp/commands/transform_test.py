@@ -71,12 +71,12 @@ def test_transform_ssp_level_high(
 
     expected_param_data = {
         'AC-1(a)': 'Parameter AC-1(a): organization-defined personnel or roles',
-        'AC-1(a)(1)': 'Parameter AC-1(a)(1): organization-level; mission/business process-level; system-level',
-        'AC-1(b)': 'Parameter AC-1(b): official',
+        'AC-1(a)(1)': 'Parameter AC-1(a)(1):',
+        'AC-1(b)': 'Parameter AC-1(b):',
         'AC-1(c)(1)-1': 'Parameter AC-1(c)(1)-1: at least every 3 years',
-        'AC-1(c)(1)-2': 'Parameter AC-1(c)(1)-2: events',
+        'AC-1(c)(1)-2': 'Parameter AC-1(c)(1)-2:',
         'AC-1(c)(2)-1': 'Parameter AC-1(c)(2)-1: at least annually',
-        'AC-1(c)(2)-2': 'Parameter AC-1(c)(2)-2: events'
+        'AC-1(c)(2)-2': 'Parameter AC-1(c)(2)-2:'
     }
 
     temp_doc_output: DocxDocument = Document(str(tmp_file))

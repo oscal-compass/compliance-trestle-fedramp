@@ -100,10 +100,7 @@ class FedrampSSPReader:
         resolved_catalog: Catalog = profile_resolver.get_resolved_profile_catalog(
             self._root,
             self._ssp.import_profile.href,
-            param_rep=ParameterRep.VALUE_OR_LABEL_OR_CHOICES,
-            block_params=False,
-            params_format='[.]',
-            show_value_warnings=True,
+            param_rep=ParameterRep.LEAVE_MOUSTACHE,
         )
         self.catalog_interface = CatalogInterface(resolved_catalog)
 
@@ -198,7 +195,7 @@ class FedrampSSPReader:
             # SSP markdown editing.
             if implemented_requirement.set_parameters:
                 self._update_param(param, implemented_requirement.set_parameters)
-            param_str = ControlInterface.param_to_str(param, ParameterRep.VALUE_OR_LABEL_OR_CHOICES, False, False)
+            param_str = ControlInterface.param_to_str(param, ParameterRep.VALUE_OR_EMPTY_STRING)
             parameters[param_id] = param_str if param_str else ''
 
         parameters_by_part_name: Dict[str, str] = {}
