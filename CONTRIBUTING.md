@@ -7,7 +7,7 @@ To contribute code or documentation, please submit a [pull request](https://gith
 
 A good way to familiarize yourself with the codebase and contribution process is
 to look for and tackle low-hanging fruit in the [issue tracker](https://github.com/oscal-compass/compliance-trestle-fedramp/issues).
-Before embarking on a more ambitious contribution, please quickly [get in touch](https://oscal-compass.github.io/compliance-trestle-fedramp/maintainers/) with us.
+Before embarking on a more ambitious contribution, please quickly [get in touch](https://github.com/oscal-compass/compliance-trestle-fedramp/blob/develop/MAINTAINERS.md) with us.
 
 **Note: We appreciate your effort, and want to avoid a situation where a contribution
 requires extensive rework (by you or by us), sits in backlog for a long time, or
@@ -36,7 +36,7 @@ For a list of the maintainers, see the [maintainers](https://github.com/oscal-co
 
 ### Merging and release workflow
 
-The `compliance-trestle-fedramp` follows the same release and merging workflow `trestle` follows. Please refer to the [trestle release and merging workflow](https://github.com/oscal-compass/compliance-trestle/blob/develop/CONTRIBUTING.md#trestle-merging-and-release-workflow).
+The `compliance-trestle-fedramp` project follows the same release and merging workflow `trestle` follows. Please refer to the [trestle release and merging workflow](https://github.com/oscal-compass/compliance-trestle/blob/develop/CONTRIBUTING.md#trestle-merging-and-release-workflow).
 
 ## Typing, docstrings and documentation
 
@@ -46,7 +46,7 @@ The `compliance-trestle-fedramp` project uses type hints and docstrings to impro
 
 By contributing to this project, you agree to license your contribution under the \[Apache 2.0 License\]. For more detailed requirements, please refer to the `trestle`  Legal section in the [CONTRIBUTING.md](https://github.com/oscal-compass/compliance-trestle/blob/develop/CONTRIBUTING.md#legal).
 
-## Setup - Developing `trestle`
+## Setup - Developing `compliance-trestle-fedramp`
 
 ### Does `compliance-trestle-fedramp` run correctly on my platform
 
@@ -92,7 +92,7 @@ pytest fixtures are available to allow provision of common functionality.  See c
 
 #### FedRAMP sources for development and testing
 
-The `trestle` FedRAMP plugin relies on reference data from the FedRAMP automation repository testing and development. The FedRAMP automation repository is a submodule in the trestle project. The FedRAMP automation repository is located at: https://github.com/GSA/fedramp-automation
+The `trestle` FedRAMP plugin relies on reference data from the FedRAMP automation repository for testing and development purposes. The FedRAMP automation repository is a submodule in the trestle project. The FedRAMP automation repository is located at: https://github.com/GSA/fedramp-automation
 
 In order to develop/test, the submodule must be checked out with `git submodule update --init` or `make submodules`.
 
