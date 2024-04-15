@@ -64,8 +64,11 @@ test-bdist:: clean
 release::
 	git config --global user.name "semantic-release (via Github actions)"
 	git config --global user.email "semantic-release@github-actions"
-	semantic-release publish
-
+	@if [ "${MINOR}" = "true" ]; then \
+        semantic-release publish --minor; \
+    else \
+        semantic-release publish; \
+    fi
 
 mdformat:
 	pre-commit run mdformat --all-files
