@@ -110,7 +110,8 @@ def test_ssp_control_dict() -> Iterator[FedrampControlDict]:
                 'AC-1(c)(2)-2': 'AC-1(c)(2)-2 parameter example',
             },
             control_origination=None,
-            implementation_status=None
+            implementation_status=None,
+            responsible_roles=None
         ),
         'AC-2(1)': FedrampSSPData(
             control_implementation_description={'': 'Overall description for AC-2(1)'},
@@ -119,7 +120,8 @@ def test_ssp_control_dict() -> Iterator[FedrampControlDict]:
                 'AC-2(2)-2': 'AC-2(2)-2 parameter example',
             },
             control_origination=[const.FEDRAMP_SP_SYSTEM],
-            implementation_status=const.FEDRAMP_PLANNED
+            implementation_status=const.FEDRAMP_PLANNED,
+            responsible_roles=['Customer']
         ),
         'AC-20': FedrampSSPData(
             control_implementation_description={
@@ -131,7 +133,8 @@ def test_ssp_control_dict() -> Iterator[FedrampControlDict]:
                 'AC-20(b)': 'AC-20(b) parameter example',
             },
             control_origination=[const.FEDRAMP_SP_CORPORATE, const.FEDRAMP_INHERITED],
-            implementation_status=const.FEDRAMP_PARTIAL
+            implementation_status=const.FEDRAMP_PARTIAL,
+            responsible_roles=['Admin, Customer']
         ),
         'CM-6': FedrampSSPData(
             control_implementation_description={
@@ -146,7 +149,8 @@ def test_ssp_control_dict() -> Iterator[FedrampControlDict]:
                 'CM-6(c)-2': 'CM-6(c)-2 parameter example',
             },
             control_origination=[const.FEDRAMP_SHARED],
-            implementation_status=const.FEDRAMP_IMPLEMENTED
+            implementation_status=const.FEDRAMP_IMPLEMENTED,
+            responsible_roles=['Provider']
         )
     }
     yield control_dict

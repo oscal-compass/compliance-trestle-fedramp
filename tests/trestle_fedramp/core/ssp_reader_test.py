@@ -24,7 +24,7 @@ from trestle.common.const import NAMESPACE_FEDRAMP
 from trestle.common.model_utils import ModelUtils
 from trestle.core.generators import generate_sample_model
 from trestle.oscal import ssp
-from trestle.oscal.common import Property
+from trestle.oscal.common import Property, ResponsibleRole
 
 from trestle_fedramp.core.ssp_reader import FedrampControlDict, FedrampSSPReader
 
@@ -87,6 +87,11 @@ def test_reader_ssp_data(tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str]) -> 
     assert param_dict['AU-1(c)(2)-1'] == 'at least annually'
     assert param_dict['AU-1(c)(2)-2'] == ''
 
+    # Verify the responsible roles
+    assert ssp_control_dict['AC-2'].responsible_roles == [
+        '[SAMPLE]Unix Administrator', 'System Information System Security Officer (or Equivalent)'
+    ]
+
 
 def test_get_control_origination() -> None:
     """Test getting control origination from the implemented requirement."""
@@ -143,3 +148,24 @@ def test_get_implementation_status_failures() -> None:
 
     with pytest.raises(ValueError, match='Invalid implementation status value: invalid. Use one of .*'):
         FedrampSSPReader.get_implementation_status(impl_req)
+
+
+# Negative test cases for responsible roles
+
+
+def test_responsible_role_failures(tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str]) -> None:
+    """Testing failure cases for getting the responsible roles."""
+    tmp_trestle_dir, ssp_name = tmp_trestle_dir_with_ssp
+    ssp_file_path = ModelUtils.get_model_path_for_name_and_class(tmp_trestle_dir, ssp_name, ssp.SystemSecurityPlan)
+    assert ssp_file_path is not None
+
+    ssp_reader: FedrampSSPReader = FedrampSSPReader(tmp_trestle_dir, ssp_file_path)
+    # Wrong namespace
+    impl_req = generate_sample_model(ssp.ImplementedRequirement)
+    impl_req.control_id = 'ac-1'
+    responsible_role = generate_sample_model(ResponsibleRole)
+    responsible_role.role_id = 'invalid_role'
+    impl_req.responsible_roles = [responsible_role]
+
+    with pytest.raises(ValueError, match='Role with id invalid_role for control ac-1 not found.*'):
+        ssp_reader.get_responsible_roles(impl_req)

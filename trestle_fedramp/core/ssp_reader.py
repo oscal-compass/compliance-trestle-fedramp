@@ -22,6 +22,7 @@ Control Origination Property -> Control Origination String Value(s)
 Control Implementation Description -> Dictionary of response for each part
 Control Parameters -> Dictionary of parameter values for each part and location in the prose to match the
 expected FedRAMP values
+Responsible Roles -> String of responsible roles for the control separated by commas
 """
 
 import logging
@@ -67,6 +68,7 @@ class FedrampSSPData:
     parameters: Dict[str, str]
     control_origination: Optional[List[str]]
     implementation_status: Optional[str]
+    responsible_roles: Optional[List[str]]
 
 
 # FedRAMP data by control label
@@ -112,6 +114,8 @@ class FedrampSSPReader:
         # Setup dictionaries for component title. Only include components that are in the include_components list.
         self._comp_titles_by_uuid: Dict[str, str] = self._get_component_info()
 
+        self._roles_by_id: Dict[str, str] = self._get_roles()
+
     def _get_component_info(self) -> Dict[str, str]:
         """Get the component information mapped to UUID."""
         return {component.uuid: component.title for component in as_list(self._ssp.system_implementation.components)}
@@ -126,6 +130,10 @@ class FedrampSSPReader:
                 controls_by_label[control.id] = label
         return controls_by_label
 
+    def _get_roles(self) -> Dict[str, str]:
+        """Get the roles by ID."""
+        return {role.id: role.title for role in as_list(self._ssp.metadata.roles)}
+
     def read_ssp_data(self) -> FedrampControlDict:
         """Read the ssp from file and return the data for the FedRAMP Template."""
         control_dict: FedrampControlDict = {}
@@ -139,11 +147,13 @@ class FedrampSSPReader:
                     str, str] = self.get_control_implementation_description(implemented_requirement)
                 implementation_status: Optional[str] = self.get_implementation_status(implemented_requirement)
                 parameters: Dict[str, str] = self.get_control_parameters(implemented_requirement)
+                responsible_roles: Optional[List[str]] = self.get_responsible_roles(implemented_requirement)
                 control_dict[label] = FedrampSSPData(
                     control_origination=control_origination,
                     control_implementation_description=control_implementation_description,
                     implementation_status=implementation_status,
-                    parameters=parameters
+                    parameters=parameters,
+                    responsible_roles=responsible_roles
                 )
         return control_dict
 
@@ -253,6 +263,22 @@ class FedrampSSPReader:
             param_id = stache_contents.replace('insert: param,', '').strip()
             param_ids.append(param_id)
         return param_ids
+
+    def get_responsible_roles(self, implemented_requirement: ImplementedRequirement) -> Optional[List[str]]:
+        """Get the responsible roles."""
+        responsible_roles: List[str] = []
+        for role in as_list(implemented_requirement.responsible_roles):
+            role_title = self._roles_by_id.get(role.role_id, '')
+            if role_title:
+                responsible_roles.append(role_title)
+            else:
+                raise ValueError(
+                    f'Role with id {role.role_id} for control '
+                    f'{implemented_requirement.control_id} not found in the metadata roles'
+                )
+        if not responsible_roles:
+            return None
+        return responsible_roles
 
     @staticmethod
     def get_implementation_status(implemented_requirement: ImplementedRequirement) -> Optional[str]:

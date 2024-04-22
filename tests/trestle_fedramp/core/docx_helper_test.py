@@ -45,14 +45,14 @@ def test_fedramp_docx_populate(docx_document: DocxDocument, test_ssp_control_dic
         row_header = table.rows[0].cells[0].text
         if control_summaries.is_control_summary_table(row_header):
             control_id = fedramp_docx.get_control_id(row_header)
-            data: FedrampSSPData = test_ssp_control_dict.get(control_id, FedrampSSPData({}, {}, None, None))
+            data: FedrampSSPData = test_ssp_control_dict.get(control_id, FedrampSSPData({}, {}, None, None, None))
             verify_control_origination_checkboxes(table.cell(*control_summaries._control_origination_cell), data)
             verify_implementation_status_checkboxes(table.cell(*control_summaries._implementation_status_cell), data)
             # Check that the parameters are in the cell text (partial match)
             verify_parameters(table, data.parameters, partial_match=True)
         if control_implementation_description.is_control_implementation_table(row_header):
             control_id = fedramp_docx.get_control_id(row_header)
-            data = test_ssp_control_dict.get(control_id, FedrampSSPData({}, {}, None, None))
+            data = test_ssp_control_dict.get(control_id, FedrampSSPData({}, {}, None, None, None))
             # Check that the responses are in the cell text (partial match)
             verify_responses(table, data.control_implementation_description, partial_match=True)
 
@@ -65,7 +65,8 @@ def test_fedramp_docx_with_invalid_input(docx_document: DocxDocument) -> None:
             control_implementation_description={},
             parameters={},
             control_origination=[const.FEDRAMP_INHERITED],
-            implementation_status=None
+            implementation_status=None,
+            responsible_roles=None
         )
     }
     fedramp_docx = FedrampDocx(docx_document, invalid_control_dict)
@@ -82,7 +83,8 @@ def test_fedramp_docx_with_non_existent_values(docx_document: DocxDocument) -> N
             control_implementation_description={},
             parameters={},
             control_origination=['invalid'],
-            implementation_status=None
+            implementation_status=None,
+            responsible_roles=None
         )
     }
     fedramp_docx = FedrampDocx(docx_document, invalid_control_dict)
