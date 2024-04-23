@@ -102,6 +102,7 @@ class ControlSummaries():
             const.FEDRAMP_NOT_APPLICABLE: 5
         }
         self._parameter_start_row = 2
+        self._responsible_role_cell: Tuple[int, int] = (1, 0)
 
     @staticmethod
     def is_control_summary_table(row_header: str) -> bool:
@@ -211,6 +212,10 @@ class ControlSummaries():
                 self._set_implementation_status(implementation_status_cell, ssp_data.implementation_status)
             if ssp_data.parameters:
                 self._set_parameter_values(table, ssp_data.parameters)
+            if ssp_data.responsible_roles:
+                responsible_role_cell: _Cell = table.cell(*self._responsible_role_cell)
+                responsible_role_str = ', '.join(ssp_data.responsible_roles)
+                responsible_role_cell.text = f'{responsible_role_cell.text} {responsible_role_str}'
         except Exception as e:
             raise TrestleError(f'Error populating control summary for {control_id}: {e}')
 

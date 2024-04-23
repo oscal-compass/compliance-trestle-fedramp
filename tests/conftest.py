@@ -134,7 +134,7 @@ def test_ssp_control_dict() -> Iterator[FedrampControlDict]:
             },
             control_origination=[const.FEDRAMP_SP_CORPORATE, const.FEDRAMP_INHERITED],
             implementation_status=const.FEDRAMP_PARTIAL,
-            responsible_roles=['Admin, Customer']
+            responsible_roles=['Admin', 'Customer']
         ),
         'CM-6': FedrampSSPData(
             control_implementation_description={

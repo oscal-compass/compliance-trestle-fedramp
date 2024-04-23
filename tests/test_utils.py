@@ -126,3 +126,12 @@ def verify_parameters(summary_table: Table, parameters: Dict[str, str], partial_
                 assert value in row.text
             else:
                 assert value == row.text
+
+
+def verify_responsible_roles(responsible_roles: _Cell, ssp_data: FedrampSSPData) -> None:
+    """Verify the responsible roles are populated correctly."""
+    if not ssp_data.responsible_roles:
+        assert responsible_roles.text == 'Responsible Role:'
+    else:
+        expected_roles = ', '.join(ssp_data.responsible_roles)
+        assert responsible_roles.text == 'Responsible Role: ' + expected_roles

@@ -24,6 +24,7 @@ from tests.test_utils import (
     verify_implementation_status_checkboxes,
     verify_parameters,
     verify_responses,
+    verify_responsible_roles
 )
 
 from trestle.common.err import TrestleError
@@ -50,6 +51,7 @@ def test_fedramp_docx_populate(docx_document: DocxDocument, test_ssp_control_dic
             verify_implementation_status_checkboxes(table.cell(*control_summaries._implementation_status_cell), data)
             # Check that the parameters are in the cell text (partial match)
             verify_parameters(table, data.parameters, partial_match=True)
+            verify_responsible_roles(table.cell(*control_summaries._responsible_role_cell), data)
         if control_implementation_description.is_control_implementation_table(row_header):
             control_id = fedramp_docx.get_control_id(row_header)
             data = test_ssp_control_dict.get(control_id, FedrampSSPData({}, {}, None, None, None))
