@@ -15,10 +15,8 @@
 
 import base64
 import logging
-import pathlib
 import sys
-
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 from saxonche import PySaxonProcessor
 
@@ -36,9 +34,7 @@ class JsonXmlConverter:
 
     def __init__(self):
         """Initialize JSON to XML converter."""
-        self.ssp_j_x_xsl_path = pathlib.Path(
-            resource_filename('trestle_fedramp.resources', const.NIST_SSP_JSON_XML_XSL)
-        ).resolve()
+        self.ssp_j_x_xsl_path = files('trestle_fedramp.resources').joinpath(const.NIST_SSP_JSON_XML_XSL)
         logger.info(f'SSP converter from JSON to XML: {self.ssp_j_x_xsl_path}')
 
         self.initial_template = const.NIST_INITIAL_TEMPLATE

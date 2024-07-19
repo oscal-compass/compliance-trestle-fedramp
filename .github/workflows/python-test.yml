@@ -100,7 +100,7 @@ jobs:
           path: ~/Library/Caches/pip
         # - os: windows-latest
         #   path: ~\AppData\Local\pip\Cache
-        python-version: [3.8, 3.9]
+        python-version: [3.9, 3.11]
     steps:
     - name: Don't mess with line endings
       run: |
@@ -124,16 +124,16 @@ jobs:
       run: |
         make develop
     - name: Pytest Fast
-      if: ${{ !(matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8') }}
+      if: ${{ !(matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9') }}
       run: |
         make test
     - name: Pytest Cov
-      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8' }}
+      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9' }}
       run: |
         make test-cov
 
     - name: Upload artifact
-      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.8' }}
+      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9' }}
       uses: actions/upload-artifact@v2
       with:
         name: coverage
@@ -156,7 +156,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: 3.9
     - uses: actions/cache@v2
       with:
         path: ~/.cache/pip
@@ -180,7 +180,7 @@ jobs:
           -Dsonar.python.coverage.reportPaths=coverage.xml
           -Dsonar.tests=tests/
           -Dsonar.sources=trestle_fedramp/ 
-          -Dsonar.python.version=3.8
+          -Dsonar.python.version=3.9
           -Dsonar.projectKey=compliance-trestle-fedramp
           -Dsonar.organization=compliance-trestle
     - name: SonarQube Quality Gate check
