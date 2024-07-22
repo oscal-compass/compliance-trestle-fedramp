@@ -39,7 +39,7 @@ code-lint:
 	pre-commit run flake8 --all-files
 
 code-typing:
-	mypy --pretty trestle
+	mypy --pretty trestle-fedramp
 
 test::
 	python -m pytest -vvvv --exitfirst -n auto
