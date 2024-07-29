@@ -98,8 +98,7 @@ class FedrampSSPReader:
         self._root = trestle_root
         self._ssp: SystemSecurityPlan = load_validate_model_path(self._root, ssp_path)  # type: ignore
 
-        profile_resolver = ProfileResolver()
-        resolved_catalog: Catalog = profile_resolver.get_resolved_profile_catalog(
+        resolved_catalog: Catalog = ProfileResolver.get_resolved_profile_catalog(
             self._root,
             self._ssp.import_profile.href,
             param_rep=ParameterRep.LEAVE_MOUSTACHE,
@@ -140,7 +139,7 @@ class FedrampSSPReader:
 
         for implemented_requirement in as_list(self._ssp.control_implementation.implemented_requirements):
             control_id = implemented_requirement.control_id
-            label = self._control_labels_by_id.get(control_id, '')
+            label = self._control_labels_by_id.get(control_id, None)
             if label:
                 control_origination: Optional[List[str]] = self.get_control_origination_values(implemented_requirement)
                 control_implementation_description: Dict[
