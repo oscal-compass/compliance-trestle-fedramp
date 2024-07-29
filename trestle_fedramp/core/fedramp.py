@@ -17,8 +17,7 @@ import logging
 import pathlib
 import sys
 import tempfile
-
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 from saxonche import (PySaxonApiError, PySaxonProcessor, PyXslt30Processor)
 
@@ -37,21 +36,18 @@ class FedrampValidator:
 
     def __init__(self):
         """Intialize FedRAMP validator."""
-        self.baselines_path = pathlib.Path(resource_filename('trestle_fedramp.resources',
-                                                             const.FEDRAM_BASELINE)).resolve()
+        self.baselines_path = files('trestle_fedramp.resources').joinpath(const.FEDRAM_BASELINE)
+
         if not self.baselines_path.exists():
             raise TrestleError(f'Fedramp baseline directory {self.baselines_path} does not exist')
 
-        self.registry_path = pathlib.Path(resource_filename('trestle_fedramp.resources',
-                                                            const.FEDRAMP_REGISTRY)).resolve()
+        self.registry_path = files('trestle_fedramp.resources').joinpath(const.FEDRAMP_REGISTRY)
         if not self.registry_path.exists():
             raise TrestleError(f'Fedramp registry directory {self.registry_path} does not exist')
 
-        self.ssp_xsl_path = pathlib.Path(resource_filename('trestle_fedramp.resources',
-                                                           const.FEDRAMP_SSP_XSL)).resolve()
+        self.ssp_xsl_path = files('trestle_fedramp.resources').joinpath(const.FEDRAMP_SSP_XSL)
 
-        self.svrl_xsl_path = pathlib.Path(resource_filename('trestle_fedramp.resources',
-                                                            const.FEDRAM__SVRL_XSL)).resolve()
+        self.svrl_xsl_path = files('trestle_fedramp.resources').joinpath(const.FEDRAM__SVRL_XSL)
 
         logger.debug(f'Baselines dir: {self.baselines_path}')
         logger.debug(f'Registry dir: {self.registry_path}')
