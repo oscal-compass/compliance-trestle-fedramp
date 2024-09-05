@@ -18,7 +18,7 @@ Compliance trestle fedramp is currently in beta. The expectation is that in ongo
 
 ## Contributing to Trestle-fedramp
 
-Our project welcomes external contributions. Please consult [contributing](CONTRIBUTING.md) to get started.
+Our project welcomes external contributions. Please refer to the [Contributing guide](CONTRIBUTING.md) and the [Code of Conduct](https://github.com/oscal-compass/community/blob/main/CODE_OF_CONDUCT.md) for more information on how to contribute.
 
 ## License & Authors
 
