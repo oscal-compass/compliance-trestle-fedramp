@@ -15,4 +15,4 @@
 # limitations under the License.
 """trestle_fedramp an extension to compliance trestle for functionality specific to the FedRAMP program."""
 
-__version__ = '0.2.1'
+__version__ = '0.3.0'
