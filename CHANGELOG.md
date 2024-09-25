@@ -2,6 +2,29 @@
 
 
 
+## v0.4.0 (2024-09-25)
+
+### Chore
+
+* chore: Merge back version tags and changelog into develop. ([`fa1b53d`](https://github.com/oscal-compass/compliance-trestle-fedramp/commit/fa1b53da7b4e239165c9e32a1c4909140cb1d0cb))
+
+### Feature
+
+* feat: adds fedramp-transform command implementation (#39)
+
+This changes adds the initial implementation for populating
+FedRAMP document templates with information from OSCAL SSPs with
+FedRAMP extensions
+
+Signed-off-by: Jennifer Power &lt;barnabei.jennifer@gmail.com&gt; ([`2136659`](https://github.com/oscal-compass/compliance-trestle-fedramp/commit/213665951cd3e80de3c3baf26a1f982551c7c7db))
+
+### Unknown
+
+* Merge pull request #57 from oscal-compass/develop
+
+chore: fedramp plugin release ([`73522ca`](https://github.com/oscal-compass/compliance-trestle-fedramp/commit/73522ca3dcd7a8d41ebc0a1c01a874d6e74f31f1))
+
+
 ## v0.3.0 (2024-09-16)
 
 ### Breaking
