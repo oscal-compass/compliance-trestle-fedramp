@@ -54,16 +54,15 @@ class JsonXmlConverter:
 
         xml_str: str = ''
         with PySaxonProcessor(license=False) as saxon_proc:
-            # set initial template global property
-            saxon_proc.set_configuration_property('it', self.initial_template)
             xslt_proc = saxon_proc.new_xslt30_processor()
+            executable = xslt_proc.compile_stylesheet(stylesheet_file=str(xsl_path))
 
             # Create data URI from JSON SSP content
             content_base64_encoded = base64.b64encode(json_content.encode('utf-8')).decode('utf-8')
             data_uri = f'data:application/json;base64,{content_base64_encoded}'
 
             # Set the input json file parameter for conversion
-            xslt_proc.set_parameter(
+            executable.set_parameter(
                 # Pass data URI to process in-memory json content
                 self.file_param_name,
                 saxon_proc.make_string_value(data_uri)
@@ -72,6 +71,6 @@ class JsonXmlConverter:
             )
 
             # Convert the model to XML as a string
-            xml_str = xslt_proc.transform_to_string(source_file=str(xsl_path), stylesheet_file=str(xsl_path))
+            xml_str = executable.call_template_returning_string(self.initial_template)
 
         return xml_str
