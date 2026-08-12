@@ -1,4 +1,4 @@
 [submodule "fedramp-source"]
 	path = fedramp-source
-	url = https://github.com/GSA/fedramp-automation
+	url = https://github.com/oscal-compass-lab/fedramp-source-2024.git
 	branch = master
