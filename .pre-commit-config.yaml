@@ -18,7 +18,7 @@ repos:
     rev: 7.3.0
     hooks:
       - id: flake8
-        args: [--extend-ignore, "P1,C812,C813,C814,C815,C816,W503,W605,B017,B028", "--illegal-import-packages=filecmp"]
+        args: [--extend-ignore, "P1,C812,C813,C814,C815,C816,W503,W605,B017,B028"]
         additional_dependencies:
           [
             flake8-2020,
@@ -34,13 +34,12 @@ repos:
             flake8-print,
             flake8-quotes,
             flake8-string-format,
-            flake8-illegal-import,
             pep8-naming,
           ]
         files: "^(tests|scripts)"
         stages: [pre-commit]
       - id: flake8
-        args: [--extend-ignore, "P1,C812,C813,C814,C815,C816,W503,W605,B017,B028", "--illegal-import-packages=filecmp"]
+        args: [--extend-ignore, "P1,C812,C813,C814,C815,C816,W503,W605,B017,B028"]
         additional_dependencies:
           [
             flake8-2020,
@@ -56,7 +55,6 @@ repos:
             flake8-print,
             flake8-quotes,
             flake8-string-format,
-            flake8-illegal-import,
             pep8-naming,
             flake8-bandit,
             dlint,

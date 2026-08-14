@@ -242,7 +242,7 @@ class FedrampSSPReader:
                 parameters_by_part_name[label] = parameters.get(params_ids[0], '')
             elif params_ids:
                 for i, param_id in enumerate(params_ids):
-                    parameters_by_part_name[f'{label}-{i+1}'] = parameters.get(param_id, '')
+                    parameters_by_part_name[f'{label}-{i + 1}'] = parameters.get(param_id, '')
         for subpart in as_list(part.parts):
             self._get_parameters_by_part(subpart, label, parameters, parameters_by_part_name)
 
