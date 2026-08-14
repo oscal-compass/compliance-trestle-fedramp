@@ -90,7 +90,7 @@ pytest fixtures are available to allow provision of common functionality.  See c
 
 #### FedRAMP sources for development and testing
 
-The `trestle` FedRAMP plugin relies on reference data from the FedRAMP automation repository for testing and development purposes. The FedRAMP automation repository is a submodule in the trestle project. The FedRAMP automation repository is located at: https://github.com/GSA/fedramp-automation
+The `trestle` FedRAMP plugin relies on reference data from the FedRAMP automation repository for testing and development purposes. The FedRAMP automation repository is a submodule in the trestle project. The FedRAMP automation repository is located at: https://github.com/oscal-compass-lab/fedramp-automation
 
 In order to develop/test, the submodule must be checked out with `git submodule update --init` or `make submodules`.
 
