@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.3.0  # Use the ref you want to point at
+    rev: v5.0.0
     hooks:
       - id: check-merge-conflict
       - id: check-yaml
@@ -12,17 +12,16 @@ repos:
       - id: yapf
         args: [--in-place, --parallel, --recursive, --style, .yapf-config]
         files: "^(trestle_fedramp|tests|scripts)"
-        stages: [commit]
+        stages: [pre-commit]
         additional_dependencies: [toml]
   - repo: https://github.com/PyCQA/flake8
-    rev: 5.0.4
+    rev: 7.3.0
     hooks:
       - id: flake8
         args: [--extend-ignore, "P1,C812,C813,C814,C815,C816,W503,W605,B017,B028", "--illegal-import-packages=filecmp"]
         additional_dependencies:
           [
             flake8-2020,
-            flake8-broken-line,
             flake8-bugbear,
             flake8-builtins,
             flake8-commas,
@@ -35,18 +34,16 @@ repos:
             flake8-print,
             flake8-quotes,
             flake8-string-format,
-            flake8-use-fstring,
             flake8-illegal-import,
             pep8-naming,
           ]
         files: "^(tests|scripts)"
-        stages: [commit]
+        stages: [pre-commit]
       - id: flake8
         args: [--extend-ignore, "P1,C812,C813,C814,C815,C816,W503,W605,B017,B028", "--illegal-import-packages=filecmp"]
         additional_dependencies:
           [
             flake8-2020,
-            flake8-broken-line,
             flake8-bugbear,
             flake8-builtins,
             flake8-commas,
@@ -59,16 +56,15 @@ repos:
             flake8-print,
             flake8-quotes,
             flake8-string-format,
-            flake8-use-fstring,
             flake8-illegal-import,
             pep8-naming,
             flake8-bandit,
-            dlint  
+            dlint,
           ]
         files: "^(trestle_fedramp)"
-        stages: [commit]
+        stages: [pre-commit]
   - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.16
+    rev: 0.7.22
     hooks:
     - id: mdformat
       exclude: "CHANGELOG.md"
@@ -76,4 +72,4 @@ repos:
       - mdformat-tables
       - mdformat-config
       - mdformat-frontmatter
-      - mdformat-gfm
+      - mdformat-gfm==0.3.7
