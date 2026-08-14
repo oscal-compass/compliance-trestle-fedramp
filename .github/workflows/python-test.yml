@@ -25,13 +25,13 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: '3.11'
     - uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: ubuntu-latest-3.9-pip-${{ hashFiles('setup.cfg') }}
+        key: ubuntu-latest-3.11-pip-${{ hashFiles('setup.cfg') }}
         restore-keys: |
-          ubuntu-latest-3.9-pip-
+          ubuntu-latest-3.11-pip-
     - name: Install build tools
       run: |
         make develop
@@ -72,13 +72,13 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: '3.11'
     - uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: ubuntu-latest-3.9-pip-${{ hashFiles('setup.cfg') }}
+        key: ubuntu-latest-3.11-pip-${{ hashFiles('setup.cfg') }}
         restore-keys: |
-          ubuntu-latest-3.9-pip-
+          ubuntu-latest-3.11-pip-
     - name: Install build tools
       run: |
         make develop
@@ -100,7 +100,7 @@ jobs:
           path: ~/Library/Caches/pip
         # - os: windows-latest
         #   path: ~\AppData\Local\pip\Cache
-        python-version: [3.9, 3.11]
+        python-version: ['3.10', '3.11']
     steps:
     - name: Don't mess with line endings
       run: |
@@ -124,16 +124,16 @@ jobs:
       run: |
         make develop
     - name: Pytest Fast
-      if: ${{ !(matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9') }}
+      if: ${{ matrix.os != 'ubuntu-latest' }}
       run: |
         make test
     - name: Pytest Cov
-      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9' }}
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
         make test-cov
 
     - name: Upload artifact
-      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9' }}
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       uses: actions/upload-artifact@v4
       with:
         name: coverage
@@ -156,13 +156,13 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: '3.11'
     - uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: ubuntu-latest-3.9-pip-${{ hashFiles('setup.cfg') }}
+        key: ubuntu-latest-3.11-pip-${{ hashFiles('setup.cfg') }}
         restore-keys: |
-          ubuntu-latest-3.9-pip-
+          ubuntu-latest-3.11-pip-
     - name: Install build tools
       run: |
         make develop
@@ -180,7 +180,7 @@ jobs:
           -Dsonar.python.coverage.reportPaths=coverage.xml
           -Dsonar.tests=tests/
           -Dsonar.sources=trestle_fedramp/ 
-          -Dsonar.python.version=3.9
+          -Dsonar.python.version=3.11
           -Dsonar.projectKey=compliance-trestle-fedramp
           -Dsonar.organization=compliance-trestle
     - name: SonarQube Quality Gate check
