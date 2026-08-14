@@ -69,15 +69,16 @@ def tmp_trestle_dir_with_ssp(tmp_path: pathlib.Path, monkeypatch: MonkeyPatch) -
     testargs = ['trestle', 'init']
     monkeypatch.setattr(sys, 'argv', testargs)
     try:
-        Trestle().run()
+        try:
+            Trestle().run()
+        except Exception as e:
+            raise TrestleError(f'Error initializing trestle workspace: {e}')
         i = ImportCmd()
         args = argparse.Namespace(
             trestle_root=tmp_path, file=str(file_path), output=model_name, verbose=1, regenerate=False
         )
-        assert i._run(args) == 0
-    except Exception as e:
-        raise TrestleError(f'Error creating trestle workspace with ssp: {e}')
-    else:
+        if i._run(args) != 0:
+            raise TrestleError(f'Error importing SSP into trestle workspace: {file_path}')
         yield (tmp_path, model_name)
     finally:
         os.chdir(pytest_cwd)
