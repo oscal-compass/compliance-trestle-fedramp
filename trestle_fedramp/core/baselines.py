@@ -13,7 +13,7 @@
 # limitations under the License.
 """Information about Baselines and templates."""
 
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 from trestle_fedramp.const import (FEDRAMP_APPENDIX_A_HIGH, FEDRAMP_APPENDIX_A_LOW, FEDRAMP_APPENDIX_A_MODERATE)
 
@@ -37,11 +37,11 @@ class BaselineLevel:
         Returns:
             str: The file path of the template.
         """
-        resources_path = 'trestle_fedramp.resources'
+        resources_pkg = files('trestle_fedramp.resources')
         data = {
-            cls.LOW: resource_filename(resources_path, FEDRAMP_APPENDIX_A_LOW),
-            cls.MODERATE: resource_filename(resources_path, FEDRAMP_APPENDIX_A_MODERATE),
-            cls.HIGH: resource_filename(resources_path, FEDRAMP_APPENDIX_A_HIGH)
+            cls.LOW: str(resources_pkg.joinpath(FEDRAMP_APPENDIX_A_LOW)),
+            cls.MODERATE: str(resources_pkg.joinpath(FEDRAMP_APPENDIX_A_MODERATE)),
+            cls.HIGH: str(resources_pkg.joinpath(FEDRAMP_APPENDIX_A_HIGH))
         }
         if level not in cls.LEVELS:
             raise ValueError(f'Invalid level: {level}. Use one of {cls.LEVELS}')
