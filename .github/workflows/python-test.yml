@@ -100,7 +100,7 @@ jobs:
           path: ~/Library/Caches/pip
         # - os: windows-latest
         #   path: ~\AppData\Local\pip\Cache
-        python-version: ['3.10', '3.11']
+        python-version: ['3.11', '3.12']
     steps:
     - name: Don't mess with line endings
       run: |
