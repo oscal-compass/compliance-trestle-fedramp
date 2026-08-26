@@ -1,3 +1,5 @@
+<img src="fedramp-legacy-content.png" alt="FedRAMP legacy content"><br />
+
 # compliance-trestle-fedramp
 
 A plugin for [compliance-trestle](https://github.com/oscal-compass/compliance-trestle) to provide functionality specifically for FedRAMP.
