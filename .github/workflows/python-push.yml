@@ -21,7 +21,7 @@ jobs:
           path: ~/Library/Caches/pip
         # - os: windows-latest
         #   path: ~\AppData\Local\pip\Cache
-        python-version: [3.9, 3.11]
+        python-version: [3.11, 3.12]
     steps:
     - name: Don't mess with line endings
       run: |
@@ -44,35 +44,35 @@ jobs:
       run: |
         make develop
     - name: Setup pre-commit
-      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9') }}
+      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11') }}
       run: |
         make pre-commit
     - name: Install dependencies
       run: |
         make install
     - name: Run md document formatting (mdformat)
-      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9') }}
+      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11') }}
       run: |
         make mdformat
     - name: Run code formatting (yapf)
-      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9') }}
+      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11') }}
       run: |
         make code-format
     - name: Run code linting (flake8)
-      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9') }}
+      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11') }}
       run: |
         make code-lint
     - name: Run code typing check (mypy)
-      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9') }}
+      if: ${{ (matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11') }}
       continue-on-error: true 
       run: |
         make code-typing
     - name: Pytest Fast
-      if: ${{ !(matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9') }}
+      if: ${{ !(matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11') }}
       run: |
         make test
     - name: Pytest Cov
-      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9' }}
+      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11' }}
       run: |
         make test-cov
 
