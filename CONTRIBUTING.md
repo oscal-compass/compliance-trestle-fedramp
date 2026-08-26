@@ -42,7 +42,7 @@ The `compliance-trestle-fedramp` project uses type hints and docstrings to impro
 
 ## Legal
 
-By contributing to this project, you agree to license your contribution under the \[Apache 2.0 License\]. For more detailed requirements, please refer to the `trestle`  Legal section in the [CONTRIBUTING.md](https://github.com/oscal-compass/compliance-trestle/blob/develop/CONTRIBUTING.md#legal).
+By contributing to this project, you agree to license your contribution under the [Apache 2.0 License]. For more detailed requirements, please refer to the `trestle` Legal section in the [CONTRIBUTING.md](https://github.com/oscal-compass/compliance-trestle/blob/develop/CONTRIBUTING.md#legal).
 
 ## Setup - Developing `compliance-trestle-fedramp`
 
@@ -78,19 +78,19 @@ Tests should be in the test subdirectory. Each file should be named test\_\*.py 
 
 Note that with Python3 there should be no need for __init__.py in directories.
 
-Test discovery should be automatic when you select a .py file for editing. After tests are discovered a flask icon will appear on the left and you can select it to see a panel listing of your tests.  In addition your test functions will be annotated with Run/Debug so they can be launched directly from the editor.  When everything is set up properly you should be able to step through your test code - which is important.
+Test discovery should be automatic when you select a .py file for editing. After tests are discovered a flask icon will appear on the left and you can select it to see a panel listing of your tests. In addition your test functions will be annotated with Run/Debug so they can be launched directly from the editor. When everything is set up properly you should be able to step through your test code - which is important.
 
-Sometimes the discovery fails - and you may need to resort to uninstalling the python extension and reinstalling it - perhaps also shutting down code and restarting.  This is a lightweight operation and seems to be safe and usually fixes any problems.
+Sometimes the discovery fails - and you may need to resort to uninstalling the python extension and reinstalling it - perhaps also shutting down code and restarting. This is a lightweight operation and seems to be safe and usually fixes any problems.
 
 Test discovery will fail or stop if any of the tests have errors in them - so be sure to monitor the Problems panel at the bottom for problems in the code.
 
 Note that there are many panels available in Output - so be sure to check `Python Test Log` for errors and output from the tests.
 
-pytest fixtures are available to allow provision of common functionality.  See conftest.py and tmp_dir for an example.
+pytest fixtures are available to allow provision of common functionality. See conftest.py and tmp_dir for an example.
 
 #### FedRAMP sources for development and testing
 
-The `trestle` FedRAMP plugin relies on reference data from the FedRAMP automation repository for testing and development purposes. The FedRAMP automation repository is a submodule in the trestle project. The FedRAMP automation repository is located at: https://github.com/GSA/fedramp-automation
+The `trestle` FedRAMP plugin relies on reference data from the FedRAMP automation repository for testing and development purposes. The FedRAMP automation repository is a submodule in the trestle project. The FedRAMP automation repository is located at: https://github.com/oscal-compass-lab/fedramp-automation
 
 In order to develop/test, the submodule must be checked out with `git submodule update --init` or `make submodules`.
 
@@ -104,12 +104,12 @@ To retrieve these artifacts, run `make download-release-artifacts`.
 
 ### Code style and formatting
 
-The `trestle` FedRAMP plugin uses [yapf](https://github.com/google/yapf) for code formatting and [flake8](https://flake8.pycqa.org/en/latest/) for code styling.  It also uses [pre-commit](https://pre-commit.com/) hooks that are integrated into the development process and the CI. When you run `make develop` you are ensuring that the pre-commit hooks are installed and updated to their latest versions for this repository. This ensures that all delivered code has been properly formatted
-and passes the linter rules.  See the [pre-commit configuration file](https://github.com/oscal-compass/compliance-trestle-fedramp/blob/develop/.pre-commit-config.yaml) for details on
+The `trestle` FedRAMP plugin uses [yapf](https://github.com/google/yapf) for code formatting and [flake8](https://flake8.pycqa.org/en/latest/) for code styling. It also uses [pre-commit](https://pre-commit.com/) hooks that are integrated into the development process and the CI. When you run `make develop` you are ensuring that the pre-commit hooks are installed and updated to their latest versions for this repository. This ensures that all delivered code has been properly formatted
+and passes the linter rules. See the [pre-commit configuration file](https://github.com/oscal-compass/compliance-trestle-fedramp/blob/develop/.pre-commit-config.yaml) for details on
 `yapf` and `flake8` configurations.
 
 Since `yapf` and `flake8` are installed as part of the `pre-commit` hooks, running `yapf` and `flake8`
-manually must be done through `pre-commit`.  See examples below:
+manually must be done through `pre-commit`. See examples below:
 
 ```bash
 make code-format

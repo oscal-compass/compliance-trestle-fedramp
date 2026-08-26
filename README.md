@@ -1,3 +1,5 @@
+<img src="fedramp-legacy-content.png" alt="FedRAMP legacy content"><br />
+
 # compliance-trestle-fedramp
 
 A plugin for [compliance-trestle](https://github.com/oscal-compass/compliance-trestle) to provide functionality specifically for FedRAMP.
@@ -6,7 +8,7 @@ This plugin provides APIs and commands for validating a FedRAMP compliant SSP (i
 
 ## Python codebase, easy installation via pip
 
-compliance-trestle-fedramp currently runs on  python platforms on Linux and Mac. Windows support is planned to be added soon. It is available on PyPi so it is easily installed via pip.  It is under active development and new releases are made available regularly.
+compliance-trestle-fedramp currently runs on python platforms on Linux and Mac. Windows support is planned to be added soon. It is available on PyPi so it is easily installed via pip. It is under active development and new releases are made available regularly.
 
 ## Complete documentation and tutorials
 

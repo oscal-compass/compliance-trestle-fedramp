@@ -29,6 +29,6 @@ If applicable, add screenshots to help explain your problem.
 
 ## Environment
 
-- OS: \[e.g. iOS\]
+- OS: [e.g. iOS]
 - Python version:
 - Installed packages:
