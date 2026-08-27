@@ -1,5 +1,7 @@
 # MAINTAINERS
 
-Vikas Agarwal - [vikas-agarwal76](https://github.com/vikas-agarwal76)
+Christopher Butler [butler54](https://github.com/butler54)
 
-Jennifer Power [jpower432](https://github.com/jpower432)
+Lou Degenaro [degenaro](https://github.com/degenaro)
+
+Vikas Agarwal [vikas-agarwal76](https://github.com/vikas-agarwal76)
