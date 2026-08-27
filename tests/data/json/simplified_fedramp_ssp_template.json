@@ -660,7 +660,7 @@
       "remarks": "This OSCAL-based FedRAMP SSP Template can be used for the FedRAMP Low, Moderate, and High baselines.\n\nGuidance for OSCAL-based FedRAMP Tailored Low Impact - Software as a Service (LI-SaaS) content has not yet been developed."
     },
     "import-profile": {
-      "href": "https://raw.githubusercontent.com/GSA/fedramp-automation/5f44c1b09af13d203f008be6bd33603ad7cb0202/dist/content/rev5/baselines/json/FedRAMP_rev5_MODERATE-baseline-resolved-profile_catalog.json",
+      "href": "https://raw.githubusercontent.com/oscal-compass-lab/fedramp-automation/89eddfa27da3d3ec8d2b34b61827af40af7169f1/dist/content/rev5/baselines/json/FedRAMP_rev5_MODERATE-baseline-resolved-profile_catalog.json",
       "remarks": "This example points to the FedRAMP Rev 5 Moderate baseline that is part of the official FedRAMP 1.0.4 release.\n\nMust adjust accordingly for applicable baseline and revision."
     },
     "system-characteristics": {

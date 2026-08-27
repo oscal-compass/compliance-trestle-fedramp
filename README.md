@@ -1,3 +1,5 @@
+<img src="fedramp-legacy-content.png" alt="FedRAMP legacy content"><br />
+
 # compliance-trestle-fedramp
 
 A plugin for [compliance-trestle](https://github.com/oscal-compass/compliance-trestle) to provide functionality specifically for FedRAMP.
@@ -6,7 +8,7 @@ This plugin provides APIs and commands for validating a FedRAMP compliant SSP (i
 
 ## Python codebase, easy installation via pip
 
-compliance-trestle-fedramp currently runs on  python platforms on Linux and Mac. Windows support is planned to be added soon. It is available on PyPi so it is easily installed via pip.  It is under active development and new releases are made available regularly.
+compliance-trestle-fedramp currently runs on python platforms on Linux and Mac. Windows support is planned to be added soon. It is available on PyPi so it is easily installed via pip. It is under active development and new releases are made available regularly.
 
 ## Complete documentation and tutorials
 
@@ -41,3 +43,18 @@ Consult [contributors](https://github.com/oscal-compass/compliance-trestle-fedra
 # limitations under the License.
 
 ```
+
+______________________________________________________________________
+
+We are a Cloud Native Computing Foundation sandbox project.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://www.cncf.io/wp-content/uploads/2022/07/cncf-white-logo.svg">
+  <img src="https://www.cncf.io/wp-content/uploads/2022/07/cncf-color-bg.svg" width=300 />
+</picture>
+
+The Linux Foundation® (TLF) has registered trademarks and uses trademarks. For a list of TLF trademarks, see [Trademark Usage](https://www.linuxfoundation.org/legal/trademark-usage).
+
+*OSCAL Compass is an independent open source project. It is not affiliated with, endorsed by, or sponsored by the National Institute of Standards and Technology (NIST) or any other government agency.*
+
+*OSCAL Compass was originally contributed by IBM.*

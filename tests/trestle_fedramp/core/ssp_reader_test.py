@@ -96,18 +96,16 @@ def test_reader_ssp_data(tmp_trestle_dir_with_ssp: Tuple[pathlib.Path, str]) -> 
 def test_get_control_origination() -> None:
     """Test getting control origination from the implemented requirement."""
     impl_req = generate_sample_model(ssp.ImplementedRequirement)
-    impl_req.props = []
-    impl_req.props.append(
+    impl_req.props = [
         Property(name='control-origination', value='sp-corporate', ns='https://example.com')  # type: ignore
-    )
+    ]
 
     # This should be none because the namespace is not the FedRAMP namespace.
     assert FedrampSSPReader.get_control_origination_values(impl_req) is None
 
-    impl_req.props = []
-    impl_req.props.append(
+    impl_req.props = [
         Property(name='control-origination', value='sp-corporate', ns=NAMESPACE_FEDRAMP)  # type: ignore
-    )
+    ]
 
     # This should return the long name of the control origination value.
     assert FedrampSSPReader.get_control_origination_values(impl_req) == ['Service Provider Corporate']
@@ -120,31 +118,26 @@ def test_get_implementation_status_failures() -> None:
     """Testing failure cases for getting the implementation status."""
     # Wrong namespace
     impl_req = generate_sample_model(ssp.ImplementedRequirement)
-    impl_req.props = []
-    impl_req.props.append(
+    impl_req.props = [
         Property(name='implementation-status', value='planned', ns='https://example.com')  # type: ignore
-    )
+    ]
 
     assert FedrampSSPReader.get_implementation_status(impl_req) is None
 
     # Too many implementation status properties
-    impl_req.props = []
-    impl_req.props.extend(
-        [
-            Property(name='implementation-status', value='planned', ns=NAMESPACE_FEDRAMP),  # type: ignore
-            Property(name='implementation-status', value='implemented', ns=NAMESPACE_FEDRAMP)  # type: ignore
-        ]
-    )
+    impl_req.props = [
+        Property(name='implementation-status', value='planned', ns=NAMESPACE_FEDRAMP),  # type: ignore
+        Property(name='implementation-status', value='implemented', ns=NAMESPACE_FEDRAMP)  # type: ignore
+    ]
     impl_req.control_id = 'ac-1'
 
     with pytest.raises(ValueError, match='Multiple implementation status properties found for control id .*'):
         FedrampSSPReader.get_implementation_status(impl_req)
 
     # Invalid implementation status value
-    impl_req.props = []
-    impl_req.props.append(
+    impl_req.props = [
         Property(name='implementation-status', value='invalid', ns=NAMESPACE_FEDRAMP)  # type: ignore
-    )
+    ]
 
     with pytest.raises(ValueError, match='Invalid implementation status value: invalid. Use one of .*'):
         FedrampSSPReader.get_implementation_status(impl_req)
